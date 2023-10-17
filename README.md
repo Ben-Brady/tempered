@@ -80,13 +80,6 @@ def image(*, src: str, alt: str = "", with_styles: bool = True) -> str:
     return __html
 ```
 
-
-## Requirements
-
-- Scoped CSS
-- Typed Python Components
-- Components Import
-
 ## Templating
 
 ### Parameters
@@ -115,12 +108,14 @@ If omitted, styles are placed at the end of the component
 ### Style Include
 
 ```html
+{!include post}
+
 <head>
-    {!styles post}
+    {!styles}
 </head>
 ```
 
-Manually add a component styles to the HTML
+Manually add a component styles to the HTML, should be placed at the top of the component
 
 This is useful for when you need to include the CSS for dynamically create components, such as with HTMX
 
