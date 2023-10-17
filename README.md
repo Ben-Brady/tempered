@@ -4,9 +4,12 @@ Generate native python functions from HTML templates
 
 A jinja2 inspired, type checked, compiled, scoped css, html templates
 
+[PyPi Package](https://pypi.org/project/tempered)
+
 ```python
 pip install tempered
 ```
+
 
 ## Features
 
