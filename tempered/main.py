@@ -1,18 +1,18 @@
-from .template import RequiredParameter, TemplateParameter, Template
-from .parse import parse_template
-from .construct import create_module, create_template_function
+from . import parse
+from .compile import compile_module
+from .parse import Template
 import ast
 import astor
 import inspect
 import importlib
 from pathlib import Path
-from types import ModuleType
 from typing import LiteralString, Any, cast
+from types import ModuleType
 import autopep8
 
 
 _type_imports: list[ast.ImportFrom] = []
-_template_functions: list[ast.FunctionDef] = []
+_templates: list[Template] = []
 
 
 def add_template_folder(
@@ -38,9 +38,11 @@ def add_template(
         *,
         context: dict[str, Any] = {}
         ):
-    template_data = parse_template(name, template, context)
-    _template_func = create_template_function(template_data)
-    _template_functions.append(_template_func)
+    _templates.append(parse.parse_template(name, template, context))
+
+
+def add_template_obj(template: Template):
+    _templates.append(template)
 
 
 def register_type(type: type):
@@ -55,24 +57,32 @@ def register_type(type: type):
     _type_imports.append(import_)
 
 
+
+BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
+
+
 def build():
-    file_ast = create_module(
+    file_ast = compile_module(
         type_imports=_type_imports,
-        template_functions=_template_functions,
+        templates=_templates,
     )
 
     source = astor.to_source(file_ast)
     source = autopep8.fix_code(source)
-    MODULE_FOLDER = Path(__file__).parent
-    moudle_file = MODULE_FOLDER.joinpath(COMPONENTS_FILENAME)
-    with open(moudle_file, "w") as f:
+
+    with open(BUILD_FILE, "w") as f:
         f.write(source)
 
-    return load_module()
+    return load()
 
-COMPONENTS_FILENAME = "__components.py"
-def load_module():
-    from tempered import __components # type: ignore
-    importlib.reload(__components)
-    return __components
 
+def load():
+    try:
+        from tempered.generated import __components # type: ignore
+    except Exception as e:
+        BUILD_FILE.unlink(missing_ok=True)
+        BUILD_FILE.touch()
+        return load()
+    else:
+        importlib.reload(__components)
+        return __components
