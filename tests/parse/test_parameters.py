@@ -51,3 +51,9 @@ def test_parse_parameters_with_annotation_and_default():
         {!param a: int = 1!}
     """)
     assert TemplateParameter(name="a", type="int", default=1) in template.parameters
+
+def test_parse_parameters_with_complex_annotation():
+    template = parse_template("abc", """
+        {!param a: list[str]!}
+    """)
+    assert TemplateParameter(name="a", type="list[str]") in template.parameters
