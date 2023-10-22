@@ -7,7 +7,6 @@ from .main import (
 
 __all__ = [
     "add_template",
-    "add_template_obj",
     "add_template_folder",
     "register_type",
     "build",
