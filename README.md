@@ -41,7 +41,7 @@ print(components.image(
     src="/example.png",
     alt="Example Post",
     with_styles=True,
-))>
+))
 ```
 
 ```html
