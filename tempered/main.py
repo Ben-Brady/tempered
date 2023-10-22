@@ -2,12 +2,10 @@ from . import parser
 from .compile.module import compile_module
 from .parser import Template
 import ast
-import astor
 import inspect
 import importlib
 from pathlib import Path
 from typing import LiteralString, Any, cast
-from types import ModuleType
 import autopep8
 
 
@@ -42,10 +40,6 @@ def add_template(
     _templates.append(template_obj)
 
 
-def add_template_obj(template: Template):
-    _templates.append(template)
-
-
 def register_type(type: type):
     filepath = inspect.getfile(type)
     module = inspect.getmodulename(filepath)
@@ -58,9 +52,7 @@ def register_type(type: type):
     _type_imports.append(import_)
 
 
-
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
-
 
 def build():
     file_ast = compile_module(
@@ -68,7 +60,7 @@ def build():
         templates=_templates,
     )
 
-    source = astor.to_source(file_ast)
+    source = ast.unparse(file_ast)
     source = autopep8.fix_code(source)
 
     with open(BUILD_FILE, "w") as f:

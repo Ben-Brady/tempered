@@ -13,5 +13,5 @@ dependencies = [
     "bs4",
     "minify-html",
     "tinycss2",
-    "astor",
+    "rcssmin",
 ]
