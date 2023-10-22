@@ -1,4 +1,4 @@
-from tempered.parse import parse_template, TemplateParameter, RequiredParameter, LiteralBlock
+from tempered.parser import parse_template, TemplateParameter, RequiredParameter, LiteralBlock
 
 
 def _assert_parameter_required(parameter: TemplateParameter):
@@ -7,8 +7,8 @@ def _assert_parameter_required(parameter: TemplateParameter):
 
 def test_parse_removes_parameters():
     template = parse_template("abc", """
-        {!param a}
-        {!param b}
+        {!param a!}
+        {!param b!}
     """)
     block = template.body[0]
     assert isinstance(block, LiteralBlock)
@@ -17,7 +17,7 @@ def test_parse_removes_parameters():
 
 def test_parse_parameter():
     template = parse_template("abc", """
-        {!param a}
+        {!param a !}
     """)
     assert TemplateParameter(name="a") in template.parameters
     _assert_parameter_required(template.parameters[0])
@@ -25,7 +25,7 @@ def test_parse_parameter():
 
 def test_parse_parameters_with_builtin_annotation():
     template = parse_template("abc", """
-        {!param a: str}
+        {!param a: str !}
     """)
     assert TemplateParameter(name="a", type="str") in template.parameters
     _assert_parameter_required(template.parameters[0])
@@ -33,7 +33,7 @@ def test_parse_parameters_with_builtin_annotation():
 
 def test_parse_parameters_with_custom_annotation():
     template = parse_template("abc", """
-        {!param a: Post}
+        {!param a: Post !}
     """)
     assert TemplateParameter(name="a", type="Post") in template.parameters
     _assert_parameter_required(template.parameters[0])
@@ -41,13 +41,13 @@ def test_parse_parameters_with_custom_annotation():
 
 def test_parse_parameters_with_default():
     template = parse_template("abc", """
-        {!param a = 1}
+        {!param a = 1!}
     """)
     assert TemplateParameter(name="a", default=1) in template.parameters
 
 
 def test_parse_parameters_with_annotation_and_default():
     template = parse_template("abc", """
-        {!param a: int = 1}
+        {!param a: int = 1!}
     """)
     assert TemplateParameter(name="a", type="int", default=1) in template.parameters

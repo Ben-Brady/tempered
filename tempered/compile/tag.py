@@ -1,4 +1,4 @@
-from ..parse.parse_ast import *
+from ..parser.parse_ast import *
 from ..ast_utils import (
     create_constant, create_call, create_escape_call, create_add_assign,
     create_name, create_if, create_string_concat
@@ -52,6 +52,13 @@ def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.AST]:
             assert_never(e)
 
 
+def construct_block(tags: Sequence[TemplateTag], ctx: BuildContext) -> list[ast.stmt]:
+    block = []
+    for tag in tags:
+        block.extend(construct_tag(tag, ctx))
+
+    return block
+
 
 def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
     if_body = [create_add_assign(
@@ -70,6 +77,7 @@ def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.
         if_body=if_body,
     )]
 
+
 def construct_style(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
     if_body = [create_add_assign(
         target=ctx.result_value,
@@ -87,24 +95,47 @@ def construct_style(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
         if_body=if_body,
     )]
 
+
 def construct_if(block: IfBlock, ctx: BuildContext) -> Sequence[ast.AST]:
-    if_block = []
-    else_block = []
+    def insert_elif(
+        if_statement: ast.If,
+        condition: ast.expr,
+        block: list[ast.stmt]
+        ):
+        cur_if = if_statement
+        while len(cur_if.orelse) == 1 and isinstance(cur_if.orelse[0], ast.If):
+            cur_if = cur_if.orelse[0]
+        cur_if.orelse = [
+            ast.If(
+                test=condition,
+                body=block,
+                orelse=[],
+            )
+        ]
 
-    for tag in block.if_block:
-        if_block.extend(construct_tag(tag, ctx))
+    def insert_else(
+        if_statement: ast.If,
+        block: list[ast.stmt]
+        ):
+        cur_if = if_statement
+        while len(cur_if.orelse) == 1 and isinstance(cur_if.orelse[0], ast.If):
+            cur_if = cur_if.orelse[0]
 
-    if block.else_block:
-        for tag in block.else_block:
-            else_block.extend(construct_tag(tag, ctx))
+        cur_if.orelse = block
 
-    return [
-        ast.If(
-            test=block.condition,
-            body=if_block,
-            orelse=else_block,
-        )
-    ]
+    body = construct_block(block.if_block, ctx)
+    if_statement = ast.If(
+        test=block.condition,
+        body=body,
+        orelse=[],
+    )
+    for elif_cond, elif_block in block.elif_blocks:
+        insert_elif(if_statement, elif_cond, construct_block(elif_block, ctx))
+
+    if block.else_block is not None:
+        insert_else(if_statement, construct_block(block.else_block, ctx))
+
+    return [ if_statement ]
 
 
 def construct_for(block: ForBlock, ctx: BuildContext) -> Sequence[ast.AST]:

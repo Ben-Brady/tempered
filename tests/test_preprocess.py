@@ -22,7 +22,7 @@ def test_preprocess_css():
     """
     html, style = preprocess_style_tags(HTML)
 
-    assert minify_css("body {background: black;}") in style.css
+    assert minify_css("body {background: black;}") in style
 
     soup = bs4.BeautifulSoup(html, "html.parser")
     div = soup.find("div")

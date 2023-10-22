@@ -1,5 +1,5 @@
 from tempered.compile import compile_module
-from tempered.parse import Template
+from tempered.parser import Template
 import ast
 from typing import Callable
 

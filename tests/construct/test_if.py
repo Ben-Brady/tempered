@@ -1,5 +1,5 @@
 from . import build_template
-from tempered.parse import Template, LiteralBlock, TemplateParameter, IfBlock
+from tempered.parser import Template, LiteralBlock, TemplateParameter, IfBlock
 import ast
 
 
@@ -37,6 +37,6 @@ def test_if_block_is_dynamic():
         )],
     )
     func = build_template(template)
-    assert func(True) == "A", "Expression isn't escaped"
-    assert func(False) == "B", "Expression isn't escaped"
+    assert func(block=True) == "A", "Expression isn't escaped"
+    assert func(block=False) == "B", "Expression isn't escaped"
 

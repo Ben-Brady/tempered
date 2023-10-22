@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from typing import Any, TypeAlias, Sequence, override
 from abc import ABC
 
+
 class Tag(ABC):
     pass
 
@@ -47,6 +48,7 @@ class IfBlock(Tag):
     condition: ast.expr
     if_block: TemplateBlock
     else_block: TemplateBlock | None
+    elif_blocks: list[tuple[ast.expr, TemplateBlock]] = field(default_factory=list)
 
 
 @dataclass
@@ -87,17 +89,8 @@ class Template:
 TemplateBlock: TypeAlias = Sequence[TemplateTag]
 
 __all__ = [
-    "LiteralBlock",
-    "ExprBlock",
-    "HtmlBlock",
-    "ComponentBlock",
-    "IncludeStyleBlock",
-    "StyleBlock",
-    "IfBlock",
-    "ForBlock",
-    "TemplateTag",
-    "RequiredParameter",
-    "TemplateParameter",
-    "Template",
-    "TemplateBlock",
+    "TemplateBlock", "TemplateTag", "Template", "Tag",
+    "IfBlock", "ForBlock",
+    "LiteralBlock", "ExprBlock", "HtmlBlock", "ComponentBlock",
+    "TemplateParameter", "RequiredParameter", "StyleBlock", "IncludeStyleBlock"
 ]

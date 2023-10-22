@@ -1,5 +1,5 @@
 from . import build_template
-from tempered.parse import Template, LiteralBlock, TemplateParameter, ExprBlock, IfBlock
+from tempered.parser import Template, LiteralBlock, TemplateParameter, ExprBlock, IfBlock
 import ast
 
 
@@ -26,5 +26,5 @@ def test_use_parameters():
         ],
     ))
 
-    assert func("example text") == "example text", "Parameters aren't used"
+    assert func(value="example text") == "example text", "Parameters aren't used"
 

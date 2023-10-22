@@ -1,5 +1,5 @@
 from . import build_template
-from tempered.parse import Template, LiteralBlock
+from tempered.parser import Template, LiteralBlock
 
 
 def test_template_add_styles():

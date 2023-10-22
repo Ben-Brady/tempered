@@ -2,8 +2,7 @@ import ast
 from typing import Any, Iterable, Sequence
 from types import NoneType, EllipsisType
 from .compile.constants import ESCAPE_FUNC_NAME
-from .parse import RequiredParameter, TemplateParameter
-from dataclasses import dataclass
+from .parser import RequiredParameter, TemplateParameter
 
 
 def create_constant(value: Any) -> ast.expr:
@@ -34,7 +33,6 @@ def create_constant(value: Any) -> ast.expr:
         case NoneType() | EllipsisType() | str() | bytes() | bool() | int() | float() | complex():
             return ast.Constant(value=value)
         case type():
-            print(type(value))
             raise ValueError(f"Cannot convert {value} to an ast constant")
         case _:
             raise ValueError(f"Cannot convert {value} to an ast constant")
@@ -121,9 +119,9 @@ def create_arguments(
             case default:
                 return create_constant(default)
 
-    def create_annotation(annotation: str|None) -> ast.Constant|None:
+    def create_annotation(annotation: str|None) -> ast.expr|None:
         if annotation:
-            create_constant(annotation)
+            return create_constant(annotation)
         else:
             return None
 

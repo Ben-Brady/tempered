@@ -1,5 +1,5 @@
 from . import build_template
-from tempered.parse import Template, LiteralBlock, ExprBlock
+from tempered.parser import Template, LiteralBlock, ExprBlock
 import ast
 import bs4
 

@@ -1,6 +1,6 @@
-from . import parse
-from .compile import compile_module
-from .parse import Template
+from . import parser
+from .compile.module import compile_module
+from .parser import Template
 import ast
 import astor
 import inspect
@@ -38,7 +38,8 @@ def add_template(
         *,
         context: dict[str, Any] = {}
         ):
-    _templates.append(parse.parse_template(name, template, context))
+    template_obj = parser.parse_template(name, template, context)
+    _templates.append(template_obj)
 
 
 def add_template_obj(template: Template):
@@ -76,13 +77,21 @@ def build():
     return load()
 
 
+# We have to use an exception, because returning recursively breaks intelisense
 def load():
+    try:
+        return _try_load()
+    except Exception:
+        return _try_load()
+
+
+def _try_load():
     try:
         from tempered.generated import __components # type: ignore
     except Exception as e:
         BUILD_FILE.unlink(missing_ok=True)
         BUILD_FILE.touch()
-        return load()
+        raise e
     else:
         importlib.reload(__components)
         return __components

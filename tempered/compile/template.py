@@ -1,4 +1,4 @@
-from ..parse.parse_ast import TemplateParameter, Template
+from ..parser.parse_ast import TemplateParameter, Template
 from .tag import construct_tag, BuildContext, StyleBlock
 from .. import ast_utils
 import ast
@@ -16,7 +16,7 @@ def construct_template_arguments(
             TemplateParameter(
                 name="with_styles",
                 type="bool",
-                default=False,
+                default=True,
             )
         ]
     )
@@ -49,8 +49,6 @@ def construct_body(template: Template) -> Sequence[ast.AST]:
     has_styles = template.style != "" or len(template.child_components) > 0
     if template_style_tag_count == 0 and has_styles:
         template.body = [StyleBlock(), *template.body]
-
-
 
     for block in template.body:
         statements.extend(construct_tag(block, ctx))

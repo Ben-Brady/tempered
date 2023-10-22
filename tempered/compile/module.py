@@ -1,5 +1,5 @@
 from ..ast_utils import create_name, create_assignment, create_module, create_function, create_constant
-from ..parse import Template
+from ..parser import Template
 from .constants import IMPORTS, style_constant
 from .template import construct_template_arguments, construct_body
 import ast

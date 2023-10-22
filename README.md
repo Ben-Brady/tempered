@@ -1,21 +1,18 @@
-# Tempered (Alpha)
+# Tempered (Beta)
 
 Generate native python functions from HTML templates
 
-A jinja2 inspired, type checked, compiled, scoped css, html templates
+- Scoped CSS
+- Type checked
+- Intelisense
+- Compiled
 
-[PyPi Package](https://pypi.org/project/tempered)
+[PyPi](https://pypi.org/project/tempered)
+[Github](https://github.com/Ben-Brady/tempered)
 
 ```python
 pip install tempered
 ```
-
-
-## Features
-
-- [x] Type checked
-- [x] Compiled
-- [x] Scoped CSS
 
 ## Example
 
@@ -49,8 +46,8 @@ print(components.image(
 
 ```html
 <!-- Generated -->
-<style>img.styles-1ad5be0d {width: 100px;height: 100px;}</style>
-<img class='styles-1ad5be0d' src="/example.png" alt="Example Post">
+<style>img.tempered-1ad5be0d {width: 100px;height: 100px;}</style>
+<img class='tempered-1ad5be0d' src="/example.png" alt="Example Post">
 ```
 
 
@@ -66,13 +63,13 @@ Additionally, it allows IDEs to provide intelisense to components
 # This file is dynamicly generated when you build the templates
 from tempered import _internals  as __internals
 
-IMAGE_STYLE = "<style>img.styles-1ad5be0d {width: 100px;height: 100px;}</style>"
+IMAGE_STYLE = "<style>img.tempered-1ad5be0d {width: 100px;height: 100px;}</style>"
 
 def image(*, src: str, alt: str = "", with_styles: bool = True) -> str:
     __html = ""
     if with_styles:
         __html += IMAGE_STYLE
-    __html += "<img class='styles-1ad5be0d' src=\""
+    __html += "<img class='tempered-1ad5be0d' src=\""
     __html += __internals.escape(src)
     __html += "\" alt=\""
     __html += __internals.escape(alt)
@@ -99,7 +96,7 @@ Use `{!styles}` for styles, this is where styles are placed
 
 ```html
 <head>
-    {!styles}
+    {% styles %}
 </head>
 ```
 
@@ -111,7 +108,7 @@ If omitted, styles are placed at the end of the component
 {!include post}
 
 <head>
-    {!styles}
+    {% styles %}
 </head>
 ```
 
@@ -150,7 +147,7 @@ Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 {!param text: str}
 
 <a src="{{src}}">
-    {{text}}
+    {{ text }}
 </a>
 ```
 **Important**:
