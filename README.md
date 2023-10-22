@@ -18,8 +18,8 @@ pip install tempered
 
 ```html
 <!-- templates/image.html -->
-{!param src: str}
-{!param alt: str = ""}
+{!param src: str!}
+{!param alt: str = ""!}
 
 <img src="{{src}}" alt="{{alt}}">
 
@@ -81,12 +81,12 @@ def image(*, src: str, alt: str = "", with_styles: bool = True) -> str:
 
 ### Parameters
 
-Use `{!param}` for parameters, this must placed at the root level
+Use `{!param !}` for parameters, this must placed at the root level
 ```html
-{!param a: str = "A"} <!-- Typed Default Value Parameter-->
-{!param b = 2}        <!-- Default Value Parameter-->
-{!param c: list}      <!-- Typed Parameter-->
-{!param d}            <!-- Parameter -->
+{! param d !}            <!-- Parameter -->
+{! param c: list !}      <!-- Typed Parameter-->
+{! param b = 2 !}        <!-- Default Value Parameter-->
+{! param a: str = "A" !} <!-- Typed Default Value Parameter-->
 <!DOCTYPE HTML>
 ```
 
@@ -96,7 +96,7 @@ Use `{!styles}` for styles, this is where styles are placed
 
 ```html
 <head>
-    {% styles %}
+    {! styles !}
 </head>
 ```
 
@@ -105,7 +105,7 @@ If omitted, styles are placed at the end of the component
 ### Style Include
 
 ```html
-{!include post}
+{!include post!}
 
 <head>
     {% styles %}
@@ -119,7 +119,7 @@ This is useful for when you need to include the CSS for dynamically create compo
 
 ### Component
 
-Use `{%component  %}` for a component, call this like
+Use `{% component  %}` for a component, call this like
 
 ```html
 <div>
@@ -129,7 +129,7 @@ Use `{%component  %}` for a component, call this like
 
 ### Html
 
-Use `{%html %}` to include literal html without escaping
+Use `{% html %}` to include literal html without escaping
 
 ```html
 {!param markdown_html: str}
@@ -143,8 +143,8 @@ Use `{%html %}` to include literal html without escaping
 Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 
 ```html
-{!param src: str}
-{!param text: str}
+{! param src: str !}
+{! param text: str !}
 
 <a src="{{src}}">
     {{ text }}
@@ -178,18 +178,32 @@ You can also have an else block
 {% endif %}
 ```
 
+As well as an elif block
+
+```html
+{!param number: int}
+
+{% if number < 10 %}
+    {{ number }} is less than 10
+{% elif number < 100 %}
+    {{ number }} is less than 100
+{% else %}
+    {{ number }} is bigger than 100
+{% endif %}
+```
+
 ### for
 
 Use `{%for %}`
 
 ```html
-{!param commments: list[str] }
+{!param commments: list[str] !}
 
 {% for comment in comments %}
     <span>
         {{comment}}
     </span>
-{% endif %}
+{% endfor %}
 ```
 
 ```html
@@ -198,6 +212,6 @@ Use `{%for %}`
 <ul>
 {% for x in range(10) %}
     <li>{{x}}</li>
-{% endif %}
+{% endfor %}
 </ul>
 ```
