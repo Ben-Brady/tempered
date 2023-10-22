@@ -82,11 +82,13 @@ def construct_style(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
     if_body = [create_add_assign(
         target=ctx.result_value,
         value=create_string_concat(
+            create_constant("<style>"),
             style_constant(ctx.template.name),
             *(
                 style_constant(name)
                 for name in ctx.template.child_components
-            )
+            ),
+            create_constant("</style>"),
         )
     )]
 
