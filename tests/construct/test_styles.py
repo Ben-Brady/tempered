@@ -9,7 +9,7 @@ def test_template_add_styles():
         body=[
             LiteralBlock("Bar!"),
         ],
-        style=CSS
+        css=CSS
     ))
 
     assert CSS in func(with_styles=True)
@@ -22,7 +22,7 @@ def test_template_wont_add_styles():
         body=[
             LiteralBlock("Bar!"),
         ],
-        style=CSS
+        css=CSS
     ))
 
     assert CSS not in func(with_styles=False)

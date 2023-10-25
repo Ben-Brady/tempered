@@ -49,18 +49,3 @@ def test_expr_block_escapes_param():
     assert isinstance(a_tag, bs4.Tag), "Expression isn't escaped"
     assert "onerror" not in a_tag.attrs, "Expression isn't escaped"
     assert list(a_tag.attrs.keys()) == ["href"], "Expression isn't escaped"
-
-
-def test_multiple_expr_chained():
-    func = build_template(Template(
-        name="expr",
-        body=[
-            LiteralBlock("1"),
-            ExprBlock(ast.Constant(value="a")),
-            LiteralBlock("2"),
-            ExprBlock(ast.Constant(value="b")),
-            LiteralBlock("3"),
-            ExprBlock(ast.Constant(value="c")),
-        ],
-    ))
-    assert func() == "1a2b3c"

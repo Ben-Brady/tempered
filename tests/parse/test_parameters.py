@@ -1,4 +1,5 @@
 from tempered.parser import parse_template, TemplateParameter, RequiredParameter, LiteralBlock
+import ast
 
 
 def _assert_parameter_required(parameter: TemplateParameter):
@@ -27,7 +28,8 @@ def test_parse_parameters_with_builtin_annotation():
     template = parse_template("abc", """
         {!param a: str !}
     """)
-    assert TemplateParameter(name="a", type="str") in template.parameters
+    assert template.parameters[0].name == "a"
+    assert ast.unparse(template.parameters[0].type) == "str"
     _assert_parameter_required(template.parameters[0])
 
 
@@ -35,8 +37,10 @@ def test_parse_parameters_with_custom_annotation():
     template = parse_template("abc", """
         {!param a: Post !}
     """)
-    assert TemplateParameter(name="a", type="Post") in template.parameters
+
     _assert_parameter_required(template.parameters[0])
+    assert template.parameters[0].name == "a"
+    assert ast.unparse(template.parameters[0].type) == "Post"
 
 
 def test_parse_parameters_with_default():
@@ -50,10 +54,16 @@ def test_parse_parameters_with_annotation_and_default():
     template = parse_template("abc", """
         {!param a: int = 1!}
     """)
-    assert TemplateParameter(name="a", type="int", default=1) in template.parameters
+
+    assert template.parameters[0].name == "a"
+    assert ast.unparse(template.parameters[0].type) == "int"
+    assert template.parameters[0].default == 1
+
 
 def test_parse_parameters_with_complex_annotation():
     template = parse_template("abc", """
         {!param a: list[str]!}
     """)
-    assert TemplateParameter(name="a", type="list[str]") in template.parameters
+
+    assert template.parameters[0].name == "a"
+    assert ast.unparse(template.parameters[0].type) == "list[str]"
