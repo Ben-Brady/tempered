@@ -1,7 +1,8 @@
-from ..ast_utils import create_name, create_assignment, create_module, create_function, create_constant
-from ..parser import Template
+from .. import ast_utils
+from ..ast_utils import create_name, create_assignment, create_module, create_function
+from ..parser import Template, TemplateParameter, RequiredParameter
 from .constants import IMPORTS, style_constant
-from .template import construct_template_arguments, construct_body
+from .body import construct_body
 import ast
 from typing import Sequence
 
@@ -13,26 +14,82 @@ def compile_module(
     style_constants = [
         create_assignment(
             target=style_constant(template.name),
-            value=template.style,
+            value=template.css,
         )
         for template in templates
     ]
+
+    functions = []
+    for template in templates:
+        func = create_function(
+            name=template.name,
+            args=create_arguments(
+                arguments=[],
+                kw_arguments=[
+                    *template.parameters,
+                    TemplateParameter(
+                        name="with_styles",
+                        type=ast_utils.create_name("bool"),
+                        default=True,
+                    )
+                ]
+            ),
+            body=construct_body(template),
+            returns=create_name('str'),
+        )
+        functions.append(func)
+
 
     return create_module([
         *IMPORTS,
         *type_imports,
         *style_constants,
-        *(
-            create_template_function(template)
-            for template in templates
-        ),
+        *functions,
     ])
 
 
-def create_template_function(template: Template) -> ast.FunctionDef:
-    return create_function(
-        name=template.name,
-        args=construct_template_arguments(template.parameters),
-        body=construct_body(template),
-        returns=create_name('str'),
+def create_arguments(
+        arguments: list[TemplateParameter],
+        kw_arguments: list[TemplateParameter]
+        ) -> ast.arguments:
+    def construct_default(param: TemplateParameter):
+        match param.default:
+            case RequiredParameter():
+                return None
+            case default:
+                return ast_utils.create_constant(default)
+
+    def create_annotation(annotation: ast.expr|None) -> ast.expr|None:
+        if annotation:
+            return annotation
+        else:
+            return None
+
+    def create_argument_list(
+            parameters: list[TemplateParameter]
+            ) -> tuple[list[ast.arg], list[ast.expr|None]]:
+        args = [
+            ast.arg(
+                arg=param.name,
+                annotation=create_annotation(param.type),
+            )
+            for param in parameters
+        ]
+        defaults = [
+            construct_default(param)
+            for param in parameters
+        ]
+        return args, defaults
+
+
+    args, defaults = create_argument_list(arguments)
+    kw_args, kw_defaults = create_argument_list(kw_arguments)
+
+
+    return ast.arguments(
+        args=args,
+        defaults=defaults,
+        kwonlyargs=kw_args,
+        kw_defaults=kw_defaults,
+        posonlyargs=[],
     )

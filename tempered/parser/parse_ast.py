@@ -71,7 +71,7 @@ class RequiredParameter:
 @dataclass
 class TemplateParameter:
     name: str
-    type: str | None = None
+    type: ast.expr | None = None
     default: Any | RequiredParameter = RequiredParameter()
 
 
@@ -83,7 +83,7 @@ class Template:
 
     body: TemplateBlock = field(default_factory=list)
     child_components: list[str] = field(default_factory=list)
-    style: str = ""
+    css: str = ""
 
 
 TemplateBlock: TypeAlias = Sequence[TemplateTag]

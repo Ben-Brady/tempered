@@ -1,47 +1,90 @@
 from ..parser.parse_ast import *
+from .. import ast_utils
 from ..ast_utils import (
-    create_constant, create_call, create_escape_call, create_add_assign,
-    create_name, create_if, create_string_concat
+    create_constant, create_call, create_escape_call,
+    create_name, create_if, create_string_concat, create_attribute
 )
 from .constants import style_constant
 import ast
-from typing import Sequence, assert_never
-from dataclasses import dataclass, field
+from typing import Sequence, assert_never, Protocol
+from dataclasses import dataclass
+
+
+class Result(Protocol):
+    def create_assignment(self) -> list[ast.AST]:
+        ...
+
+    def add(self, value: ast.expr) -> ast.AST:
+        ...
+
+    def create_return(self) -> ast.AST:
+        ...
+
+
+class StringResult(Result):
+    _variable: ast.Name
+
+    def __init__(self):
+        self._variable = ast_utils.create_name('__output')
+
+    def create_assignment(self) -> list[ast.AST]:
+        return [ast_utils.create_assignment(
+            target=self._variable,
+            value="",
+        )]
+
+    def add(self, value: ast.expr) -> ast.AST:
+        return ast_utils.create_add_assign(
+            target=self._variable,
+            value=value,
+        )
+
+    def create_return(self) -> ast.AST:
+        return ast.Return(value=self._variable)
+
+
+class ArrayResult(Result):
+    _variable: ast.Name
+
+    def __init__(self):
+        self._variable = ast_utils.create_name('__output')
+
+    def create_assignment(self) -> list[ast.AST]:
+        return [ast_utils.create_assignment(
+            target=self._variable,
+            value=[],
+        )]
+
+    def add(self, value: ast.expr) -> ast.AST:
+        return ast.Expr(value=create_call(
+            func=create_attribute(self._variable, 'append'),
+            args=[value],
+        ))
+
+    def create_return(self) -> ast.AST:
+        return ast.Return(
+            value=ast_utils.construct_array_join(self._variable)
+        )
 
 
 @dataclass
 class BuildContext:
     template: Template
-    result_value: ast.Name
+    result: Result
 
 
 def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.AST]:
     match tag:
         case LiteralBlock():
-            return [create_add_assign(
-                target=ctx.result_value,
-                value=create_constant(tag.body),
-            )]
+            return [ctx.result.add(create_constant(tag.body))]
         case ExprBlock():
-            return [create_add_assign(
-                target=ctx.result_value,
-                value=create_escape_call(tag.value),
-            )]
+            return [ctx.result.add(create_escape_call(tag.value))]
         case HtmlBlock():
-            return [create_add_assign(
-                target=ctx.result_value,
-                value=tag.value,
-            )]
+            return [ctx.result.add(tag.value)]
         case ComponentBlock():
-            return [create_add_assign(
-                target=ctx.result_value,
-                value=tag.component_call,
-            )]
+            return [ctx.result.add(tag.component_call)]
         case IncludeStyleBlock():
-            return [create_add_assign(
-                target=ctx.result_value,
-                value=style_constant(tag.template),
-            )]
+            return [ctx.result.add(style_constant(tag.template))]
         case StyleBlock():
             return construct_style(tag, ctx)
         case IfBlock():
@@ -61,40 +104,34 @@ def construct_block(tags: Sequence[TemplateTag], ctx: BuildContext) -> list[ast.
 
 
 def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
-    if_body = [create_add_assign(
-        target=ctx.result_value,
-        value=create_string_concat(
-            style_constant(ctx.template.name),
-            *(
-                style_constant(name)
-                for name in ctx.template.child_components
-            )
+    value = create_string_concat(
+        style_constant(ctx.template.name),
+        *(
+            style_constant(name)
+            for name in ctx.template.child_components
         )
-    )]
+    )
 
     return [create_if(
         condition=create_name("with_styles"),
-        if_body=if_body,
+        if_body=[ctx.result.add(value)],
     )]
 
 
 def construct_style(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
-    if_body = [create_add_assign(
-        target=ctx.result_value,
-        value=create_string_concat(
-            create_constant("<style>"),
-            style_constant(ctx.template.name),
-            *(
-                style_constant(name)
-                for name in ctx.template.child_components
-            ),
-            create_constant("</style>"),
-        )
-    )]
+    value = create_string_concat(
+        create_constant("<style>"),
+        style_constant(ctx.template.name),
+        *(
+            style_constant(name)
+            for name in ctx.template.child_components
+        ),
+        create_constant("</style>"),
+    )
 
     return [create_if(
         condition=create_name("with_styles"),
-        if_body=if_body,
+        if_body=[ctx.result.add(value)],
     )]
 
 
@@ -107,6 +144,7 @@ def construct_if(block: IfBlock, ctx: BuildContext) -> Sequence[ast.AST]:
         cur_if = if_statement
         while len(cur_if.orelse) == 1 and isinstance(cur_if.orelse[0], ast.If):
             cur_if = cur_if.orelse[0]
+
         cur_if.orelse = [
             ast.If(
                 test=condition,
