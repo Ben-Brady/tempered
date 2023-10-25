@@ -1,6 +1,6 @@
 from .. import ast_utils
 from ..parser import Template
-from .tag import construct_tag, BuildContext, StyleBlock, ArrayResult
+from .tag import construct_tag, BuildContext, StyleBlock, ArrayResult, StringResult
 import ast
 from typing import Sequence, Any
 
@@ -12,7 +12,7 @@ def construct_body(template: Template) -> Sequence[ast.AST]:
 
     ctx = BuildContext(
         template=template,
-        result=ArrayResult(),
+        result=StringResult(),
     )
 
     statements.extend(ctx.result.create_assignment())
