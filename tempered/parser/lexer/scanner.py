@@ -1,14 +1,15 @@
 from typing import Sequence
 import string
+from array import array
 
 
-# Try using array.array
 class TextScanner:
-    html: str
-    _checkpoint: str|None = None
+    html: array[str]
+    _checkpoint: array[str]|None = None
 
     def __init__(self, html: str):
-        self.html = html
+        self.html = array("u")
+        self.html.fromunicode(html[::-1])
 
 
     @property
@@ -17,7 +18,7 @@ class TextScanner:
 
 
     def checkpoint(self):
-        self._checkpoint = self.html
+        self._checkpoint = self.html[:]
 
 
     def restore(self):
@@ -29,23 +30,27 @@ class TextScanner:
 
 
     def pop(self, length: int = 1) -> str:
-        popped_text = self.html[:length]
-        self.html = self.html[length:]
+        popped_text = ""
+        for _ in range(length):
+            popped_text += self.html.pop()
+
         return popped_text
 
 
     def startswith(self, *text: str) -> bool:
-        return any((
-            self.html.startswith(match)
-            for match in text
-        ))
+        for match in text:
+            html_text = self.html[-len(match)::][::-1].tounicode()
+            if html_text == match:
+                return True
+
+        return False
 
 
     def accept(self, text: str) -> bool:
-        if not self.html.startswith(text):
+        if not self.startswith(text):
             return False
 
-        self.html = self.html[len(text):]
+        self.html = self.html[:-len(text)]
         return True
 
 
@@ -60,24 +65,22 @@ class TextScanner:
 
         text = ""
         while self.has_text:
-            if any(self.startswith(match) for match in matches):
+            if self.startswith(*matches):
                 break
 
-            text += self.pop(1)
+            text += self.pop()
 
         return text
-
 
     def take_while(self, *matches: str) -> str:
         text = ""
         while self.has_text:
-            if not any(self.startswith(match) for match in matches):
+            if not self.startswith(*matches):
                 break
 
-            text += self.pop(1)
+            text += self.pop()
 
         return text
-
 
     def take_whitespace(self):
         WHITESPACE_CHARS = list(string.whitespace)
@@ -87,4 +90,3 @@ class TextScanner:
     def take_ident(self) -> str:
         IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
         return self.take_while(*IDENT_LETTERS)
-
