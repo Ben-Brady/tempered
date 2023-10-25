@@ -26,6 +26,7 @@ def _assert_single_parameter(
     if isinstance(default, RequiredParameter):
         assert isinstance(param.default, RequiredParameter)
     else:
+        assert not isinstance(param.default, RequiredParameter)
         assert ast.literal_eval(param.default) == default
 
 

@@ -30,7 +30,7 @@ def compile_module(
                     TemplateParameter(
                         name="with_styles",
                         type=ast_utils.create_name("bool"),
-                        default=True,
+                        default=ast_utils.create_constant("True"),
                     )
                 ]
             ),
