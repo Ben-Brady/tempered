@@ -2,7 +2,6 @@ import ast
 from typing import Any, Iterable, Sequence
 from types import NoneType, EllipsisType
 from .compile.constants import ESCAPE_FUNC_NAME
-from .parser import RequiredParameter, TemplateParameter
 
 
 def create_constant(value: Any) -> ast.expr:
@@ -93,6 +92,7 @@ def create_assignment(target: str|ast.Name, value: Any) -> ast.Assign:
     return ast.Assign(
         targets=[target],
         value=create_constant(value),
+        type_comment=None,
     )
 
 
@@ -106,56 +106,6 @@ def create_if(
 
     else_body = else_body or []
     return ast.If(test=condition, body=if_body, orelse=else_body)
-
-
-def create_arguments(
-        arguments: list[TemplateParameter],
-        kw_arguments: list[TemplateParameter]
-        ) -> ast.arguments:
-    def construct_default(param: TemplateParameter):
-        match param.default:
-            case RequiredParameter():
-                return None
-            case default:
-                return create_constant(default)
-
-    def create_annotation(annotation: str|None) -> ast.expr|None:
-        if annotation:
-            return create_constant(annotation)
-        else:
-            return None
-
-    def create_argument_list(
-            parameters: list[TemplateParameter]
-            ) -> tuple[
-                list[ast.arg],
-                list[ast.expr|None]
-            ]:
-        args = [
-            ast.arg(
-                arg=param.name,
-                annotation=create_annotation(param.type),
-            )
-            for param in parameters
-        ]
-        defaults = [
-            construct_default(param)
-            for param in parameters
-        ]
-        return args, defaults
-
-
-    args, defaults = create_argument_list(arguments)
-    kw_args, kw_defaults = create_argument_list(kw_arguments)
-
-
-    return ast.arguments(
-        args=args,
-        defaults=defaults,
-        kwonlyargs=kw_args,
-        kw_defaults=kw_defaults,
-        posonlyargs=[],
-    )
 
 
 def create_add_assign(target: str|ast.Name, value: str|ast.AST) -> ast.AugAssign:
@@ -181,3 +131,18 @@ def create_string_concat(*args: ast.expr) -> ast.expr:
             op=ast.Add(),
             right=create_string_concat(*args[1:]),
         )
+
+
+def create_attribute(value: ast.expr, attr: str):
+    return ast.Attribute(
+        value=value,
+        attr=attr,
+    )
+
+
+def construct_array_join(array: ast.expr) -> ast.Call:
+    return ast.Call(
+        func=ast.Attribute(value=ast.Constant(value=''), attr='join'),
+        args=[array],
+        keywords=[]
+    )

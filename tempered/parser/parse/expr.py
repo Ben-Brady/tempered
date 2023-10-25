@@ -17,12 +17,12 @@ def parse_parameter(parameter: str) -> TemplateParameter:
             return TemplateParameter(name=name)
         case ast.AnnAssign(
             target=ast.Name(id=name),
-            annotation=ast.Name(id=type)|ast.Constant(value=type),
+            annotation=annotation,
             value=ast.Name(id=default)|ast.Constant(value=default)
         ):
             return TemplateParameter(
                 name=name,
-                type=type if isinstance(type, str) else type.id,
+                type=annotation,
                 default=default if default is not None else RequiredParameter()
             )
         case ast.Assign(
@@ -35,11 +35,11 @@ def parse_parameter(parameter: str) -> TemplateParameter:
             )
         case ast.AnnAssign(
             target=ast.Name(id=name),
-            annotation=ast.Name(id=type)|ast.Constant(value=type),
+            annotation=annotation,
         ):
             return TemplateParameter(
                 name=name,
-                type=type if isinstance(type, str) else type.id,
+                type=annotation,
             )
         case _:
             raise ValueError(f"Invalid Parameter: {parameter}")

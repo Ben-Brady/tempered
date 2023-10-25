@@ -18,7 +18,7 @@ def parse_template(
     html, css = preprocess_style_tags(html)
     tokens = to_token_stream(html)
 
-    tokens, params = extract_parameters(tokens)
+    tokens, parameters = extract_parameters(tokens)
 
     scanner = TokenScanner(tokens)
     child_components = get_child_components(tokens)
@@ -26,11 +26,11 @@ def parse_template(
 
     return Template(
         name=name,
-        parameters=params,
         context=context,
+        parameters=parameters,
         body=body,
         child_components=child_components,
-        style=css,
+        css=css,
     )
 
 
@@ -90,7 +90,6 @@ def next_tag(scanner: TokenScanner) -> TemplateTag:
             raise ValueError(f"Unexpected {e}")
 
 
-
 def next_if(
         scanner: TokenScanner,
         condition_str: str,
@@ -148,4 +147,3 @@ def next_for(
         iterable=iterable,
         loop_variable=loop_var,
     )
-
