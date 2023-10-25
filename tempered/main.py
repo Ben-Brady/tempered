@@ -2,8 +2,10 @@ from . import parser
 from .compile.module import compile_module
 from .parser import Template
 import ast
+import sys
 import inspect
 import importlib
+from importlib.util import spec_from_loader, module_from_spec
 from pathlib import Path
 from types import ModuleType
 from typing import LiteralString, Any, cast
@@ -61,22 +63,18 @@ def _build_python() -> str:
         type_imports=_type_imports,
         templates=_templates,
     )
+    _type_imports.clear()
+    _templates.clear()
     return ast.unparse(module_ast)
+
 
 def build() -> Any:
     source = _build_python()
-    globals = {}
-    exec(source, globals)
-
-    class Module: pass
-    module = Module()
-
-    for key, value in globals.items():
-        if key.startswith("__"):
-            continue
-
-        setattr(module, key, value)
-
+    spec = spec_from_loader("tempered.components", loader=None)
+    assert spec is not None
+    module = module_from_spec(spec)
+    exec(source, module.__dict__)
+    sys.modules["tempered.components"] = module
     return module
 
 
