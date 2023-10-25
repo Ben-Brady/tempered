@@ -11,28 +11,16 @@ def parse_parameter(parameter: str) -> TemplateParameter:
 
     expr = module.body[0]
     match expr:
-        case ast.Expr(
-            value=ast.Name(id=name)
-        ):
-            return TemplateParameter(name=name)
         case ast.AnnAssign(
             target=ast.Name(id=name),
             annotation=annotation,
-            value=ast.Name(id=default)|ast.Constant(value=default)
+            value=default
         ):
             return TemplateParameter(
                 name=name,
                 type=annotation,
                 default=default if default is not None else RequiredParameter()
             )
-        case ast.Assign(
-            targets=[ast.Name(id=name)],
-            value=ast.Constant(value=default)
-        ):
-            return TemplateParameter(
-                name=name,
-                default=default
-            )
         case ast.AnnAssign(
             target=ast.Name(id=name),
             annotation=annotation,
@@ -41,6 +29,18 @@ def parse_parameter(parameter: str) -> TemplateParameter:
                 name=name,
                 type=annotation,
             )
+        case ast.Assign(
+            targets=[ast.Name(id=name)],
+            value=default
+        ):
+            return TemplateParameter(
+                name=name,
+                default=default
+            )
+        case ast.Expr(
+            value=ast.Name(id=name)
+        ):
+            return TemplateParameter(name=name)
         case _:
             raise ValueError(f"Invalid Parameter: {parameter}")
 

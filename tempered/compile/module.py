@@ -57,7 +57,7 @@ def create_arguments(
             case RequiredParameter():
                 return None
             case default:
-                return ast_utils.create_constant(default)
+                return default
 
     def create_annotation(annotation: ast.expr|None) -> ast.expr|None:
         if annotation:

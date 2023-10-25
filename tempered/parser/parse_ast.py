@@ -72,7 +72,7 @@ class RequiredParameter:
 class TemplateParameter:
     name: str
     type: ast.expr | None = None
-    default: Any | RequiredParameter = RequiredParameter()
+    default: ast.expr | RequiredParameter = RequiredParameter()
 
 
 @dataclass
