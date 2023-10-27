@@ -1,13 +1,17 @@
-from typing import Sequence
+from typing import Sequence, Self
 import string
 from array import array
 
 
 class TextScanner:
+    original: str
+    position: int = 0
+
     html: array[str]
-    _checkpoint: array[str]|None = None
+    _checkpoint: tuple[array[str], int]|None = None
 
     def __init__(self, html: str):
+        self.original = html
         self.html = array("u")
         self.html.fromunicode(html[::-1])
 
@@ -18,14 +22,14 @@ class TextScanner:
 
 
     def checkpoint(self):
-        self._checkpoint = self.html[:]
+        self._checkpoint = self.html[:], self.position
 
 
     def restore(self):
         if self._checkpoint is None:
             raise RuntimeError("No checkpoint to restore from")
 
-        self.html = self._checkpoint
+        self.html, self.position = self._checkpoint
         self._checkpoint = None
 
 
@@ -34,7 +38,17 @@ class TextScanner:
         for _ in range(length):
             popped_text += self.html.pop()
 
+        self.position += length
         return popped_text
+
+
+    def accept(self, text: str) -> bool:
+        if not self.startswith(text):
+            return False
+
+        self.html = self.html[:-len(text)]
+        self.position += len(text)
+        return True
 
 
     def startswith(self, *text: str) -> bool:
@@ -46,17 +60,9 @@ class TextScanner:
         return False
 
 
-    def accept(self, text: str) -> bool:
-        if not self.startswith(text):
-            return False
-
-        self.html = self.html[:-len(text)]
-        return True
-
-
     def expect(self, text: str):
         if not self.accept(text):
-            raise ValueError(f"Expected {text!r} but got {self.html!r}")
+            raise self.error(f"Expected {text!r}")
 
 
     def take_until(self, matches: str|list[str]) -> str:
@@ -82,11 +88,41 @@ class TextScanner:
 
         return text
 
-    def take_whitespace(self):
-        WHITESPACE_CHARS = list(string.whitespace)
-        self.take_while(*WHITESPACE_CHARS)
+
+    def error(self, msg: str) -> Exception:
+        return ParserException.create(msg, self.original, self.position)
 
 
-    def take_ident(self) -> str:
-        IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
-        return self.take_while(*IDENT_LETTERS)
+class ParserException(Exception):
+    @classmethod
+    def create(cls, msg: str, source: str, position: int) -> Self:
+        line_index = source[:position].count("\n") - 1
+
+        lines = source.split("\n")
+
+        err_line = lines[line_index]
+
+        try:
+            prev_line = "\n" + lines[line_index - 1]
+        except IndexError:
+            prev_line = ""
+
+        try:
+            next_line = "\n" + lines[line_index + 1]
+        except IndexError:
+            next_line = ""
+
+
+        line_no = line_index + 1
+        line_start = source.rfind("\n", 0, position) + 1
+        offset = position - line_start
+
+        message = (
+            f"{msg} on line {line_no}, offset {offset}" +
+            "\n" +
+            prev_line +
+            f"{err_line}\n" +
+            f"{offset * ' '}^" +
+            next_line
+        )
+        return cls(message)
