@@ -1,10 +1,7 @@
 from tempered.parser import parse_template, TemplateParameter, RequiredParameter, LiteralBlock
 import ast
 from typing import Any
-
-
-def _assert_parameter_required(parameter: TemplateParameter):
-    assert isinstance(parameter.default, RequiredParameter)
+import pytest
 
 
 def _assert_single_parameter(
@@ -93,4 +90,26 @@ def test_parse_parameters_with_complex_annotation():
         "{!param a: list[str]!}",
         name="a",
         type="list[str]",
+    )
+
+
+@pytest.mark.xfail
+def test_parse_parameters_with_end_statement_default():
+    _assert_single_parameter(
+        "{!param a = '!}' !}",
+        name="a",
+        default="!}",
+    )
+
+
+@pytest.mark.xfail
+def test_parse_parameters_with_multiline_string_default():
+    _assert_single_parameter(
+        """{!param a =
+        '''
+        a
+        '''
+        """,
+        name="a",
+        default="!}",
     )
