@@ -55,9 +55,9 @@ def minify_css(css: str) -> str:
 def apply_scope_to_soup(soup: BeautifulSoup, scope_id: str):
     for tag in soup.find_all():
         tag: Tag
-        class_attr = tag.attrs.get("class", "")
+        classes = tag.attrs.get("class", "")
 
-        if isinstance(class_attr, list):
-            class_attr = " ".join(class_attr)
+        if isinstance(classes, list):
+            classes = " ".join(classes)
 
-        tag.attrs["class"] = class_attr + f"{scope_id}"
+        tag.attrs["class"] = classes + " " + scope_id
