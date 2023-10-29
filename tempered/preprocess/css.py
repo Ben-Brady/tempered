@@ -1,6 +1,6 @@
 from tempered.parser import *
+from .scope import apply_scope_to_css
 from bs4 import BeautifulSoup, Tag
-import tinycss2
 from tinycss2.ast import QualifiedRule, IdentToken, LiteralToken
 from rcssmin import cssmin
 from typing import cast, LiteralString
@@ -12,7 +12,7 @@ warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 
 html, css = str, str
-def preprocess_style_tags(body: str) -> tuple[html, css]:
+def generate_scoped_styles(body: str) -> tuple[html, css]:
     soup = BeautifulSoup(body, "html.parser")
     css = ""
 
@@ -24,8 +24,8 @@ def preprocess_style_tags(body: str) -> tuple[html, css]:
             css += tag.text
         else:
             scope_id = _generate_scoped_style_id()
-            apply_scope_to_soup(scope_id, soup)
-            css += add_scope_rules_to_css(scope_id, tag.text)
+            apply_scope_to_soup(soup, scope_id)
+            css += apply_scope_to_css(tag.text, scope_id)
 
         tag.decompose()
 
@@ -41,29 +41,18 @@ def _generate_scoped_style_id() -> str:
     return f"tempered-{hash}"
 
 
-def minify_css(in_css: str) -> str:
-    css = cssmin(in_css)
-    match css:
+def minify_css(css: str) -> str:
+    minified_css = cssmin(css)
+    match minified_css:
         case str():
-            return cast(LiteralString, css)
+            return cast(LiteralString, minified_css)
         case bytes() | bytearray():
-            return cast(LiteralString, css.decode())
+            return cast(LiteralString, minified_css.decode())
         case _:
             raise TypeError("Expected str or bytes")
 
 
-def add_scope_rules_to_css(scope_id: str, css: str) -> str:
-    css_tokens = tinycss2.parse_stylesheet(css)
-
-    for token in css_tokens:
-        if isinstance(token, QualifiedRule):
-            token.prelude.insert(0, LiteralToken(0, 0, "."))
-            token.prelude.insert(1, IdentToken(0, 0, scope_id))
-
-    return tinycss2.serialize(css_tokens)
-
-
-def apply_scope_to_soup(scope_id: str, soup: BeautifulSoup):
+def apply_scope_to_soup(soup: BeautifulSoup, scope_id: str):
     for tag in soup.find_all():
         tag: Tag
         class_attr = tag.attrs.get("class", "")

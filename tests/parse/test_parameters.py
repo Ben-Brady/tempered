@@ -37,7 +37,7 @@ def test_parse_removes_parameters():
     assert block.body == "" or block.body.isspace()
 
 
-def test_parse_parameter():
+def test_parse_parameter_single():
     _assert_single_parameter(
         "{!param a !}",
         name="a"

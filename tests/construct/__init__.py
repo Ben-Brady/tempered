@@ -1,11 +1,10 @@
-from tempered.compile import compile_module
-from tempered.main import _build_python, _templates, build
+import tempered
 from tempered.parser import Template
-import ast
 from typing import Callable
 
 
 def build_template(template: Template) -> Callable:
-    _templates.append(template)
-    module = build()
+    components = tempered.Tempered()
+    components.add_template_obj(template)
+    module = components.build_memory()
     return getattr(module, template.name)

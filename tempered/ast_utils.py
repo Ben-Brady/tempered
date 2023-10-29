@@ -1,34 +1,22 @@
 import ast
 from typing import Any, Iterable, Sequence
 from types import NoneType, EllipsisType
-from .compile.constants import ESCAPE_FUNC_NAME
+
+
+def _create_iterable_constant(iterable: Iterable[Any]) -> list[ast.expr]:
+    return [create_constant(item) for item in iterable]
 
 
 def create_constant(value: Any) -> ast.expr:
-    def create_iterable_constant(iterable: Iterable[Any]) -> list[ast.expr]:
-        return [
-            create_constant(item)
-            for item in iterable
-        ]
-
     match value:
         case list():
-            return ast.List(
-                elts=create_iterable_constant(value)
-            )
+            return create_list(value)
         case set():
-            return ast.Set(
-                elts=create_iterable_constant(value)
-            )
+            return create_tuple(value)
         case tuple():
-            return ast.Tuple(
-                elts=create_iterable_constant(value)
-            )
+            return create_set(value)
         case dict():
-            return ast.Dict(
-                keys=create_iterable_constant(value.keys()),
-                values=create_iterable_constant(value.values()),
-            )
+            return create_dict(value)
         case NoneType() | EllipsisType() | str() | bytes() | bool() | int() | float() | complex():
             return ast.Constant(value=value)
         case type():
@@ -36,7 +24,20 @@ def create_constant(value: Any) -> ast.expr:
         case _:
             raise ValueError(f"Cannot convert {value} to an ast constant")
 
+def create_list(value: Iterable) -> ast.List:
+    return ast.List(elts=_create_iterable_constant(value))
 
+def create_tuple(value: Iterable) -> ast.Tuple:
+    return ast.Tuple(elts=_create_iterable_constant(value))
+
+def create_set(value: Iterable) -> ast.Set:
+    return ast.Set(elts=_create_iterable_constant(value))
+
+def create_dict(value: dict) -> ast.Dict:
+    return ast.Dict(
+        keys=_create_iterable_constant(value.keys()),
+        values=_create_iterable_constant(value.values()),
+    )
 
 def create_call(
         func: ast.AST,
@@ -51,10 +52,6 @@ def create_call(
             for name, value in keywords.items()
         ],
     )
-
-
-def create_escape_call(value: ast.expr) -> ast.expr:
-    return create_call(ESCAPE_FUNC_NAME, [value])
 
 
 def create_name(target: str) -> ast.Name:
@@ -85,16 +82,6 @@ def create_function(
         type_params=[],
     )
 
-def create_assignment(target: str|ast.Name, value: Any) -> ast.Assign:
-    if isinstance(target, str):
-        target = create_name(target)
-
-    return ast.Assign(
-        targets=[target],
-        value=create_constant(value),
-        type_comment=None,
-    )
-
 
 def create_if(
         condition: ast.AST,
@@ -108,7 +95,7 @@ def create_if(
     return ast.If(test=condition, body=if_body, orelse=else_body)
 
 
-def create_add_assign(target: str|ast.Name, value: str|ast.AST) -> ast.AugAssign:
+def create_add_assign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssign:
     if isinstance(target, str):
         target = create_name(target)
 
@@ -119,6 +106,17 @@ def create_add_assign(target: str|ast.Name, value: str|ast.AST) -> ast.AugAssign
         op=ast.Add(),
         target=target,
         value=value,
+    )
+
+
+def create_assignment(target: str|ast.Name, value: Any) -> ast.Assign:
+    if isinstance(target, str):
+        target = create_name(target)
+
+    return ast.Assign(
+        targets=[target],
+        value=create_constant(value),
+        type_comment=None,
     )
 
 
@@ -140,9 +138,12 @@ def create_attribute(value: ast.expr, attr: str):
     )
 
 
-def construct_array_join(array: ast.expr) -> ast.Call:
+def create_array_join(array: ast.expr) -> ast.Call:
     return ast.Call(
         func=ast.Attribute(value=ast.Constant(value=''), attr='join'),
         args=[array],
         keywords=[]
     )
+
+def create_return(value: ast.expr | None = None) -> ast.Return:
+    return ast.Return(value=value)

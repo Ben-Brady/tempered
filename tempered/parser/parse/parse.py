@@ -1,4 +1,4 @@
-from ...preprocess import preprocess_style_tags, minify_html
+from ...preprocess import generate_scoped_styles, minify_html
 from ..parse_ast import *
 from ..lexer import *
 from .scanner import TokenScanner
@@ -14,8 +14,8 @@ def parse_template(
     context = context or {}
 
     html = template_html
+    html, css = generate_scoped_styles(html)
     html = minify_html(html)
-    html, css = preprocess_style_tags(html)
     tokens = to_token_stream(html)
 
     tokens, parameters = extract_parameters(tokens)
