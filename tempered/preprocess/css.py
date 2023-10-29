@@ -3,7 +3,7 @@ from .scope import apply_scope_to_css
 from bs4 import BeautifulSoup, Tag
 from tinycss2.ast import QualifiedRule, IdentToken, LiteralToken
 from rcssmin import cssmin
-from typing import cast, LiteralString
+from typing import cast, LiteralString, NamedTuple
 from zlib import crc32
 
 import warnings
@@ -11,8 +11,12 @@ from bs4 import MarkupResemblesLocatorWarning
 warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 
-html, css = str, str
-def generate_scoped_styles(body: str, prefix: str = "tempered") -> tuple[html, css]:
+class ScopedStyles(NamedTuple):
+    html: str
+    css: str
+
+
+def generate_scoped_styles(body: str, prefix: str = "tempered") -> ScopedStyles:
     soup = BeautifulSoup(body, "html.parser")
     css = ""
 
@@ -29,7 +33,10 @@ def generate_scoped_styles(body: str, prefix: str = "tempered") -> tuple[html, c
 
         tag.decompose()
 
-    return soup.prettify(formatter="minimal"), minify_css(css)
+    return ScopedStyles(
+        html=soup.prettify(formatter="minimal"),
+        css=minify_css(css)
+    )
 
 
 counter = 0

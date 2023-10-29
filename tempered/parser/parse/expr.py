@@ -59,8 +59,6 @@ def parse_expr(expression: str) -> ast.expr:
         raise ValueError(f"Invalid Expr: {expression}")
 
 
-
-
 def parse_ident(expr: str) -> ast.Name:
     if keyword.iskeyword(expr):
         raise ValueError(f"Invalid identifier: {expr}")

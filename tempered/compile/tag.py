@@ -1,5 +1,7 @@
-from ..parser.parse_ast import *
-from .. import ast_utils
+from ..parser. parse_ast import (
+    Template, TemplateTag, LiteralBlock, ExprBlock, HtmlBlock, IncludeStyleBlock,
+    ComponentBlock, StyleBlock, IfBlock, ForBlock,
+)
 from ..ast_utils import (
     create_constant, create_call,
     create_name, create_if, create_string_concat, create_attribute

@@ -2,7 +2,6 @@ from . import parser
 from .compile.module import compile_module
 from .parser import Template
 import ast
-import sys
 import inspect
 import importlib
 from importlib.util import spec_from_loader, module_from_spec
@@ -29,11 +28,8 @@ class Tempered:
             context: dict[str, Any] = {}
             ):
         folder = Path(folder)
-        for file in folder.iterdir():
-            if not file.name.endswith(".html"):
-                continue
-
-            name = file.name.removesuffix(".html")
+        for file in folder.glob("**/*.*"):
+            name = file.stem
             template = cast(LiteralString, file.read_text())
             self.add_template(
                 name=name,

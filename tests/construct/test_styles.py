@@ -1,13 +1,13 @@
 from . import build_template
-from tempered.parser import Template, LiteralBlock
+from tempered import parser
 
 
 def test_template_add_styles():
     CSS = "a{color:red;}"
-    func = build_template(Template(
+    func = build_template(parser.Template(
         name="post",
         body=[
-            LiteralBlock("Bar!"),
+            parser.LiteralBlock("Bar!"),
         ],
         css=CSS
     ))
@@ -17,12 +17,28 @@ def test_template_add_styles():
 
 def test_template_wont_add_styles():
     CSS = "a{color:red;}"
-    func = build_template(Template(
+    func = build_template(parser.Template(
         name="post",
         body=[
-            LiteralBlock("Bar!"),
+            parser.LiteralBlock("Bar!"),
+
         ],
         css=CSS
     ))
 
     assert CSS not in func(with_styles=False)
+
+
+def test_template_places_styles():
+    CSS = "B"
+    func = build_template(parser.Template(
+        name="post",
+        body=[
+            parser.LiteralBlock("A"),
+            parser.StyleBlock(),
+            parser.LiteralBlock("C"),
+        ],
+        css=CSS
+    ))
+
+    assert func() == "A<style>B</style>C"
