@@ -37,6 +37,8 @@ def _generate_scoped_style_id(prefix: str) -> str:
     global counter
     counter += 1
     id = str(counter).encode()
+
+    prefix = prefix.replace("-", "_").lower()
     hash = hex(crc32(id))[2:6]
     return f"{prefix}-{hash}"
 
