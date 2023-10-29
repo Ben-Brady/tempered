@@ -56,4 +56,8 @@ def apply_scope_to_soup(soup: BeautifulSoup, scope_id: str):
     for tag in soup.find_all():
         tag: Tag
         class_attr = tag.attrs.get("class", "")
+
+        if isinstance(class_attr, list):
+            class_attr = " ".join(class_attr)
+
         tag.attrs["class"] = class_attr + f"{scope_id}"
