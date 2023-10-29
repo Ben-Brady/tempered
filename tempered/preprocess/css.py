@@ -12,7 +12,7 @@ warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 
 html, css = str, str
-def generate_scoped_styles(body: str) -> tuple[html, css]:
+def generate_scoped_styles(body: str, prefix: str = "tempered") -> tuple[html, css]:
     soup = BeautifulSoup(body, "html.parser")
     css = ""
 
@@ -23,7 +23,7 @@ def generate_scoped_styles(body: str) -> tuple[html, css]:
         if is_global:
             css += tag.text
         else:
-            scope_id = _generate_scoped_style_id()
+            scope_id = _generate_scoped_style_id(prefix)
             apply_scope_to_soup(soup, scope_id)
             css += apply_scope_to_css(tag.text, scope_id)
 
@@ -33,12 +33,12 @@ def generate_scoped_styles(body: str) -> tuple[html, css]:
 
 
 counter = 0
-def _generate_scoped_style_id() -> str:
+def _generate_scoped_style_id(prefix: str) -> str:
     global counter
     counter += 1
     id = str(counter).encode()
-    hash = hex(crc32(id))[2:]
-    return f"tempered-{hash}"
+    hash = hex(crc32(id))[2:6]
+    return f"{prefix}-{hash}"
 
 
 def minify_css(css: str) -> str:

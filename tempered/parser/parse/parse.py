@@ -14,7 +14,7 @@ def parse_template(
     context = context or {}
 
     html = template_html
-    html, css = generate_scoped_styles(html)
+    html, css = generate_scoped_styles(html, prefix=name)
     html = minify_html(html)
     tokens = to_token_stream(html)
 

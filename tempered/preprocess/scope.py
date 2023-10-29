@@ -21,4 +21,3 @@ def add_scope_to_rule(rule: QualifiedRule, scope_id: str):
 def insert_scope(rule: QualifiedRule, scope_id: str, position: int):
     rule.prelude.insert(position + 1, IdentToken(0, 0, scope_id))
     rule.prelude.insert(position + 1, LiteralToken(0, 0, "."))
-
