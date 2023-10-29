@@ -4,7 +4,7 @@ from ..ast_utils import (
     create_constant, create_call,
     create_name, create_if, create_string_concat, create_attribute
 )
-from .utils import create_style_name, create_escape_call
+from .utils import create_style_name, create_escape_call, WITH_STYLES_PARAMETER
 from .accumulators import Result
 import ast
 from typing import Sequence, assert_never, Protocol
@@ -25,10 +25,10 @@ def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.AST]:
             return [ctx.result.create_add(create_escape_call(tag.value))]
         case HtmlBlock():
             return [ctx.result.create_add(tag.value)]
-        case ComponentBlock():
-            return [ctx.result.create_add(tag.component_call)]
         case IncludeStyleBlock():
             return [ctx.result.create_add(create_style_name(tag.template))]
+        case ComponentBlock():
+            return construct_component_tag(tag, ctx)
         case StyleBlock():
             return construct_style(tag, ctx)
         case IfBlock():
@@ -45,6 +45,21 @@ def construct_block(tags: Sequence[TemplateTag], ctx: BuildContext) -> list[ast.
         block.extend(construct_tag(tag, ctx))
 
     return block
+
+
+def construct_component_tag(tag: ComponentBlock, ctx: BuildContext) -> list[ast.AST]:
+    func = tag.component_call.func
+    args = tag.component_call.args.copy()
+    keywords = {
+        keyword.arg: keyword.value
+        for keyword in
+        tag.component_call.keywords
+        if keyword.arg
+    }
+    keywords[WITH_STYLES_PARAMETER] = create_constant(False)
+
+    func_call = create_call(func, args, keywords)
+    return [ctx.result.create_add(func_call)]
 
 
 def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:

@@ -1,5 +1,5 @@
 import ast
-from tempered.ast_utils import *
+from ..ast_utils import *
 
 UTILS_IMPORT = ast.ImportFrom(
     module='tempered',
@@ -21,6 +21,7 @@ IMPORTS = [
     UTILS_IMPORT,
 ]
 
+WITH_STYLES_PARAMETER = "with_styles"
 
 def create_escape_call(value: ast.expr) -> ast.expr:
     ESCAPE_FUNC_NAME = ast.Attribute(

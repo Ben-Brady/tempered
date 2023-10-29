@@ -1,7 +1,7 @@
 from .. import ast_utils
 from ..ast_utils import create_name, create_assignment, create_module, create_function
 from ..parser import Template, TemplateParameter, RequiredParameter
-from .utils import IMPORTS, create_style_name
+from .utils import IMPORTS, create_style_name, WITH_STYLES_PARAMETER
 from .body import construct_body
 import ast
 from typing import Sequence
@@ -26,7 +26,7 @@ def compile_module(
             kw_arguments=[
                 *template.parameters,
                 TemplateParameter(
-                    name="with_styles",
+                    name=WITH_STYLES_PARAMETER,
                     type=ast_utils.create_name("bool"),
                     default=ast_utils.create_constant("True"),
                 )
