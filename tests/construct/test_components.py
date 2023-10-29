@@ -3,7 +3,8 @@ import tempered
 from tempered import parser, ast_utils
 import ast
 
-def test_components_prevent_css_reuse():
+
+def test_components_prevent_css_duplication():
     components = tempered.Tempered()
     child_template = parser.Template(
         name="child",
