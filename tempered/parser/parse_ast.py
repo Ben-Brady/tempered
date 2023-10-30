@@ -58,10 +58,16 @@ class ForBlock(Tag):
     loop_block: TemplateBlock
 
 
+@dataclass
+class AssignmentBlock(Tag):
+    target: ast.expr
+    value: ast.expr
+
+
 TemplateTag: TypeAlias = (
     LiteralBlock | HtmlBlock | ExprBlock |
     ComponentBlock | StyleBlock | IncludeStyleBlock |
-    IfBlock | ForBlock
+    IfBlock | ForBlock | AssignmentBlock
 )
 
 class RequiredParameter:
@@ -90,7 +96,7 @@ TemplateBlock: TypeAlias = Sequence[TemplateTag]
 
 __all__ = [
     "TemplateBlock", "TemplateTag", "Template", "Tag",
-    "IfBlock", "ForBlock",
+    "IfBlock", "ForBlock", "AssignmentBlock",
     "LiteralBlock", "ExprBlock", "HtmlBlock", "ComponentBlock",
     "TemplateParameter", "RequiredParameter", "StyleBlock", "IncludeStyleBlock"
 ]

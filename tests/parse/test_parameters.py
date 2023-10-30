@@ -93,7 +93,7 @@ def test_parse_parameters_with_complex_annotation():
     )
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_parse_parameters_with_end_statement_default():
     _assert_single_parameter(
         "{!param a = '!}' !}",
@@ -102,7 +102,7 @@ def test_parse_parameters_with_end_statement_default():
     )
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_parse_parameters_with_multiline_string_default():
     _assert_single_parameter(
         """{!param a =

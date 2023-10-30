@@ -71,6 +71,8 @@ def take_statement_token(scanner: TextScanner) -> Token:
         return take_forstart_token(scanner)
     elif statement == "endfor":
         return take_forend_token(scanner)
+    elif statement == "set":
+        return take_set_token(scanner)
     elif statement == "component":
         return take_component_token(scanner)
     elif statement == "html":
@@ -166,6 +168,18 @@ def take_component_token(scanner: TextScanner) -> ComponentToken:
     scanner.expect(STATEMENT_END)
 
     return ComponentToken(template=template, expr=expr)
+
+
+def take_set_token(scanner: TextScanner) -> SetToken:
+    scanner.expect(STATEMENT_START)
+    take_whitespace(scanner)
+    scanner.expect("set")
+    take_whitespace(scanner)
+    assignment = scanner.take_until(STATEMENT_END).rstrip()
+    take_whitespace(scanner)
+    scanner.expect(STATEMENT_END)
+
+    return SetToken(assignment)
 
 
 def take_if_token(scanner: TextScanner) -> IfStartToken:

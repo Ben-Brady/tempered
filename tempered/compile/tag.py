@@ -1,9 +1,9 @@
-from ..parser. parse_ast import (
+from ..parser.parse_ast import (
     Template, TemplateTag, LiteralBlock, ExprBlock, HtmlBlock, IncludeStyleBlock,
-    ComponentBlock, StyleBlock, IfBlock, ForBlock,
+    ComponentBlock, StyleBlock, IfBlock, ForBlock, AssignmentBlock
 )
 from ..ast_utils import (
-    create_constant, create_call,
+    create_constant, create_call, create_assignment,
     create_name, create_if, create_string_concat, create_attribute
 )
 from .utils import create_style_name, create_escape_call, WITH_STYLES_PARAMETER
@@ -37,6 +37,8 @@ def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.AST]:
             return construct_if(tag, ctx)
         case ForBlock():
             return construct_for(tag, ctx)
+        case AssignmentBlock():
+            return construct_assignment(tag, ctx)
         case e:
             assert_never(e)
 
@@ -56,6 +58,13 @@ def construct_component_tag(tag: ComponentBlock, ctx: BuildContext) -> list[ast.
 
     func_call = create_call(func, keywords=keywords)
     return [ctx.result.create_add(func_call)]
+
+
+def construct_assignment(tag: AssignmentBlock, ctx: BuildContext) -> Sequence[ast.AST]:
+    return [ast.Assign(
+        targets=[tag.target],
+        value=tag.value,
+    )]
 
 
 def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:

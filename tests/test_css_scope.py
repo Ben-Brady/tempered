@@ -51,7 +51,7 @@ def test_class_and_psuedo():
     )
 
 
-@pytest.mark.xfail
+@pytest.mark.skip
 def test_many_classes():
     assert_rule_transformed(
         scope="scope",

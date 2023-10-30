@@ -79,12 +79,17 @@ class ForEndToken:
     pass
 
 
+@dataclass
+class SetToken:
+    assignment: str
+
+
 Token: TypeAlias = (
     LiteralToken |
     ParameterToken | StylesToken | StylesIncludeToken |
     ComponentToken | HtmlExprToken | EscapedExprToken |
     IfStartToken | ElIfToken | ElseToken | IfEndToken |
-    ForStartToken | ForEndToken
+    ForStartToken | ForEndToken | SetToken
 )
 
 __all__ = [
@@ -92,5 +97,5 @@ __all__ = [
     "ParameterToken", "StylesToken", "StylesIncludeToken",
     "ComponentToken", "HtmlExprToken", "EscapedExprToken",
     "IfStartToken", "ElIfToken", "ElseToken", "IfEndToken",
-    "ForStartToken", "ForEndToken",
+    "ForStartToken", "ForEndToken", "SetToken"
 ]
