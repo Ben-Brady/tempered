@@ -40,7 +40,7 @@ class ComponentBlock(Tag):
     # Needed to prevent CSS from being created multiple times
     # Also to prevent HTML from being escaped
     component_name: str
-    component_call: ast.Call
+    keywords: dict[str, ast.expr]
 
 
 @dataclass

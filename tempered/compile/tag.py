@@ -50,17 +50,11 @@ def construct_block(tags: Sequence[TemplateTag], ctx: BuildContext) -> list[ast.
 
 
 def construct_component_tag(tag: ComponentBlock, ctx: BuildContext) -> list[ast.AST]:
-    func = tag.component_call.func
-    args = tag.component_call.args.copy()
-    keywords = {
-        keyword.arg: keyword.value
-        for keyword in
-        tag.component_call.keywords
-        if keyword.arg
-    }
+    func = create_name(tag.component_name)
+    keywords = tag.keywords.copy()
     keywords[WITH_STYLES_PARAMETER] = create_constant(False)
 
-    func_call = create_call(func, args, keywords)
+    func_call = create_call(func, keywords=keywords)
     return [ctx.result.create_add(func_call)]
 
 

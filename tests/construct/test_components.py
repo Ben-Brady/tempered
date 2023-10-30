@@ -16,25 +16,24 @@ def test_components_prevent_css_duplication():
         ],
         css="div { a: b}",
     )
-    child_call = ast_utils.create_call(
-        func=ast_utils.create_name("child"),
-        args=[],
-        keywords={
-            "value": ast_utils.create_constant("a"),
-            "with_styles": ast_utils.create_constant(True),
-        }
-    )
     parent_template = parser.Template(
         name="parent",
         body=[
             parser.ComponentBlock(
                 component_name="child",
-                component_call=child_call,
+                keywords={
+                    "value": ast_utils.create_constant("a"),
+                    "with_styles": ast_utils.create_constant(True),
+                },
             ),
             parser.ComponentBlock(
                 component_name="child",
-                component_call=child_call,
+                keywords={
+                    "value": ast_utils.create_constant("a"),
+                    "with_styles": ast_utils.create_constant(False),
+                },
             ),
+            parser.StyleBlock(),
         ],
         child_components=["child"],
     )
@@ -42,6 +41,6 @@ def test_components_prevent_css_duplication():
     components.add_template_obj(child_template)
     components.add_template_obj(parent_template)
     module = components.build_memory()
-    html: str = module.parent()
+    html: str = module.parent(with_styles=True)
     assert html.count(child_template.css) == 1
 

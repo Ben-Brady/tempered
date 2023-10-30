@@ -43,10 +43,14 @@ def parse_component_block(
     call = parse_expr(expr)
     if not isinstance(call, ast.Call):
         raise ValueError("Component call must be a function call")
-
+    keywords = {
+        keyword.arg: keyword.value
+        for keyword in call.keywords
+        if keyword.arg is not None
+    }
     return ComponentBlock(
         component_name=template,
-        component_call=call,
+        keywords=keywords,
     )
 
 

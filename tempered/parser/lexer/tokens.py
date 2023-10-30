@@ -60,11 +60,9 @@ class IfStartToken:
 class ElIfToken:
     condition: str
 
-
 @dataclass
 class ElseToken:
     pass
-
 
 @dataclass
 class IfEndToken:
@@ -75,7 +73,6 @@ class IfEndToken:
 class ForStartToken:
     variable: str
     iterable: str
-
 
 @dataclass
 class ForEndToken:

@@ -8,6 +8,7 @@ def test_template_add_styles():
         name="post",
         body=[
             parser.LiteralBlock("Bar!"),
+            parser.StyleBlock(),
         ],
         css=CSS
     ))
@@ -21,7 +22,7 @@ def test_template_wont_add_styles():
         name="post",
         body=[
             parser.LiteralBlock("Bar!"),
-
+            parser.StyleBlock(),
         ],
         css=CSS
     ))
