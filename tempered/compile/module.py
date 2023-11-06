@@ -28,7 +28,7 @@ def compile_module(
                 TemplateParameter(
                     name=WITH_STYLES_PARAMETER,
                     type=ast_utils.create_name("bool"),
-                    default=ast_utils.create_constant("True"),
+                    default=ast_utils.create_constant(True),
                 )
             ]
         )
