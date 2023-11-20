@@ -39,7 +39,7 @@ def test_template_places_styles():
             parser.StyleBlock(),
             parser.LiteralBlock("C"),
         ],
-        css=CSS
+        css=CSS,
     ))
 
     assert func() == "A<style>B</style>C"

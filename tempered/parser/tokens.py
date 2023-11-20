@@ -1,4 +1,4 @@
-from .. import parse_ast
+from . import parse_ast
 from typing import TypeAlias, Protocol, runtime_checkable
 from dataclasses import dataclass
 

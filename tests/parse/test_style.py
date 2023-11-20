@@ -26,7 +26,7 @@ def test_preprocess_extracts_global_css():
     </style>
     """
     scoped = generate_scoped_styles(HTML)
-    assert minify_css(scoped.style) == "body{background:black}"
+    assert minify_css(scoped.css) == "body{background:black}"
 
 
 def test_preprocess_scopes_css():

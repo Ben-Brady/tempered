@@ -1,4 +1,4 @@
-from ..lexer import Token
+from ..lexer.tokens import Token
 from typing import Sequence
 
 

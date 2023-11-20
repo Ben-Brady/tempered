@@ -1,9 +1,10 @@
 from .tokens import *
-from .scanner import TextScanner
+from .text_scanner import TextScanner
 from typing import Sequence
 import string
 
 
+CONTROL_ESCAPE = r"\{"
 EXPR_START = "{{"
 EXPR_END = "}}"
 DIRECTIVE_START = "{!"
@@ -44,16 +45,19 @@ def take_directive_token(scanner: TextScanner) -> Token:
     scanner.expect(DIRECTIVE_START)
     take_whitespace(scanner)
     directive = take_ident(scanner)
-    scanner.restore()
+    scanner.backtrack()
 
-    if directive == "param":
-        return take_param_token(scanner)
-    elif directive == "styles":
-        return take_styles_token(scanner)
-    elif directive == "include":
-        return take_include_token(scanner)
-    else:
-        raise scanner.error(f'Unknown Directive "{directive}"')
+    match directive:
+        case "param":
+            return take_param_token(scanner)
+        case "styles":
+            return take_styles_token(scanner)
+        case "include":
+            return take_include_token(scanner)
+        case "extends":
+            return take_extends_token(scanner)
+        case _:
+            raise scanner.error(f'Unknown Directive "{directive}"')
 
 
 def take_statement_token(scanner: TextScanner) -> Token:
@@ -61,26 +65,29 @@ def take_statement_token(scanner: TextScanner) -> Token:
     scanner.expect(STATEMENT_START)
     take_whitespace(scanner)
     statement = take_ident(scanner)
-    scanner.restore()
+    scanner.backtrack()
 
-    if statement == "if":
-        return take_if_token(scanner)
-    if statement == "elif":
-        return take_elif_token(scanner)
-    if statement == "else":
-        return take_else_token(scanner)
-    if statement == "endif":
-        return take_endif_token(scanner)
-    elif statement == "for":
-        return take_forstart_token(scanner)
-    elif statement == "endfor":
-        return take_forend_token(scanner)
-    elif statement == "set":
-        return take_set_token(scanner)
-    elif statement == "html":
-        return take_html_token(scanner)
-    else:
-        raise scanner.error(f'Unknown Statement "{statement}"')
+    match statement:
+        case "if":
+            return take_if_token(scanner)
+        case "elif":
+            return take_elif_token(scanner)
+        case "else":
+            return take_else_token(scanner)
+        case "endif":
+            return take_endif_token(scanner)
+        case "for":
+            return take_forstart_token(scanner)
+        case "endfor":
+            return take_forend_token(scanner)
+        case "set":
+            return take_set_token(scanner)
+        case "html":
+            return take_html_token(scanner)
+        case "slot":
+            return take_slot_token(scanner)
+        case _:
+            raise scanner.error(f'Unknown Statement "{statement}"')
 
 
 def take_styles_token(scanner: TextScanner) -> Token:
@@ -112,9 +119,8 @@ def take_param_token(scanner: TextScanner) -> Token:
     take_whitespace(scanner)
     scanner.expect("param")
 
-    parameter = ""
     take_whitespace(scanner)
-    parameter += scanner.take_until(DIRECTIVE_END).rstrip()
+    parameter = scanner.take_until(DIRECTIVE_END).rstrip()
     take_whitespace(scanner)
 
     scanner.expect(DIRECTIVE_END)
@@ -126,8 +132,7 @@ def take_literal_token(scanner: TextScanner) -> LiteralToken:
     while scanner.has_text:
         if scanner.startswith(EXPR_START, DIRECTIVE_START, STATEMENT_START):
             break
-        elif scanner.startswith(r"\{"):
-            scanner.pop(2)
+        elif scanner.accept(CONTROL_ESCAPE):
             body += "{"
         else:
             body += scanner.pop()
@@ -157,23 +162,34 @@ def take_html_token(scanner: TextScanner) -> HtmlExprToken:
 
 def take_component_token(scanner: TextScanner) -> ComponentToken:
     scanner.expect(COMPONENT_START)
-    component_name = take_ident(scanner)
     take_whitespace(scanner)
+    call = scanner.take_until(COMPONENT_END).rstrip()
+    take_whitespace(scanner)
+    scanner.expect(COMPONENT_END)
 
-    parameters = []
-    while not scanner.accept(COMPONENT_END):
-        parameter = ""
-        parameter += take_ident(scanner)
-        scanner.expect("=")
-        parameter += "="
-        parameter += take_literal(scanner)
-        take_whitespace(scanner)
-        parameters.append(parameter)
+    return ComponentToken(call)
 
-    return ComponentToken(
-        template=component_name,
-        parameters=parameters
-    )
+
+def take_extends_token(scanner: TextScanner) -> ExtendsToken:
+    scanner.expect(DIRECTIVE_START)
+    take_whitespace(scanner)
+    scanner.expect("extends")
+    take_whitespace(scanner)
+    layout = take_string(scanner)
+    take_whitespace(scanner)
+    scanner.expect(DIRECTIVE_END)
+
+    return ExtendsToken(layout)
+
+
+def take_slot_token(scanner: TextScanner) -> SlotToken:
+    scanner.expect(STATEMENT_START)
+    take_whitespace(scanner)
+    scanner.expect("slot")
+    take_whitespace(scanner)
+    scanner.expect(STATEMENT_END)
+
+    return SlotToken(None)
 
 
 def take_set_token(scanner: TextScanner) -> SetToken:
@@ -265,23 +281,23 @@ def take_ident(scanner: TextScanner) -> str:
     return scanner.take_while(*IDENT_LETTERS)
 
 
-def take_literal(scanner: TextScanner) -> str:
+def take_value(scanner: TextScanner) -> str:
     stack = []
-
     text = ""
-    while scanner.has_text:
-        if scanner.startswith("None"):
-            text += scanner.pop(4)
-        elif scanner.startswith("True"):
-            text += scanner.pop(4)
-        elif scanner.startswith("False"):
-            text += scanner.pop(5)
+
+    while len(stack) != 0:
+        if scanner.accept("None"):
+            text += "None"
+        elif scanner.accept("True"):
+            text += "True"
+        elif scanner.accept("False"):
+            text += "False"
         elif scanner.startswith("'", '"'):
-            text += take_string(scanner)
+            return take_string(scanner)
         elif scanner.startswith(*string.digits):
-            text += take_number(scanner)
+            return take_number(scanner)
         elif scanner.startswith(*IDENT_LETTERS):
-            text += take_ident(scanner)
+            return take_ident(scanner)
         elif scanner.startswith("{", "[", "("):
             char = scanner.pop()
             stack.append(char)
@@ -289,9 +305,8 @@ def take_literal(scanner: TextScanner) -> str:
         elif scanner.startswith("}", "]", ")"):
             stack.pop()
             text += scanner.pop()
-        elif len(stack) > 0:
-            text += scanner.pop()
-        else:
+
+        if not scanner.has_text:
             break
 
     return text

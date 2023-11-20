@@ -2,25 +2,21 @@ from . import parser, build
 from .compile.module import compile_module
 import ast
 import inspect
-import importlib
 from importlib.util import spec_from_loader, module_from_spec
 from pathlib import Path
 from types import ModuleType
-from typing import LiteralString, Any, cast, Literal, overload
-import autopep8
+from typing import LiteralString, Any, cast, overload
 
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 
 
 class Tempered:
-    _type_imports: list[ast.ImportFrom]
     _templates: list[parser.Template]
     template_files: list[Path]
 
 
     def __init__(self, template_folder: str|Path|None = None):
-        self._type_imports = []
         self._templates = []
         self.template_files = []
         if template_folder:
@@ -56,25 +52,13 @@ class Tempered:
         self._templates.append(template)
 
 
-    def register_type(self, type: type):
-        filepath = inspect.getfile(type)
-        module = inspect.getmodulename(filepath)
-        name = type.__name__
-        import_ = ast.ImportFrom(
-            module=module,
-            names=[ast.alias(name=name)],
-            level=0,
-        )
-        self._type_imports.append(import_)
-
-
     def build_to(self, module: ModuleType):
-        build.build_to(module, self._type_imports, self._templates)
+        build.build_to(module, self._templates)
 
 
     def build_memory(self) -> ModuleType:
-        return build.build_memory(self._type_imports, self._templates)
+        return build.build_memory(self._templates)
 
 
     def build_static(self):
-        return build.build_static(self._type_imports, self._templates)
+        return build.build_static(self._templates)

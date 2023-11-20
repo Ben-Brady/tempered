@@ -1,12 +1,16 @@
 from ..parser.parse_ast import (
     Template, TemplateTag, LiteralBlock, ExprBlock, HtmlBlock, IncludeStyleBlock,
-    ComponentBlock, StyleBlock, IfBlock, ForBlock, AssignmentBlock
+    ComponentBlock, StyleBlock, IfBlock, ForBlock,
+    AssignmentBlock, SlotBlock, LayoutExtendsBlock
 )
 from ..ast_utils import (
     create_constant, create_call, create_assignment,
     create_name, create_if, create_string_concat, create_attribute
 )
-from .utils import create_style_name, create_escape_call, WITH_STYLES_PARAMETER
+from .utils import (
+    create_style_name, create_escape_call, WITH_STYLES_PARAMETER,
+    create_layout_func_name, create_slot_param, COMPONENT_STYLES
+)
 from .accumulators import Result
 import ast
 from typing import Sequence, assert_never, Protocol
@@ -31,14 +35,21 @@ def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.AST]:
             return [ctx.result.create_add(create_style_name(tag.template))]
         case ComponentBlock():
             return construct_component_tag(tag, ctx)
-        case StyleBlock():
+        case StyleBlock() if ctx.template.layout is None:
             return construct_style(tag, ctx)
+        case StyleBlock():
+            # If a component has a layout, the styles will be placed there
+            return []
         case IfBlock():
             return construct_if(tag, ctx)
         case ForBlock():
             return construct_for(tag, ctx)
         case AssignmentBlock():
             return construct_assignment(tag, ctx)
+        case SlotBlock():
+            return construct_slot_tag(tag, ctx)
+        case LayoutExtendsBlock():
+            raise RuntimeError("Layout extends block should have been removed by now")
         case e:
             assert_never(e)
 
@@ -49,6 +60,11 @@ def construct_block(tags: Sequence[TemplateTag], ctx: BuildContext) -> list[ast.
         block.extend(construct_tag(tag, ctx))
 
     return block
+
+
+def construct_slot_tag(tag: SlotBlock, ctx: BuildContext) -> list[ast.AST]:
+    param = create_name(create_slot_param(tag.name))
+    return [ctx.result.create_add(param)]
 
 
 def construct_component_tag(tag: ComponentBlock, ctx: BuildContext) -> list[ast.AST]:
@@ -83,19 +99,17 @@ def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.
 
 
 def construct_style(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
-    value = create_string_concat(
-        create_constant("<style>"),
-        create_style_name(ctx.template.name),
-        *(
-            create_style_name(name)
-            for name in ctx.template.child_components
-        ),
-        create_constant("</style>"),
-    )
-
     return [create_if(
         condition=create_name("with_styles"),
-        if_body=[ctx.result.create_add(value)],
+        if_body=[
+            ctx.result.create_add(
+                create_string_concat(
+                    create_constant("<style>"),
+                    create_name(COMPONENT_STYLES),
+                    create_constant("</style>"),
+                )
+            )
+        ],
     )]
 
 

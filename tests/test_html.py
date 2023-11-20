@@ -1,7 +1,18 @@
 from utils import build_template
+import pytest
 
 
-def test_strings_arent_transformed():
+def test_text_isnte_escaped():
+    component = build_template("""
+        {!param foo!}
+        <style></style>
+        {% html foo %}
+    """)
+
+    assert "<a>" in component(foo="<a>")
+
+
+def test_string_literals_arent_transformed():
     component = build_template("""
         <style></style>
         {% html "<a>" %}

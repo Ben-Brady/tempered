@@ -1,5 +1,4 @@
-from typing import Sequence, Self
-import string
+from typing import Self
 from array import array
 
 
@@ -25,15 +24,18 @@ class TextScanner:
         self._checkpoint = self.html[:], self.position
 
 
-    def restore(self):
+    def backtrack(self):
         if self._checkpoint is None:
-            raise RuntimeError("No checkpoint to restore from")
+            raise RuntimeError("No checkpoint to backtrack to")
 
         self.html, self.position = self._checkpoint
         self._checkpoint = None
 
 
     def pop(self, length: int = 1) -> str:
+        if len(self.html) < length:
+            self.error("Unexpected end of text")
+
         popped_text = ""
         for _ in range(length):
             popped_text += self.html.pop()
@@ -103,12 +105,16 @@ class ParserException(Exception):
         err_line = lines[line_index]
 
         try:
-            prev_line = "\n" + lines[line_index - 1]
+            prev_line =  lines[line_index - 1]
+            if len(prev_line) > 80:
+                prev_line = prev_line[:80] + "..."
         except IndexError:
             prev_line = ""
 
         try:
-            next_line = "\n" + lines[line_index + 1]
+            next_line = lines[line_index + 1]
+            if len(next_line) > 80:
+                next_line = next_line[:80] + "..."
         except IndexError:
             next_line = ""
 
@@ -120,9 +126,9 @@ class ParserException(Exception):
         message = (
             f"{msg} on line {line_no}, offset {offset}" +
             "\n" +
-            prev_line +
-            f"{err_line}\n" +
-            f"{offset * ' '}^" +
+            prev_line + "\n" +
+            err_line + "\n" +
+            f"{offset * ' '}^" "\n" +
             next_line
         )
         return cls(message)

@@ -1,7 +1,8 @@
 from ...preprocess import generate_scoped_styles, minify_html
 from ..parse_ast import *
+from ..lexer.tokens import *
 from ..lexer import *
-from .scanner import TokenScanner
+from .token_scanner import TokenScanner
 from .expr import parse_expr, parse_stmt, parse_ident
 from typing import assert_never
 import ast
@@ -26,14 +27,20 @@ def take_tags_until(scanner: TokenScanner, stop_tags: list[type[Token]]):
 
 def next_tag(scanner: TokenScanner) -> TemplateTag|None:
     match scanner.pop():
-        case (LiteralToken() | StylesToken() | StylesIncludeToken()) as tag:
+        case (
+            LiteralToken() |
+            StylesToken() |
+            StylesIncludeToken() |
+            SlotToken() |
+            ExtendsToken()
+            ) as tag:
             return tag.into_tag()
         case EscapedExprToken(expr_str):
             return ExprBlock(parse_expr(expr_str))
         case HtmlExprToken(expr_str):
             return HtmlBlock(parse_expr(expr_str))
-        case ComponentToken(template=template, parameters=parameters):
-            return parse_component_block(template, parameters)
+        case ComponentToken(call=call):
+            return parse_component_block(call)
         case SetToken(assignment):
             return parse_set_block(assignment)
         case IfStartToken(condition):
@@ -50,26 +57,24 @@ def next_tag(scanner: TokenScanner) -> TemplateTag|None:
             assert_never(e)
 
 
-def parse_component_block(
-        template: str,
-        parameters: list[str],
-        ) -> ComponentBlock:
-    keywords = {}
-    for parameter in parameters:
-        assignment = parse_stmt(parameter)
-        match assignment:
-            case ast.Assign(
-                targets=[ast.Name(id=name)],
-                value=ast.Constant(value=styles)
-                ):
-                keywords[name] = styles
-            case _:
-                raise ValueError("Invalid Component Parameter")
+def parse_component_block(call_str: str) -> ComponentBlock:
+    call = parse_expr(call_str)
+    match call:
+        case ast.Call(
+            func=ast.Name(id=component_name),
+            keywords=keywords,
+            ):
+            return ComponentBlock(
+                component_name=component_name,
+                keywords={
+                    keyword.arg: keyword.value
+                    for keyword in keywords
+                    if keyword.arg is not None
+                },
+            )
+        case _:
+            raise ValueError("Invalid Component Call")
 
-    return ComponentBlock(
-        component_name=template,
-        keywords=keywords,
-    )
 
 
 def parse_set_block(assignment: str) -> AssignmentBlock:

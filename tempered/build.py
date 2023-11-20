@@ -13,21 +13,18 @@ BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 
 
 def _build_python(
-        type_imports: list[ast.ImportFrom],
         templates: list[parser.Template],
         ) -> str:
     module_ast = compile_module(
-        type_imports=type_imports,
         templates=templates,
     )
     return ast.unparse(module_ast)
 
 
 def build_memory(
-        type_imports: list[ast.ImportFrom],
         templates: list[parser.Template],
         ) -> ModuleType:
-    source = _build_python(type_imports, templates)
+    source = _build_python(templates)
     spec = spec_from_loader(name="tempered.components", loader=None)
     assert spec is not None
     module = module_from_spec(spec)
@@ -37,10 +34,9 @@ def build_memory(
 
 def build_to(
         module: ModuleType,
-        type_imports: list[ast.ImportFrom],
         templates: list[parser.Template],
         ):
-    source = _build_python(type_imports, templates)
+    source = _build_python(templates)
     source = autopep8.fix_code(source)
     if not hasattr(module, "__file__") or module.__file__ is None:
         raise ValueError("Module must be loaded from a file")
@@ -52,7 +48,6 @@ def build_to(
 
 
 def build_static(
-        type_imports: list[ast.ImportFrom],
         templates: list[parser.Template],
         ):
     try:
@@ -62,7 +57,7 @@ def build_static(
         BUILD_FILE.touch()
         components = _load_static_file()
 
-    build_to(components, type_imports, templates)
+    build_to(components, templates)
     return components
 
 

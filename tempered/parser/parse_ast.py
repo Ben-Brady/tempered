@@ -1,8 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 import ast
-from bs4 import BeautifulSoup
-from typing import Any, TypeAlias, Sequence, override
+from typing import Any, TypeAlias, Sequence, Literal
 from abc import ABC
 
 
@@ -66,6 +65,17 @@ class AssignmentBlock(Tag):
     value: ast.expr
 
 
+@dataclass
+class SlotBlock(Tag):
+    name: str | None = None
+    """A layout place it's content here"""
+
+
+@dataclass
+class LayoutExtendsBlock(Tag):
+    template: str
+
+
 TemplateTag: TypeAlias = (
     LiteralBlock
     | HtmlBlock
@@ -76,6 +86,8 @@ TemplateTag: TypeAlias = (
     | IfBlock
     | ForBlock
     | AssignmentBlock
+    | LayoutExtendsBlock
+    | SlotBlock
 )
 
 
@@ -95,13 +107,17 @@ class Template:
     name: str
     parameters: list[TemplateParameter] = field(default_factory=list)
     context: dict[str, Any] = field(default_factory=dict)
+    type: TemplateType = "component"
 
     body: TemplateBlock = field(default_factory=list)
-    child_components: list[str] = field(default_factory=list)
     css: str = ""
+    layout: str|None = None
+    child_components: list[str] = field(default_factory=list)
 
 
+TemplateType: TypeAlias = Literal["component", "layout"]
 TemplateBlock: TypeAlias = Sequence[TemplateTag]
+
 
 __all__ = [
     "TemplateBlock",
@@ -119,4 +135,7 @@ __all__ = [
     "RequiredParameter",
     "StyleBlock",
     "IncludeStyleBlock",
+    "LayoutExtendsBlock",
+    "SlotBlock",
+    "TemplateType"
 ]

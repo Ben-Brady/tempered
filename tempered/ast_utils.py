@@ -113,9 +113,12 @@ def create_assignment(target: str|ast.Name, value: Any) -> ast.Assign:
     if isinstance(target, str):
         target = create_name(target)
 
+    if not isinstance(value, ast.AST):
+        value = create_constant(value)
+
     return ast.Assign(
         targets=[target],
-        value=create_constant(value),
+        value=value,
         type_comment=None,
     )
 

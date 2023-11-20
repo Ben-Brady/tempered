@@ -1,14 +1,21 @@
 from .. import ast_utils
 from ..ast_utils import create_name, create_assignment, create_module, create_function
 from ..parser import Template, TemplateParameter, RequiredParameter
-from .utils import IMPORTS, create_style_name, WITH_STYLES_PARAMETER
+from .utils import (
+    IMPORTS,
+    create_style_name,
+    create_slot_param,
+    create_component_func_name,
+    create_layout_func_name,
+    WITH_STYLES_PARAMETER,
+    LAYOUT_CSS_PARAMETER,
+)
 from .body import construct_body
 import ast
 from typing import Sequence
 
 
 def compile_module(
-    type_imports: Sequence[ast.Import | ast.ImportFrom],
     templates: Sequence[Template],
 ) -> ast.Module:
     style_constants = [
@@ -18,23 +25,39 @@ def compile_module(
         )
         for template in templates
     ]
-    update_children(templates)
+    update_required_css(templates)
 
     functions = []
     for template in templates:
+        if template.type == "layout":
+            function_name = create_layout_func_name(template.name)
+        else:
+            function_name = create_component_func_name(template.name)
+
+        kw_arguements = [*template.parameters]
+        kw_arguements.append(TemplateParameter(
+            name=WITH_STYLES_PARAMETER,
+            type=ast_utils.create_name("bool"),
+            default=ast_utils.create_constant(True),
+        ))
+        if template.type == "layout":
+            kw_arguements.append(TemplateParameter(
+                name=create_slot_param(None),
+                type=ast_utils.create_name("str"),
+                default=ast_utils.create_constant(""),
+            ))
+            kw_arguements.append(TemplateParameter(
+                name=LAYOUT_CSS_PARAMETER,
+                type=ast_utils.create_name("str"),
+                default=ast_utils.create_constant(""),
+            ))
+
         args = create_arguments(
             arguments=[],
-            kw_arguments=[
-                *template.parameters,
-                TemplateParameter(
-                    name=WITH_STYLES_PARAMETER,
-                    type=ast_utils.create_name("bool"),
-                    default=ast_utils.create_constant(True),
-                ),
-            ],
+            kw_arguments=kw_arguements,
         )
         func = create_function(
-            name=template.name,
+            name=function_name,
             args=args,
             body=construct_body(template),
             returns=create_name("str"),
@@ -44,7 +67,6 @@ def compile_module(
     return create_module(
         [
             *IMPORTS,
-            *type_imports,
             *style_constants,
             *functions,
         ]
@@ -85,7 +107,7 @@ def create_arguments(
     )
 
 
-def update_children(templates: Sequence[Template]):
+def update_required_css(templates: Sequence[Template]):
     lookup = {template.name: template for template in templates}
     checked = set()
 
