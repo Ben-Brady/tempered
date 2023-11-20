@@ -7,6 +7,7 @@ from .parse.expr import parse_parameter
 from .parse.parser import create_body
 from typing import Any, Sequence, cast, Literal
 import random
+import warnings
 
 
 def parse_template(
@@ -142,6 +143,11 @@ def reparse_html(html: str, token_lookup: dict[str, Token]) -> Sequence[Token]:
         tokens.append(token_lookup.pop(token_id))
 
     if len(token_lookup) > 0:
-        raise RuntimeError("Some of the tags were mangled by the HTML")
+        warnings.warn(
+            "Some of the custom tags are not used,"
+            "this is either caused by HTML commenting a custom tag or a bug in the parser"
+
+            , RuntimeWarning
+        )
 
     return tokens
