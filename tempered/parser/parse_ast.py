@@ -9,6 +9,7 @@ from abc import ABC
 class Tag(ABC):
     pass
 
+
 @dataclass
 class LiteralBlock(Tag):
     body: str
@@ -32,6 +33,7 @@ class StyleBlock(Tag):
 @dataclass
 class IncludeStyleBlock(Tag):
     """Include a component style's"""
+
     template: str
 
 
@@ -65,10 +67,17 @@ class AssignmentBlock(Tag):
 
 
 TemplateTag: TypeAlias = (
-    LiteralBlock | HtmlBlock | ExprBlock |
-    ComponentBlock | StyleBlock | IncludeStyleBlock |
-    IfBlock | ForBlock | AssignmentBlock
+    LiteralBlock
+    | HtmlBlock
+    | ExprBlock
+    | ComponentBlock
+    | StyleBlock
+    | IncludeStyleBlock
+    | IfBlock
+    | ForBlock
+    | AssignmentBlock
 )
+
 
 class RequiredParameter:
     pass
@@ -95,8 +104,19 @@ class Template:
 TemplateBlock: TypeAlias = Sequence[TemplateTag]
 
 __all__ = [
-    "TemplateBlock", "TemplateTag", "Template", "Tag",
-    "IfBlock", "ForBlock", "AssignmentBlock",
-    "LiteralBlock", "ExprBlock", "HtmlBlock", "ComponentBlock",
-    "TemplateParameter", "RequiredParameter", "StyleBlock", "IncludeStyleBlock"
+    "TemplateBlock",
+    "TemplateTag",
+    "Template",
+    "Tag",
+    "IfBlock",
+    "ForBlock",
+    "AssignmentBlock",
+    "LiteralBlock",
+    "ExprBlock",
+    "HtmlBlock",
+    "ComponentBlock",
+    "TemplateParameter",
+    "RequiredParameter",
+    "StyleBlock",
+    "IncludeStyleBlock",
 ]

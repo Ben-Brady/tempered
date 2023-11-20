@@ -16,3 +16,4 @@ dependencies = [
     "rcssmin",
     "autopep8",
 ]
+requires-python = ">=3.9"

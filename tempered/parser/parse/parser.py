@@ -32,8 +32,8 @@ def next_tag(scanner: TokenScanner) -> TemplateTag|None:
             return ExprBlock(parse_expr(expr_str))
         case HtmlExprToken(expr_str):
             return HtmlBlock(parse_expr(expr_str))
-        case ComponentToken(template=template, expr=expr_str):
-            return parse_component_block(template, expr_str)
+        case ComponentToken(template=template, parameters=parameters):
+            return parse_component_block(template, parameters)
         case SetToken(assignment):
             return parse_set_block(assignment)
         case IfStartToken(condition):
@@ -52,16 +52,20 @@ def next_tag(scanner: TokenScanner) -> TemplateTag|None:
 
 def parse_component_block(
         template: str,
-        expr: str,
+        parameters: list[str],
         ) -> ComponentBlock:
-    call = parse_expr(expr)
-    if not isinstance(call, ast.Call):
-        raise ValueError("Component call must be a function call")
-    keywords = {
-        keyword.arg: keyword.value
-        for keyword in call.keywords
-        if keyword.arg is not None
-    }
+    keywords = {}
+    for parameter in parameters:
+        assignment = parse_stmt(parameter)
+        match assignment:
+            case ast.Assign(
+                targets=[ast.Name(id=name)],
+                value=ast.Constant(value=styles)
+                ):
+                keywords[name] = styles
+            case _:
+                raise ValueError("Invalid Component Parameter")
+
     return ComponentBlock(
         component_name=template,
         keywords=keywords,

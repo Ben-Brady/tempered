@@ -12,8 +12,8 @@ def test_preprocess_extracts_style_tags():
         div { color: red;}
     </style>
     """
-    html, _ = generate_scoped_styles(HTML)
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    scoped = generate_scoped_styles(HTML)
+    soup = bs4.BeautifulSoup(scoped.html, "html.parser")
     assert len(soup.find_all("style")) == 0
 
 
@@ -25,8 +25,8 @@ def test_preprocess_extracts_global_css():
         }
     </style>
     """
-    _, style = generate_scoped_styles(HTML)
-    assert minify_css(style) == "body{background:black}"
+    scoped = generate_scoped_styles(HTML)
+    assert minify_css(scoped.style) == "body{background:black}"
 
 
 def test_preprocess_scopes_css():
@@ -39,13 +39,13 @@ def test_preprocess_scopes_css():
         }
     </style>
     """
-    html, style = generate_scoped_styles(HTML)
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    scoped = generate_scoped_styles(HTML)
+    soup = bs4.BeautifulSoup(scoped.html, "html.parser")
     div = soup.find("div")
 
     assert div and isinstance(div, bs4.element.Tag), "div should exist"
     assert "class" in div.attrs, "div should have a scope class"
-    assert "{background:black}" in minify_css(style), "css should be preserved"
+    assert "{background:black}" in minify_css(scoped.css), "css should be preserved"
 
 
 def test_preprocess_doesnt_override_clases():
@@ -57,8 +57,8 @@ def test_preprocess_doesnt_override_clases():
         div { background: black; }
     </style>
     """
-    html, style = generate_scoped_styles(HTML)
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    scoped = generate_scoped_styles(HTML)
+    soup = bs4.BeautifulSoup(scoped.html, "html.parser")
     div = soup.find("div")
     assert div and isinstance(div, bs4.element.Tag), "div should exist"
     assert "class" in div.attrs, "div should have a scope class"

@@ -44,7 +44,7 @@ class HtmlExprToken:
 @dataclass
 class ComponentToken:
     template: str
-    expr: str
+    parameters: list[str]
 
 
 @dataclass

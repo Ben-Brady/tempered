@@ -10,6 +10,8 @@ DIRECTIVE_START = "{!"
 DIRECTIVE_END = "!}"
 STATEMENT_START = "{%"
 STATEMENT_END = "%}"
+COMPONENT_START = "{<"
+COMPONENT_END = ">}"
 IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
 WHITESPACE = string.whitespace
 
@@ -31,6 +33,8 @@ def take_token(scanner: TextScanner) -> Token:
         return take_directive_token(scanner)
     elif scanner.startswith(STATEMENT_START):
         return take_statement_token(scanner)
+    elif scanner.startswith(COMPONENT_START):
+        return take_component_token(scanner)
     else:
         return take_literal_token(scanner)
 
@@ -73,8 +77,6 @@ def take_statement_token(scanner: TextScanner) -> Token:
         return take_forend_token(scanner)
     elif statement == "set":
         return take_set_token(scanner)
-    elif statement == "component":
-        return take_component_token(scanner)
     elif statement == "html":
         return take_html_token(scanner)
     else:
@@ -154,20 +156,24 @@ def take_html_token(scanner: TextScanner) -> HtmlExprToken:
 
 
 def take_component_token(scanner: TextScanner) -> ComponentToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("component")
+    scanner.expect(COMPONENT_START)
+    component_name = take_ident(scanner)
     take_whitespace(scanner)
 
-    scanner.checkpoint()
-    template = take_ident(scanner)
-    scanner.restore()
+    parameters = []
+    while not scanner.accept(COMPONENT_END):
+        parameter = ""
+        parameter += take_ident(scanner)
+        scanner.expect("=")
+        parameter += "="
+        parameter += take_literal(scanner)
+        take_whitespace(scanner)
+        parameters.append(parameter)
 
-    expr = scanner.take_until(STATEMENT_END).rstrip()
-    take_whitespace(scanner)
-    scanner.expect(STATEMENT_END)
-
-    return ComponentToken(template=template, expr=expr)
+    return ComponentToken(
+        template=component_name,
+        parameters=parameters
+    )
 
 
 def take_set_token(scanner: TextScanner) -> SetToken:

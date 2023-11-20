@@ -1,22 +1,19 @@
-from ...preprocess import generate_scoped_styles, minify_html
-from ..parse_ast import *
-from ..lexer import *
-from .scanner import TokenScanner
-from .expr import parse_parameter
-from .parser import create_body
-from typing import LiteralString, Any, Sequence
+from ..preprocess import generate_scoped_styles, minify_html
+from .parse_ast import *
+from .lexer import *
+from .parse.scanner import TokenScanner
+from .parse.expr import parse_parameter
+from .parse.parser import create_body
+from typing import LiteralString, Any, Sequence, Iterable
 
 
 def parse_template(
-        name: str,
-        template_html: LiteralString,
-        context: dict[str, Any]|None = None
-        ) -> Template:
+    name: str, template_html: LiteralString, context: dict[str, Any] | None = None
+) -> Template:
     context = context or {}
 
     html = template_html
     html, css = generate_scoped_styles(html, prefix=name)
-    html = minify_html(html)
     tokens = to_token_stream(html)
 
     tokens, parameters = extract_parameters(tokens)
@@ -31,38 +28,30 @@ def parse_template(
         context=context,
         parameters=parameters,
         body=body,
-        child_components=child_components,
+        child_components=list(child_components),
         css=css,
     )
 
 
-def extract_parameters(tokens: Sequence[Token]) -> tuple[Sequence[Token], list[TemplateParameter]]:
+def extract_parameters(
+    tokens: Sequence[Token],
+) -> tuple[Sequence[Token], list[TemplateParameter]]:
     parameters = [
         parse_parameter(token.parameter)
         for token in tokens
         if isinstance(token, ParameterToken)
     ]
-    tokens = [
-        token for token in tokens
-        if not isinstance(token, ParameterToken)
-    ]
+    tokens = [token for token in tokens if not isinstance(token, ParameterToken)]
     return tokens, parameters
 
 
-
-def get_child_components(tokens: Sequence[Token]) -> list[str]:
-    return [
-        token.template
-        for token in tokens
-        if isinstance(token, ComponentToken)
-    ]
+def get_child_components(tokens: Sequence[Token]) -> Sequence[str]:
+    return [token.template for token in tokens if isinstance(token, ComponentToken)]
 
 
 def add_default_style_block(
-        body: TemplateBlock,
-        child_components: list[str],
-        css: str
-        ):
+    body: TemplateBlock, child_components: Sequence[str], css: str
+):
     template_style_tag_count = len([t for t in body if isinstance(t, StyleBlock)])
     if template_style_tag_count > 1:
         raise ValueError("Templates can only have one style block")

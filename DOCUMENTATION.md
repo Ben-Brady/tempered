@@ -78,6 +78,18 @@ Use `{% component  %}` for a component, call this like
 **Important**
 > Ensure you surround attributes in \"\" to prevent XSS, e.g. `<a href="{{src}}"/>`
 
+### Set
+
+Use `{% set  %}` to set a variables
+
+```html
+{!param post !}
+<div>
+    {% set title = post.title.lower() %}
+</div>
+```
+
+This can also be paired with control flow
 ## Control Flow
 
 ### If
