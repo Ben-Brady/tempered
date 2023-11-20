@@ -16,10 +16,13 @@ BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 class Tempered:
     _type_imports: list[ast.ImportFrom]
     _templates: list[parser.Template]
+    template_files: list[Path]
+
 
     def __init__(self, template_folder: str|Path|None = None):
         self._type_imports = []
         self._templates = []
+        self.template_files = []
         if template_folder:
             self.add_template_folder(template_folder)
 
@@ -30,6 +33,7 @@ class Tempered:
             ):
         folder = Path(folder)
         for file in folder.glob("**/*.*"):
+            self.template_files.append(file)
             name = file.stem
             template = cast(LiteralString, file.read_text())
             self.add_template(
