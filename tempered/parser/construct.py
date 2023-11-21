@@ -6,6 +6,7 @@ from .text_scanner import TextScanner
 from .parse.token_scanner import TokenScanner
 from .parse.expr import parse_parameter
 from .parse.parser import parse_tokens
+from pathlib import Path
 from typing import Any, Sequence, cast, Literal
 import random
 import warnings
@@ -14,13 +15,14 @@ import warnings
 def parse_template(
     name: str,
     html: str,
+    filepath: Path|None = None,
     context: dict[str, Any] | None = None,
 ) -> Template:
     context = context or {}
 
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
-    tokens = to_token_stream(html)
+    tokens = to_token_stream(html, filepath=filepath)
     html, token_lookup = reassmble_html(tokens)
 
     # Process HTML

@@ -171,7 +171,6 @@ cython_debug/
 
 # Built Visual Studio Code Extensions
 *.vsix
-templates/
 scripts/
 tempered/generated/*
 !tempered/generated/__init__.py

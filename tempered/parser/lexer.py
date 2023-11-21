@@ -2,6 +2,7 @@ from . import python_utils, tokens
 from .text_scanner import TextScanner
 from typing_extensions import Sequence, TypeVar
 import string
+from pathlib import Path
 
 
 CONTROL_ESCAPE = r"\{"
@@ -16,8 +17,8 @@ IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
 WHITESPACE = string.whitespace
 
 
-def to_token_stream(html: str) -> Sequence[tokens.Token]:
-    scanner = TextScanner(html)
+def to_token_stream(html: str, filepath: Path|None = None) -> Sequence[tokens.Token]:
+    scanner = TextScanner(html, filepath)
     _tokens: list[tokens.Token] = []
     while scanner.has_text:
         token = take_token(scanner)

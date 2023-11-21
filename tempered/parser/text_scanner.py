@@ -6,12 +6,14 @@ from pathlib import Path
 class TextScanner:
     original: str
     position: int = 0
+    file: Path|None
 
     if TYPE_CHECKING:
         text: array[str]
         _checkpoint: tuple[array[str], int] | None = None
 
-    def __init__(self, html: str):
+    def __init__(self, html: str, file: Path|None = None):
+        self.file = file
         self.original = html
         self.text = array("u")
         self.text.fromunicode(html[::-1])
@@ -108,12 +110,17 @@ class TextScanner:
         return text
 
     def error(self, msg: str) -> Exception:
-        return ParserException.create(msg, self.original, self.position)
+        return ParserException.create(msg, self.file, self.original, self.position)
 
 
 class ParserException(Exception):
     @classmethod
-    def create(cls, msg: str, source: str, position: int) -> Self:
+    def create(cls,
+            msg: str,
+            file: Path|None,
+            source: str,
+            position: int
+            ) -> Self:
         line_index = source[:position].count("\n")
 
         lines = source.split("\n")
@@ -138,14 +145,19 @@ class ParserException(Exception):
         line_start = source.rfind("\n", 0, position) + 1
         offset = position - line_start
 
+        if file is None:
+            msg = f"{msg} on line {line_no}, offset {offset}"
+        else:
+            msg = (
+                f"{msg} in {file.name} on line {line_no}, offset {offset} \n"
+                f"{file.absolute()}:{line_no}:{offset}"
+            )
+
         message = (
-            f"{msg} on line {line_no}, offset {offset}"
-            + "\n"
-            + prev_line
-            + "\n"
-            + err_line
-            + "\n"
-            + f"{offset * ' '}^"
-            "\n" + next_line
+            msg + "\n"
+            + prev_line + "\n"
+            + err_line + "\n"
+            + f"{offset * ' '}^" "\n"
+            + next_line
         )
         return cls(message)

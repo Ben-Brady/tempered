@@ -5,12 +5,12 @@ import pytest
 
 def test_layout_extend_with_default_slot():
     components = Tempered()
-    components.add_template("a", """
+    components.add_template_from_string("a", """
         <div>
         {% slot %}
         </div>
     """)
-    components.add_template("b", """
+    components.add_template_from_string("b", """
         {% extends "a" %}
         Test
     """)
@@ -24,11 +24,11 @@ def test_layout_extend_with_default_slot():
 def test_layout_migrates_css():
     CSS_KEY = "TEMPERED_CSS"
     components = Tempered()
-    components.add_template("a", """
+    components.add_template_from_string("a", """
         {%styles%}
         {% slot %}
     """)
-    components.add_template("b", """
+    components.add_template_from_string("b", """
         {% extends "a" %}
         Test
 
@@ -48,10 +48,10 @@ def test_layout_migrates_css():
 @pytest.mark.xfail
 def test_layout_extend_with_named_slots():
     components = Tempered()
-    components.add_template("layout", """
+    components.add_template_from_string("layout", """
         <title>{% slot title %}</title>
     """)
-    components.add_template("child", """
+    components.add_template_from_string("child", """
         {% extends "layout" %}
         {% block title %}{% endblock %}
     """)
@@ -65,11 +65,11 @@ def test_layout_extend_with_named_slots():
 @pytest.mark.xfail
 def test_layout_extend_with_many_named_slots():
     components = Tempered()
-    components.add_template("layout", """
+    components.add_template_from_string("layout", """
         <a>{% slot b%}</a>
         <b>{% slot a%}</b>
     """)
-    components.add_template("child", """
+    components.add_template_from_string("child", """
         {% extends "layout" %}
         {% block a %}A{% endblock %}
         {% block b %}B{% endblock %}

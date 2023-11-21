@@ -13,7 +13,7 @@ class Comment:
 
 
 if __name__ == "__main__":
-    templates.add_template("comment", """
+    templates.add_template_from_string("comment", """
     {%param comment: Comment %}
     <div>
         <span class="header">
