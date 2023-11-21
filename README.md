@@ -45,8 +45,9 @@ pip install tempered
 ```
 
 ```python
-import tempered
+from tempered import Tempered
 
+tempered = Tempered()
 tempered.add_template_folder("./templates")
 components = tempered.build()
 

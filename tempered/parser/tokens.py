@@ -24,14 +24,6 @@ class StylesToken(EasyParseToken):
 
 
 @dataclass
-class StylesIncludeToken(EasyParseToken):
-    template: str
-
-    def into_tag(self) -> parse_ast.IncludeStyleBlock:
-        return parse_ast.IncludeStyleBlock(self.template)
-
-
-@dataclass
 class ExtendsToken:
     layout: str
 

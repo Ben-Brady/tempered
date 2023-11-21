@@ -53,8 +53,11 @@ def take_tags_until(
 def next_tag(ctx: ParseContext, scanner: TokenScanner) -> parse_ast.TemplateTag | None:
     token = scanner.pop()
     match token:
-        case (tokens.LiteralToken() | tokens.StylesIncludeToken()) as tag:
+        case tokens.LiteralToken() as tag:
             return tag.into_tag()
+        case tokens.StylesIncludeToken() as tag:
+            ctx.child_components.add(tag.template)
+            return None
         case tokens.EscapedExprToken(expr_str):
             return parse_ast.ExprBlock(parse_expr(expr_str))
         case tokens.HtmlExprToken(expr_str):

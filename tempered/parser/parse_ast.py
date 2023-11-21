@@ -30,13 +30,6 @@ class StyleBlock(Tag):
 
 
 @dataclass
-class IncludeStyleBlock(Tag):
-    """Include a component style's"""
-
-    template: str
-
-
-@dataclass
 class ComponentBlock(Tag):
     # Needed to prevent CSS from being created multiple times
     # Also to prevent HTML from being escaped
@@ -83,7 +76,6 @@ TemplateTag: TypeAlias = (
     | ExprBlock
     | ComponentBlock
     | StyleBlock
-    | IncludeStyleBlock
     | IfBlock
     | ForBlock
     | AssignmentBlock

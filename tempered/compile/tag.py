@@ -1,6 +1,6 @@
 from ..parser import parse_ast
 from ..parser.parse_ast import (
-    Template, LayoutTemplate, TemplateTag, LiteralBlock, ExprBlock, HtmlBlock, IncludeStyleBlock,
+    Template, LayoutTemplate, TemplateTag, LiteralBlock, ExprBlock, HtmlBlock,
     ComponentBlock, StyleBlock, IfBlock, ForBlock,
     AssignmentBlock, SlotBlock
 )
@@ -30,8 +30,6 @@ def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.stmt]:
             return [ctx.result.create_add(create_escape_call(tag.value))]
         case HtmlBlock():
             return [ctx.result.create_add(tag.value)]
-        case IncludeStyleBlock():
-            return [ctx.result.create_add(css_name(tag.template))]
         case ComponentBlock():
             return construct_component_tag(ctx, tag)
         case StyleBlock() if ctx.layout is None:
@@ -102,21 +100,6 @@ def construct_assignment(ctx: BuildContext, tag: AssignmentBlock) -> Sequence[as
     return [ast.Assign(
         targets=[tag.target],
         value=tag.value,
-    )]
-
-
-def construct_style_include(ctx: BuildContext, tag: StyleBlock) -> Sequence[ast.stmt]:
-    value = ast_utils.Add(
-        css_name(ctx.template.name),
-        *(
-            css_name(name)
-            for name in ctx.template.child_components
-        )
-    )
-
-    return [ast_utils.If(
-        condition=ast_utils.Name("with_styles"),
-        if_body=[ctx.result.create_add(value)],
     )]
 
 
