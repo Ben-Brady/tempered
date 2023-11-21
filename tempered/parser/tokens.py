@@ -32,17 +32,30 @@ class StylesIncludeToken(EasyParseToken):
 
 
 @dataclass
-class SlotToken(EasyParseToken):
-    name: str|None
-
-    def into_tag(self) -> parse_ast.SlotBlock:
-        return parse_ast.SlotBlock(name=self.name)
-
-
-@dataclass
 class ExtendsToken:
     layout: str
 
+
+@dataclass
+class SlotToken:
+    name: str|None
+    is_required: bool
+
+
+@dataclass
+class SlotEndToken:
+    pass
+
+
+@dataclass
+class BlockToken:
+    name: str
+    is_required: bool
+
+
+@dataclass
+class BlockEndToken:
+    pass
 
 
 @dataclass
@@ -99,18 +112,9 @@ class SetToken:
 
 Token: TypeAlias = (
     LiteralToken |
-    ParameterToken | StylesToken | StylesIncludeToken |
+    ParameterToken | StylesToken | StylesIncludeToken | SetToken |
     ComponentToken | HtmlExprToken | EscapedExprToken |
     IfStartToken | ElIfToken | ElseToken | IfEndToken |
-    ForStartToken | ForEndToken | SetToken |
-    ExtendsToken | SlotToken
+    ForStartToken | ForEndToken |
+    ExtendsToken | SlotToken | SlotEndToken |BlockToken | BlockEndToken
 )
-
-__all__ = [
-    "Token", "LiteralToken",
-    "ParameterToken", "StylesToken", "StylesIncludeToken",
-    "ComponentToken", "HtmlExprToken", "EscapedExprToken",
-    "IfStartToken", "ElIfToken", "ElseToken", "IfEndToken",
-    "ForStartToken", "ForEndToken", "SetToken",
-    "ExtendsToken", "SlotToken"
-]

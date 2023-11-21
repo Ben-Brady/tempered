@@ -1,7 +1,6 @@
-from .tokens import *
+from . import python_utils, tokens
 from .text_scanner import TextScanner
-from . import python_utils
-from typing import Sequence
+from typing_extensions import Sequence, TypeVar
 import string
 
 
@@ -17,33 +16,32 @@ IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
 WHITESPACE = string.whitespace
 
 
-def to_token_stream(html: str) -> Sequence[Token]:
+def to_token_stream(html: str) -> Sequence[tokens.Token]:
     scanner = TextScanner(html)
-    tokens: list[Token] = []
+    _tokens: list[tokens.Token] = []
     while scanner.has_text:
         token = take_token(scanner)
-        tokens.append(token)
+        _tokens.append(token)
 
-    return tokens
+    return _tokens
 
 
-def take_token(scanner: TextScanner) -> Token:
-    if scanner.startswith(EXPR_START):
-        return take_expr_token(scanner)
-    elif scanner.startswith(STATEMENT_START):
+def take_token(scanner: TextScanner) -> tokens.Token:
+    if scanner.startswith(STATEMENT_START):
         return take_statement_token(scanner)
+    elif scanner.startswith(EXPR_START):
+        return take_expr_token(scanner)
     elif scanner.startswith(COMPONENT_START):
         return take_component_token(scanner)
     else:
         return take_literal_token(scanner)
 
 
-def take_statement_token(scanner: TextScanner) -> Token:
-    scanner.checkpoint()
+def take_statement_token(scanner: TextScanner) -> tokens.Token:
     scanner.expect(STATEMENT_START)
     take_whitespace(scanner)
     statement = python_utils.take_ident(scanner)
-    scanner.backtrack()
+    take_whitespace(scanner)
 
     match statement:
         case "if":
@@ -51,45 +49,45 @@ def take_statement_token(scanner: TextScanner) -> Token:
         case "elif":
             return take_elif_token(scanner)
         case "else":
-            return take_else_token(scanner)
+            scanner.expect(STATEMENT_END)
+            return tokens.ElseToken()
         case "endif":
-            return take_endif_token(scanner)
+            scanner.expect(STATEMENT_END)
+            return tokens.IfEndToken()
         case "for":
             return take_forstart_token(scanner)
         case "endfor":
-            return take_forend_token(scanner)
+            scanner.expect(STATEMENT_END)
+            return tokens.ForEndToken()
         case "set":
             return take_set_token(scanner)
         case "html":
             return take_html_token(scanner)
-        case "slot":
-            return take_slot_token(scanner)
         case "param":
             return take_param_token(scanner)
         case "styles":
-            return take_styles_token(scanner)
+            scanner.expect(STATEMENT_END)
+            return tokens.StylesToken()
         case "include":
             return take_include_token(scanner)
         case "extends":
             return take_extends_token(scanner)
+        case "slot":
+            return take_slot_token(scanner)
+        case "endslot":
+            scanner.expect(STATEMENT_END)
+            return tokens.SlotEndToken()
+        case "block":
+            return take_block_token(scanner)
+        case "endblock":
+            scanner.expect(STATEMENT_END)
+            return tokens.BlockEndToken()
         case _:
             raise scanner.error(f'Unknown Statement "{statement}"')
 
 
-def take_styles_token(scanner: TextScanner) -> Token:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("styles")
-    take_whitespace(scanner)
-    scanner.expect(STATEMENT_END)
-    return StylesToken()
 
-
-def take_include_token(scanner: TextScanner) -> Token:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("include")
-    take_whitespace(scanner)
+def take_include_token(scanner: TextScanner) -> tokens.Token:
     template = python_utils.take_ident(scanner)
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
@@ -97,23 +95,18 @@ def take_include_token(scanner: TextScanner) -> Token:
     if len(template) == 0:
         raise scanner.error("Template Name cannot be empty")
 
-    return StylesIncludeToken(template)
+    return tokens.StylesIncludeToken(template)
 
 
-def take_param_token(scanner: TextScanner) -> Token:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("param")
-
-    take_whitespace(scanner)
+def take_param_token(scanner: TextScanner) -> tokens.Token:
     parameter = scanner.take_until(STATEMENT_END).rstrip()
     take_whitespace(scanner)
 
     scanner.expect(STATEMENT_END)
-    return ParameterToken(parameter)
+    return tokens.ParameterToken(parameter)
 
 
-def take_literal_token(scanner: TextScanner) -> LiteralToken:
+def take_literal_token(scanner: TextScanner) -> tokens.LiteralToken:
     body = ""
     while scanner.has_text:
         if scanner.startswith(EXPR_START, STATEMENT_START, COMPONENT_START):
@@ -123,121 +116,102 @@ def take_literal_token(scanner: TextScanner) -> LiteralToken:
         else:
             body += scanner.pop()
 
-    return LiteralToken(body)
+    return tokens.LiteralToken(body)
 
 
-def take_expr_token(scanner: TextScanner) -> EscapedExprToken:
+def take_expr_token(scanner: TextScanner) -> tokens.EscapedExprToken:
     scanner.expect(EXPR_START)
     take_whitespace(scanner)
     expr = scanner.take_until(EXPR_END).rstrip()
     take_whitespace(scanner)
     scanner.expect(EXPR_END)
-    return EscapedExprToken(expr)
+    return tokens.EscapedExprToken(expr)
 
 
-def take_html_token(scanner: TextScanner) -> HtmlExprToken:
-    scanner.expect(STATEMENT_START)
+def take_component_token(scanner: TextScanner) -> tokens.ComponentToken:
+    scanner.expect(COMPONENT_START)
     take_whitespace(scanner)
-    scanner.expect("html")
+    call = scanner.take_until(
+        [COMPONENT_END, COMPONENT_END_ALTERNATIVE]).rstrip()
     take_whitespace(scanner)
+    scanner.accept("/")  # For />}
+    scanner.expect(COMPONENT_END)
+
+    return tokens.ComponentToken(call)
+
+
+def take_html_token(scanner: TextScanner) -> tokens.HtmlExprToken:
     expr = scanner.take_until(STATEMENT_END).rstrip()
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
-    return HtmlExprToken(expr)
+    return tokens.HtmlExprToken(expr)
 
 
-def take_component_token(scanner: TextScanner) -> ComponentToken:
-    scanner.expect(COMPONENT_START)
-    take_whitespace(scanner)
-    call = scanner.take_until([COMPONENT_END, COMPONENT_END_ALTERNATIVE]).rstrip()
-    take_whitespace(scanner)
-    scanner.accept("/") # For />}
-    scanner.expect(COMPONENT_END)
 
-    return ComponentToken(call)
-
-
-def take_extends_token(scanner: TextScanner) -> ExtendsToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("extends")
-    take_whitespace(scanner)
+def take_extends_token(scanner: TextScanner) -> tokens.ExtendsToken:
     layout = python_utils.take_string(scanner)
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return ExtendsToken(layout)
+    return tokens.ExtendsToken(layout)
 
 
-def take_slot_token(scanner: TextScanner) -> SlotToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("slot")
+def take_slot_token(scanner: TextScanner) -> tokens.SlotToken:
+    if scanner.startswith(*python_utils.IDENT_START):
+        name = python_utils.take_ident(scanner)
+        take_whitespace(scanner)
+    else:
+        name = None
+
+    is_required = bool(scanner.take_optional("required"))
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return SlotToken(None)
+    return tokens.SlotToken(
+        name=name,
+        is_required=is_required,
+    )
 
 
-def take_set_token(scanner: TextScanner) -> SetToken:
-    scanner.expect(STATEMENT_START)
+def take_block_token(scanner: TextScanner) -> tokens.BlockToken:
+    name = python_utils.take_ident(scanner)
     take_whitespace(scanner)
-    scanner.expect("set")
+
+    is_required = bool(scanner.take_optional("required"))
     take_whitespace(scanner)
+    scanner.expect(STATEMENT_END)
+
+    return tokens.BlockToken(
+        name=name,
+        is_required=is_required
+    )
+
+
+def take_set_token(scanner: TextScanner) -> tokens.SetToken:
     assignment = scanner.take_until(STATEMENT_END).rstrip()
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return SetToken(assignment)
+    return tokens.SetToken(assignment)
 
 
-def take_if_token(scanner: TextScanner) -> IfStartToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("if")
-    take_whitespace(scanner)
+def take_if_token(scanner: TextScanner) -> tokens.IfStartToken:
     condition = scanner.take_until(STATEMENT_END).rstrip()
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return IfStartToken(condition)
+    return tokens.IfStartToken(condition)
 
 
-def take_elif_token(scanner: TextScanner) -> ElIfToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("elif")
-    take_whitespace(scanner)
+def take_elif_token(scanner: TextScanner) -> tokens.ElIfToken:
     condition = scanner.take_until(STATEMENT_END).rstrip()
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return ElIfToken(condition)
+    return tokens.ElIfToken(condition)
 
 
-def take_else_token(scanner: TextScanner) -> ElseToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("else")
-    take_whitespace(scanner)
-    scanner.expect(STATEMENT_END)
-    return ElseToken()
-
-
-def take_endif_token(scanner: TextScanner) -> IfEndToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("endif")
-    take_whitespace(scanner)
-    scanner.expect(STATEMENT_END)
-    return IfEndToken()
-
-
-def take_forstart_token(scanner: TextScanner) -> ForStartToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("for")
-    take_whitespace(scanner)
+def take_forstart_token(scanner: TextScanner) -> tokens.ForStartToken:
     loop_var = python_utils.take_ident(scanner)
     take_whitespace(scanner)
     scanner.expect("in")
@@ -246,20 +220,9 @@ def take_forstart_token(scanner: TextScanner) -> ForStartToken:
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return ForStartToken(variable=loop_var, iterable=iterable)
-
-
-def take_forend_token(scanner: TextScanner) -> ForEndToken:
-    scanner.expect(STATEMENT_START)
-    take_whitespace(scanner)
-    scanner.expect("endfor")
-    take_whitespace(scanner)
-    scanner.expect(STATEMENT_END)
-
-    return ForEndToken()
+    return tokens.ForStartToken(variable=loop_var, iterable=iterable)
 
 
 def take_whitespace(scanner: TextScanner):
     WHITESPACE_CHARS = list(string.whitespace)
     scanner.take_while(*WHITESPACE_CHARS)
-

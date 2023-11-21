@@ -2,6 +2,7 @@ from .. import ast_utils
 from ..parser import Template
 from typing import Sequence
 
+
 def update_template_nested_children(templates: Sequence[Template]):
     lookup = {template.name: template for template in templates}
     checked = set()

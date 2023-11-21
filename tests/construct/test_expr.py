@@ -1,5 +1,5 @@
 from . import build_template
-from tempered.parser import Template, LiteralBlock, ExprBlock
+from tempered.parser import Template, parse_ast
 import ast
 import bs4
 
@@ -7,7 +7,7 @@ def test_expr_block():
     literal = "example text"
     func = build_template(Template(
         name="expr",
-        body=[ExprBlock(ast.Constant(value=literal))],
+        body=[parse_ast.ExprBlock(ast.Constant(value=literal))],
     ))
     assert func() == "example text", "Expression isn't placed"
 
@@ -16,7 +16,7 @@ def test_expr_block_escapes_tags():
     literal = "<script>"
     func = build_template(Template(
         name="expr",
-        body=[ExprBlock(ast.Constant(value=literal))],
+        body=[parse_ast.ExprBlock(ast.Constant(value=literal))],
     ))
     assert func() != literal, "Expression isn't escaped"
 
@@ -26,9 +26,9 @@ def test_expr_block_param():
     func = build_template(Template(
         name="expr",
         body=[
-            LiteralBlock("<a href='"),
-            ExprBlock(ast.Constant(value=link)),
-            LiteralBlock("'></a>"),
+            parse_ast.LiteralBlock("<a href='"),
+            parse_ast.ExprBlock(ast.Constant(value=link)),
+            parse_ast.LiteralBlock("'></a>"),
         ],
     ))
     assert func() == "<a href='/test'></a>", "Expression isn't escaped"
@@ -39,9 +39,9 @@ def test_expr_block_escapes_param():
     func = build_template(Template(
         name="expr",
         body=[
-            LiteralBlock("<a href='"),
-            ExprBlock(ast.Constant(value=link)),
-            LiteralBlock("'></a>"),
+            parse_ast.LiteralBlock("<a href='"),
+            parse_ast.ExprBlock(ast.Constant(value=link)),
+            parse_ast.LiteralBlock("'></a>"),
         ],
     ))
     HTML = func()
@@ -55,12 +55,12 @@ def test_multiple_expr_chained():
     func = build_template(Template(
         name="expr",
         body=[
-            LiteralBlock("1"),
-            ExprBlock(ast.Constant(value="a")),
-            LiteralBlock("2"),
-            ExprBlock(ast.Constant(value="b")),
-            LiteralBlock("3"),
-            ExprBlock(ast.Constant(value="c")),
+            parse_ast.LiteralBlock("1"),
+            parse_ast.ExprBlock(ast.Constant(value="a")),
+            parse_ast.LiteralBlock("2"),
+            parse_ast.ExprBlock(ast.Constant(value="b")),
+            parse_ast.LiteralBlock("3"),
+            parse_ast.ExprBlock(ast.Constant(value="c")),
         ],
     ))
     assert func() == "1a2b3c"

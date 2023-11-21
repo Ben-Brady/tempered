@@ -1,6 +1,6 @@
 from typing_extensions import cast, LiteralString
 from minify_html import minify
-from rcssmin import cssmin
+from rcssmin import cssmin  # type: ignore
 
 
 def minify_html(html: str) -> str:

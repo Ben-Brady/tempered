@@ -1,18 +1,18 @@
 from . import build_template
-from tempered.parser import Template, LiteralBlock, TemplateParameter, IfBlock
+from tempered.parser import Template, parse_ast, TemplateParameter
 import ast
 
 
 def test_if_block():
     template = Template(
         name="if_template",
-        body=[IfBlock(
+        body=[parse_ast.IfBlock(
             condition=ast.Constant(value=True),
             if_block=[
-                LiteralBlock("True")
+                parse_ast.LiteralBlock("True")
             ],
             else_block=[
-                LiteralBlock("False")
+                parse_ast.LiteralBlock("False")
             ]
         )],
     )
@@ -26,13 +26,13 @@ def test_if_block_is_dynamic():
         parameters=[
             TemplateParameter(name="block")
         ],
-        body=[IfBlock(
+        body=[parse_ast.IfBlock(
             condition=ast.Name(id="block"),
             if_block=[
-                LiteralBlock("A")
+                parse_ast.LiteralBlock("A")
             ],
             else_block=[
-                LiteralBlock("B")
+                parse_ast.LiteralBlock("B")
             ]
         )],
     )

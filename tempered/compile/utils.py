@@ -1,5 +1,6 @@
 import ast
 from .. import ast_utils
+from ..parser import parse_ast
 
 
 UTILS_IMPORT = ast.ImportFrom(
@@ -27,6 +28,7 @@ IMPORTS = [
 WITH_STYLES_PARAMETER = "with_styles"
 COMPONENT_STYLES = "__css"
 LAYOUT_CSS_PARAMETER = "__component_css"
+OUTPUT_VARIABLE = "__output"
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
@@ -37,32 +39,49 @@ def create_escape_call(value: ast.expr) -> ast.expr:
     return ast_utils.Call(ESCAPE_FUNC_NAME, [value])
 
 
-def create_style_name(template_name: str) -> ast.Name:
+def css_name(template_name: str) -> ast.Name:
     name = "STYLE_" + template_name.upper()
     return ast_utils.Name(name)
 
 
-def create_component_func_name(template_name: str) -> str:
+def component_func_name(template_name: str) -> str:
     return template_name
 
 
-def create_layout_func_name(template_name: str) -> str:
-    return f"_{template_name}_layout"
+def layout_func_name(template_name: str) -> str:
+    return f"__{template_name}_layout"
 
 
-def create_slot_param(slot_name: str | None) -> str:
-
-    if slot_name:
-        return f"_{slot_name}_slot"
+def slot_variable_name(slot_name: str | None) -> str:
+    if slot_name is None:
+        return OUTPUT_VARIABLE
     else:
-        return "_default_slot"
+        return f"__{slot_name}_slot_content"
 
 
-def create_layout_call(html: ast.expr, css: ast.expr, layout: str, slot: str | None) -> ast.expr:
+def slot_parameter(slot_name: str | None) -> str:
+    if slot_name:
+        return f"__{slot_name}_slot"
+    else:
+        return "__default_slot"
+
+
+def create_layout_call(
+    layout_name: str,
+    css: ast.expr,
+    has_default_slot: bool,
+    blocks: set[str],
+    ) -> ast.expr:
+    kw_args = {}
+    kw_args[LAYOUT_CSS_PARAMETER] = css
+
+    if has_default_slot:
+        kw_args[slot_parameter(None)] = ast_utils.Name(OUTPUT_VARIABLE)
+
+    for slot in blocks:
+        kw_args[slot_parameter(slot)] = ast_utils.Name(slot_variable_name(slot))
+
     return ast_utils.Call(
-        func=ast_utils.Name(create_layout_func_name(layout)),
-        keywords={
-            create_slot_param(slot): html,
-            LAYOUT_CSS_PARAMETER: css,
-        }
+        func=ast_utils.Name(layout_func_name(layout_name)),
+        keywords=kw_args,
     )

@@ -1,7 +1,7 @@
+from . import tokens
 from ..preprocess import generate_scoped_styles, minify_html
 from .parse_ast import *
-from .lexer import *
-from .tokens import *
+from .lexer import to_token_stream
 from .text_scanner import TextScanner
 from .parse.token_scanner import TokenScanner
 from .parse.expr import parse_parameter
@@ -34,17 +34,31 @@ def parse_template(
     scanner = TokenScanner(tokens)
     ctx = parse_tokens(scanner)
 
-    return Template(
-        name=name,
-        parameters=ctx.parameters,
-        context=context,
-        type=ctx.template_type,
-        body=ctx.body,
-        css=css,
-        child_components=ctx.child_components,
-        layout=ctx.layout,
-        slots=ctx.slots,
-    )
+    if ctx.is_layout:
+        return LayoutTemplate(
+            name=name,
+            parameters=ctx.parameters,
+            context=context,
+            body=ctx.body,
+            css=css,
+            child_components=ctx.child_components,
+            layout=ctx.layout,
+            blocks=ctx.blocks,
+            slots=ctx.slots,
+            has_default_slot=ctx.has_default_slot,
+        )
+    else:
+        return Template(
+            name=name,
+            parameters=ctx.parameters,
+            context=context,
+            body=ctx.body,
+            css=css,
+            child_components=ctx.child_components,
+            layout=ctx.layout,
+            blocks=ctx.blocks,
+        )
+
 
 
 def generate_token_id() -> str:
@@ -52,12 +66,14 @@ def generate_token_id() -> str:
     return f"TEMPEREDED_{id}"
 
 
-def reassmble_html(tokens: Sequence[Token]) -> tuple[str, dict[str, Token]]:
+def reassmble_html(
+    _tokens: Sequence[tokens.Token]
+    ) -> tuple[str, dict[str, tokens.Token]]:
     html = ""
-    token_lookup = {}
-    for token in tokens:
+    token_lookup: dict[str, tokens.Token] = {}
+    for token in _tokens:
         match token:
-            case LiteralToken(body):
+            case tokens.LiteralToken(body):
                 html += body
             case token:
                 token_id = generate_token_id()
@@ -67,22 +83,25 @@ def reassmble_html(tokens: Sequence[Token]) -> tuple[str, dict[str, Token]]:
     return html, token_lookup
 
 
-def reparse_html(html: str, token_lookup: dict[str, Token]) -> Sequence[Token]:
+def reparse_html(
+    html: str,
+    token_lookup: dict[str, tokens.Token]
+) -> Sequence[tokens.Token]:
     TOKEN_ID_LENGTH = len(generate_token_id())
 
     scanner = TextScanner(html)
-    tokens = []
+    tokens_: list[tokens.Token] = []
     while scanner.has_text:
         known_keys = list(token_lookup.keys())
         text = scanner.take_until(known_keys)
         if len(text) > 0:
-            tokens.append(LiteralToken(text))
+            tokens_.append(tokens.LiteralToken(text))
 
         if not scanner.has_text:
             break
 
         token_id = scanner.pop(TOKEN_ID_LENGTH)
-        tokens.append(token_lookup.pop(token_id))
+        tokens_.append(token_lookup.pop(token_id))
 
     if len(token_lookup) > 0:
         warnings.warn(
@@ -91,4 +110,4 @@ def reparse_html(html: str, token_lookup: dict[str, Token]) -> Sequence[Token]:
             RuntimeWarning,
         )
 
-    return tokens
+    return tokens_

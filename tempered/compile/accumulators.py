@@ -4,24 +4,27 @@ from typing import Protocol
 
 
 class Result(Protocol):
-    def create_assignment(self) -> list[ast.AST]:
+    def create_init(self) -> list[ast.stmt]:
         ...
 
     def create_add(self, value: ast.expr) -> ast.stmt:
         ...
 
-    def create_build(self) -> ast.expr:
+    def create_value(self) -> ast.expr:
         ...
 
 
 class StringResult(Result):
     _variable: ast.Name
 
-    def __init__(self):
-        self._variable = ast_utils.Name('__output')
+    def __init__(self, name: str|ast.Name):
+        if isinstance(name, str):
+            name = ast_utils.Name(name)
 
-    def create_assignment(self) -> list[ast.AST]:
-        return [ast_utils.Assignment(
+        self._variable = name
+
+    def create_init(self) -> list[ast.stmt]:
+        return [ast_utils.Assign(
             target=self._variable,
             value="",
         )]
@@ -32,18 +35,18 @@ class StringResult(Result):
             value=value,
         )
 
-    def create_build(self) -> ast.expr:
+    def create_value(self) -> ast.expr:
         return self._variable
 
 
 class ArrayResult(Result):
     _variable: ast.Name
 
-    def __init__(self):
-        self._variable = ast_utils.Name('__output')
+    def __init__(self, name: str):
+        self._variable = ast_utils.Name(name)
 
-    def create_assignment(self) -> list[ast.AST]:
-        return [ast_utils.Assignment(
+    def create_init(self) -> list[ast.stmt]:
+        return [ast_utils.Assign(
             target=self._variable,
             value=[],
         )]
@@ -54,6 +57,6 @@ class ArrayResult(Result):
             args=[value],
         ))
 
-    def create_build(self) -> ast.expr:
+    def create_value(self) -> ast.expr:
         return ast_utils.ArrayJoin(self._variable)
 

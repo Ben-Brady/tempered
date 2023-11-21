@@ -52,13 +52,12 @@ class Tempered:
         self._templates.append(template)
 
 
-    def build_to(self, module: ModuleType):
+    def build_to(self, module: ModuleType) -> None:
         build.build_to(module, self._templates)
 
 
     def build_memory(self) -> ModuleType:
         return build.build_memory(self._templates)
-
 
     def build_static(self):
         return build.build_static(self._templates)

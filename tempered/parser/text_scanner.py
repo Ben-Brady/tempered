@@ -8,35 +8,35 @@ class TextScanner:
     position: int = 0
 
     if TYPE_CHECKING:
-        html: array[str]
+        text: array[str]
         _checkpoint: tuple[array[str], int] | None = None
 
     def __init__(self, html: str):
         self.original = html
-        self.html = array("u")
-        self.html.fromunicode(html[::-1])
+        self.text = array("u")
+        self.text.fromunicode(html[::-1])
 
     @property
     def has_text(self) -> bool:
-        return len(self.html) != 0
+        return len(self.text) != 0
 
     def checkpoint(self):
-        self._checkpoint = self.html[:], self.position
+        self._checkpoint = self.text[:], self.position
 
     def backtrack(self):
         if self._checkpoint is None:
             raise RuntimeError("No checkpoint to backtrack to")
 
-        self.html, self.position = self._checkpoint
+        self.text, self.position = self._checkpoint
         self._checkpoint = None
 
     def pop(self, length: int = 1) -> str:
-        if len(self.html) < length:
+        if len(self.text) < length:
             self.error("Unexpected end of text")
 
         popped_text = ""
         for _ in range(length):
-            popped_text += self.html.pop()
+            popped_text += self.text.pop()
 
         self.position += length
         return popped_text
@@ -46,7 +46,7 @@ class TextScanner:
             if not self.startswith(match):
                 continue
 
-            self.html = self.html[:-len(match)]
+            self.text = self.text[:-len(match)]
             self.position += len(match)
             return True
 
@@ -54,7 +54,7 @@ class TextScanner:
 
     def startswith(self, *text: str) -> bool:
         for match in text:
-            html_text = self.html[-len(match) : :][::-1].tounicode()
+            html_text = self.text[-len(match) : :][::-1].tounicode()
             if html_text == match:
                 return True
 

@@ -6,7 +6,7 @@ import importlib
 from importlib.util import spec_from_loader, module_from_spec
 from pathlib import Path
 from types import ModuleType
-import autopep8
+import autopep8  # type: ignore
 
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")

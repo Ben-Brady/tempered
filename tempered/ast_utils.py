@@ -19,25 +19,33 @@ def Constant(value: Any) -> ast.expr:
             return Dict(value)
         case NoneType() | EllipsisType() | str() | bytes() | bool() | int() | float() | complex():
             return ast.Constant(value=value)
-        case type():
-            raise ValueError(f"Cannot convert {value} to an ast constant")
         case _:
             raise ValueError(f"Cannot convert {value} to an ast constant")
+
+
+None_ = Constant(None)
+True_ = Constant(True)
+False_ = Constant(False)
+
 
 def List(value: Iterable) -> ast.List:
     return ast.List(elts=_IterableConstant(value))
 
+
 def Tuple(value: Iterable) -> ast.Tuple:
     return ast.Tuple(elts=_IterableConstant(value))
 
+
 def Set(value: Iterable) -> ast.Set:
     return ast.Set(elts=_IterableConstant(value))
+
 
 def Dict(value: dict) -> ast.Dict:
     return ast.Dict(
         keys=_IterableConstant(value.keys()),
         values=_IterableConstant(value.values()),
     )
+
 
 def Call(
         func: ast.AST,
@@ -56,6 +64,12 @@ def Call(
 
 def Name(target: str) -> ast.Name:
     return ast.Name(id=target)
+
+
+Str = Name('str')
+Int = Name('int')
+Float = Name('float')
+Bool = Name('bool')
 
 
 def Module(body: Sequence[ast.AST]) -> ast.Module:
@@ -84,8 +98,6 @@ def Function(
     )
 
 
-
-
 def AddAssign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssign:
     if isinstance(target, str):
         target = Name(target)
@@ -100,7 +112,7 @@ def AddAssign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssign:
     )
 
 
-def Assignment(target: str|ast.Name, value: Any) -> ast.Assign:
+def Assign(target: str|ast.Name, value: Any) -> ast.Assign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -114,15 +126,46 @@ def Assignment(target: str|ast.Name, value: Any) -> ast.Assign:
     )
 
 
-def StringConcat(*args: ast.expr) -> ast.expr:
+def UnaryOp(op:ast.unaryop, arg: ast.expr) -> ast.expr:
+    return ast.UnaryOp(
+        op=op,
+        operand=arg,
+    )
+
+
+def BinOp(op:ast.operator, *args: ast.expr) -> ast.expr:
     if len(args) == 1:
         return args[0]
     else:
         return ast.BinOp(
+            op=op,
             left=args[0],
-            op=ast.Add(),
-            right=StringConcat(*args[1:]),
+            right=BinOp(op, *args[1:]),
         )
+
+
+def Add(*args: ast.expr) -> ast.expr:
+    return BinOp(ast.Add(), *args)
+
+
+def Union(*args: ast.expr) -> ast.expr:
+    return BinOp(ast.BitOr(), *args)
+
+
+def Compare(op:ast.cmpop, left: ast.expr, right: ast.expr) -> ast.expr:
+    return ast.Compare(
+        left=left,
+        ops=[op],
+        comparators=[right],
+    )
+
+
+def Is(left: ast.expr, right: ast.expr) -> ast.expr:
+    return Compare(ast.Is(), left, right)
+
+
+def Equals(left: ast.expr, right: ast.expr) -> ast.expr:
+    return Compare(ast.Eq(), left, right)
 
 
 def Attribute(value: ast.expr, attr: str):
@@ -192,3 +235,9 @@ def If(
 
     return if_statement
 
+
+def print_ast(module: list[ast.AST] | ast.Module):
+    if isinstance(module, list):
+        module = Module(module)
+
+    print(ast.unparse(module))

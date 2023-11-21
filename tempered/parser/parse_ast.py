@@ -67,9 +67,14 @@ class AssignmentBlock(Tag):
 
 @dataclass
 class SlotBlock(Tag):
-    name: str | None = None
-    """A layout place it's content here"""
+    name: str | None
+    default: TemplateBlock | None
 
+
+@dataclass
+class BlockBlock(Tag):
+    name: str | None
+    body: TemplateBlock
 
 
 TemplateTag: TypeAlias = (
@@ -83,6 +88,7 @@ TemplateTag: TypeAlias = (
     | ForBlock
     | AssignmentBlock
     | SlotBlock
+    | BlockBlock
 )
 
 
@@ -92,47 +98,25 @@ class TemplateParameter:
     type: ast.expr | None = None
     default: ast.expr | None = None
 
-@dataclass
-class TemplateSlot:
-    name: str|None
-    default: str | None = None
-
 
 @dataclass
 class Template:
     name: str
     parameters: list[TemplateParameter] = field(default_factory=list)
     context: dict[str, Any] = field(default_factory=dict)
-    type: TemplateType = "component"
 
     body: TemplateBlock = field(default_factory=list)
     css: str = ""
+    layout: str|None = None
     child_components: set[str] = field(default_factory=set)
 
-    slots: list[TemplateSlot] = field(default_factory=list)
-    layout: str|None = None
+    blocks: set[str] = field(default_factory=set)
 
 
-TemplateType: TypeAlias = Literal["component", "layout"]
+@dataclass
+class LayoutTemplate(Template):
+    has_default_slot: bool = False
+    slots: list[SlotBlock] = field(default_factory=list)
+
+
 TemplateBlock: TypeAlias = Sequence[TemplateTag]
-
-
-__all__ = [
-    "TemplateBlock",
-    "TemplateTag",
-    "TemplateParameter",
-    "TemplateSlot",
-    "Template",
-    "Tag",
-    "IfBlock",
-    "ForBlock",
-    "AssignmentBlock",
-    "LiteralBlock",
-    "ExprBlock",
-    "HtmlBlock",
-    "ComponentBlock",
-    "StyleBlock",
-    "IncludeStyleBlock",
-    "SlotBlock",
-    "TemplateType"
-]

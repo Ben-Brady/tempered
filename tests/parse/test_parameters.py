@@ -1,4 +1,4 @@
-from tempered.parser import parse_template, TemplateParameter, LiteralBlock
+from tempered.parser import parse_template, TemplateParameter, parse_ast
 import ast
 from typing import Any
 import pytest
@@ -34,7 +34,7 @@ def test_parse_removes_parameters():
         "a"
     )
     block = template.body[0]
-    assert isinstance(block, LiteralBlock)
+    assert isinstance(block, parse_ast.LiteralBlock)
     assert "a" in block.body
 
 

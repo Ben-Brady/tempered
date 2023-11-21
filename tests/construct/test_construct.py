@@ -1,5 +1,5 @@
 from . import build_template
-from tempered.parser import Template, LiteralBlock, TemplateParameter, ExprBlock, IfBlock
+from tempered.parser import Template, TemplateParameter, parse_ast, tokens
 import ast
 
 
@@ -7,8 +7,8 @@ def test_assemble_literals():
     func = build_template(Template(
         name="post",
         body=[
-            LiteralBlock("Foo!"),
-            LiteralBlock("Bar!"),
+            parse_ast.LiteralBlock("Foo!"),
+            parse_ast.LiteralBlock("Bar!"),
         ],
     ))
 
@@ -22,7 +22,7 @@ def test_use_parameters():
             TemplateParameter(name="value")
         ],
         body=[
-            ExprBlock(value=ast.Name(id="value")),
+            parse_ast.ExprBlock(value=ast.Name(id="value")),
         ],
     ))
 

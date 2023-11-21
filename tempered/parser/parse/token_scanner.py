@@ -2,6 +2,7 @@ from ..tokens import Token
 from typing_extensions import Sequence, TypeVar
 
 
+
 class TokenScanner:
     stream: Sequence[Token]
     _checkpoint: Sequence[Token]|None = None
@@ -54,7 +55,6 @@ class TokenScanner:
             raise ValueError(f"Expected {token} but got {self.stream[0]!r}")
         else:
             return self.pop() # type: ignore
-
 
     T = TypeVar("T", bound=Token)
     def take_while(self, token: type[T]) -> Sequence[T]:

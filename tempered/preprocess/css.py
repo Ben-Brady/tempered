@@ -1,6 +1,6 @@
 from tempered.parser import *
 from .scope import apply_scope_to_css
-from bs4 import BeautifulSoup, Tag
+import bs4
 from rcssmin import cssmin
 from typing_extensions import LiteralString, cast, NamedTuple
 from zlib import crc32
@@ -16,10 +16,10 @@ class ScopedStyles(NamedTuple):
 
 
 def generate_scoped_styles(body: str, prefix: str = "tempered") -> ScopedStyles:
-    soup = BeautifulSoup(body, "html.parser")
+    soup = bs4.BeautifulSoup(body, "html.parser")
     css = ""
 
-    style_tags = cast(list[Tag], soup.find_all("style"))
+    style_tags = cast(list[bs4.Tag], soup.find_all("style"))
     for tag in style_tags:
         is_global = tag.has_attr("global")
 
@@ -60,9 +60,8 @@ def minify_css(css: str) -> str:
             raise TypeError("Expected str or bytes")
 
 
-def apply_scope_to_soup(soup: BeautifulSoup, scope_id: str):
+def apply_scope_to_soup(soup: bs4.BeautifulSoup, scope_id: str):
     for tag in soup.find_all():
-        tag: Tag
         classes = tag.attrs.get("class", "")
 
         if isinstance(classes, list):
