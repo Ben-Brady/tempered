@@ -2,7 +2,7 @@ from utils import build_template
 import bs4
 
 
-def test_template_add_styles():
+def test_component_uses_with_styles():
     CSS_KEY = "TEMPERED"
     CSS = f"a{{content:'{CSS_KEY}';}}"
     func = build_template(f"""
@@ -14,24 +14,8 @@ def test_template_add_styles():
         </style>
     """)
 
-    html = func(with_styles=True)
-    assert CSS_KEY in html
-
-
-def test_template_wont_add_styles():
-    CSS_KEY = "TEMPERED"
-    CSS = f"a{{content:'{CSS_KEY}';}}"
-    func = build_template(f"""
-        <a>
-            Bar!
-        </a>
-        <style>
-            {CSS}
-        </style>
-    """)
-
-    html = func(with_styles=False)
-    assert CSS_KEY not in html
+    assert CSS_KEY in func(with_styles=True)
+    assert CSS_KEY not in func(with_styles=False)
 
 
 def test_template_places_styles():
