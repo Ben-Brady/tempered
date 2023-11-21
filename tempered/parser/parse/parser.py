@@ -65,8 +65,7 @@ def next_tag(ctx: ParseContext, scanner: TokenScanner) -> parse_ast.TemplateTag 
         case tokens.ComponentToken() as token:
             return next_component(ctx, token)
         case tokens.StylesToken():
-            parse_styles(ctx)
-            return None
+            return parse_styles(ctx)
         case tokens.ExtendsToken(layout):
             parse_extends(ctx, layout)
             return None

@@ -24,6 +24,11 @@ class StylesToken(EasyParseToken):
 
 
 @dataclass
+class StylesIncludeToken:
+    template: str
+
+
+@dataclass
 class ExtendsToken:
     layout: str
 
