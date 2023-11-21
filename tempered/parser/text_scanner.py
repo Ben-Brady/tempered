@@ -114,7 +114,7 @@ class TextScanner:
 class ParserException(Exception):
     @classmethod
     def create(cls, msg: str, source: str, position: int) -> Self:
-        line_index = source[:position].count("\n") - 1
+        line_index = source[:position].count("\n")
 
         lines = source.split("\n")
 
