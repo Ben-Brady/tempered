@@ -9,6 +9,7 @@ Generate native python functions from HTML templates
 
 [PyPi](https://pypi.org/project/tempered)
 [Github](https://github.com/Ben-Brady/tempered)
+[Documentation](https://github.com/Ben-Brady/tempered/blob/main/DOCUMENTATION.md)
 
 ```python
 pip install tempered
