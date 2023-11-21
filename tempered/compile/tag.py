@@ -1,19 +1,16 @@
 from ..parser.parse_ast import (
     Template, TemplateTag, LiteralBlock, ExprBlock, HtmlBlock, IncludeStyleBlock,
     ComponentBlock, StyleBlock, IfBlock, ForBlock,
-    AssignmentBlock, SlotBlock, LayoutExtendsBlock
+    AssignmentBlock, SlotBlock
 )
-from ..ast_utils import (
-    create_constant, create_call, create_assignment,
-    create_name, create_if, create_string_concat, create_attribute
-)
+from .. import ast_utils
 from .utils import (
     create_style_name, create_escape_call, WITH_STYLES_PARAMETER,
     create_layout_func_name, create_slot_param, COMPONENT_STYLES
 )
 from .accumulators import Result
 import ast
-from typing import Sequence, assert_never, Protocol
+from typing_extensions import Sequence, assert_never, Protocol
 from dataclasses import dataclass
 
 
@@ -23,10 +20,10 @@ class BuildContext:
     result: Result
 
 
-def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.AST]:
+def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.stmt]:
     match tag:
         case LiteralBlock():
-            return [ctx.result.create_add(create_constant(tag.body))]
+            return [ctx.result.create_add(ast_utils.Constant(tag.body))]
         case ExprBlock():
             return [ctx.result.create_add(create_escape_call(tag.value))]
         case HtmlBlock():
@@ -48,43 +45,41 @@ def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.AST]:
             return construct_assignment(tag, ctx)
         case SlotBlock():
             return construct_slot_tag(tag, ctx)
-        case LayoutExtendsBlock():
-            raise RuntimeError("Layout extends block should have been removed by now")
         case e:
             assert_never(e)
 
 
-def construct_block(tags: Sequence[TemplateTag], ctx: BuildContext) -> list[ast.stmt]:
-    block = []
+def construct_block(tags: Sequence[TemplateTag], ctx: BuildContext) -> Sequence[ast.stmt]:
+    block: list[ast.stmt] = []
     for tag in tags:
         block.extend(construct_tag(tag, ctx))
 
     return block
 
 
-def construct_slot_tag(tag: SlotBlock, ctx: BuildContext) -> list[ast.AST]:
-    param = create_name(create_slot_param(tag.name))
+def construct_slot_tag(tag: SlotBlock, ctx: BuildContext) -> Sequence[ast.stmt]:
+    param = ast_utils.Name(create_slot_param(tag.name))
     return [ctx.result.create_add(param)]
 
 
-def construct_component_tag(tag: ComponentBlock, ctx: BuildContext) -> list[ast.AST]:
-    func = create_name(tag.component_name)
+def construct_component_tag(tag: ComponentBlock, ctx: BuildContext) -> Sequence[ast.stmt]:
+    func = ast_utils.Name(tag.component_name)
     keywords = tag.keywords.copy()
-    keywords[WITH_STYLES_PARAMETER] = create_constant(False)
+    keywords[WITH_STYLES_PARAMETER] = ast_utils.Constant(False)
 
-    func_call = create_call(func, keywords=keywords)
+    func_call = ast_utils.Call(func, keywords=keywords)
     return [ctx.result.create_add(func_call)]
 
 
-def construct_assignment(tag: AssignmentBlock, ctx: BuildContext) -> Sequence[ast.AST]:
+def construct_assignment(tag: AssignmentBlock, ctx: BuildContext) -> Sequence[ast.stmt]:
     return [ast.Assign(
         targets=[tag.target],
         value=tag.value,
     )]
 
 
-def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
-    value = create_string_concat(
+def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.stmt]:
+    value = ast_utils.StringConcat(
         create_style_name(ctx.template.name),
         *(
             create_style_name(name)
@@ -92,71 +87,49 @@ def construct_style_include(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.
         )
     )
 
-    return [create_if(
-        condition=create_name("with_styles"),
+    return [ast_utils.If(
+        condition=ast_utils.Name("with_styles"),
         if_body=[ctx.result.create_add(value)],
     )]
 
 
-def construct_style(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.AST]:
-    return [create_if(
-        condition=create_name("with_styles"),
+def construct_style(tag: StyleBlock, ctx: BuildContext) -> Sequence[ast.stmt]:
+    return [ast_utils.If(
+        condition=ast_utils.Name("with_styles"),
         if_body=[
             ctx.result.create_add(
-                create_string_concat(
-                    create_constant("<style>"),
-                    create_name(COMPONENT_STYLES),
-                    create_constant("</style>"),
+                ast_utils.StringConcat(
+                    ast_utils.Constant("<style>"),
+                    ast_utils.Name(COMPONENT_STYLES),
+                    ast_utils.Constant("</style>"),
                 )
             )
         ],
     )]
 
 
-def construct_if(block: IfBlock, ctx: BuildContext) -> Sequence[ast.AST]:
-    def insert_elif(
-        if_statement: ast.If,
-        condition: ast.expr,
-        block: list[ast.stmt]
-        ):
-        cur_if = if_statement
-        while len(cur_if.orelse) == 1 and isinstance(cur_if.orelse[0], ast.If):
-            cur_if = cur_if.orelse[0]
+def construct_if(block: IfBlock, ctx: BuildContext) -> Sequence[ast.stmt]:
+    if_body = construct_block(block.if_block, ctx)
+    if block.else_block:
+        else_body = construct_block(block.else_block, ctx)
+    else:
+        else_body = None
 
-        cur_if.orelse = [
-            ast.If(
-                test=condition,
-                body=block,
-                orelse=[],
-            )
-        ]
-
-    def insert_else(
-        if_statement: ast.If,
-        block: list[ast.stmt]
-        ):
-        cur_if = if_statement
-        while len(cur_if.orelse) == 1 and isinstance(cur_if.orelse[0], ast.If):
-            cur_if = cur_if.orelse[0]
-
-        cur_if.orelse = block
-
-    body = construct_block(block.if_block, ctx)
-    if_statement = ast.If(
-        test=block.condition,
-        body=body,
-        orelse=[],
-    )
-    for elif_cond, elif_block in block.elif_blocks:
-        insert_elif(if_statement, elif_cond, construct_block(elif_block, ctx))
-
-    if block.else_block is not None:
-        insert_else(if_statement, construct_block(block.else_block, ctx))
-
-    return [ if_statement ]
+    elif_blocks = [
+        (condition, construct_block(elif_block, ctx))
+        for condition, elif_block in block.elif_blocks
+    ]
+    return [
+        ast_utils.If(
+            condition=block.condition,
+            if_body=if_body,
+            elif_blocks=elif_blocks,
+            else_body=else_body,
+        )
+    ]
 
 
-def construct_for(block: ForBlock, ctx: BuildContext) -> Sequence[ast.AST]:
+def construct_for(block: ForBlock, ctx: BuildContext) -> Sequence[ast.stmt]:
     body = []
     for tag in block.loop_block:
         body.extend(construct_tag(tag, ctx))

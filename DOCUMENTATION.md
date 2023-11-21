@@ -3,23 +3,23 @@
 
 ## Parameters
 
-Use `{!param !}` for parameters
+Use `{%param %}` for parameters
 ```html
-{! param d !}            <!-- Parameter -->
-{! param c: list !}      <!-- Typed Parameter-->
-{! param b = 2 !}        <!-- Default Value Parameter-->
-{! param a: str = "A" !} <!-- Typed Default Value Parameter-->
+{% param d %}            <!-- Parameter -->
+{% param c: list %}      <!-- Typed Parameter-->
+{% param b = 2 %}        <!-- Default Value Parameter-->
+{% param a: str = "A" %} <!-- Typed Default Value Parameter-->
 ```
 
 ## Styles
 
 ### Style Placement
 
-Use `{!styles}` for styles, this is where styles are placed
+Use `{%styles}` for styles, this is where styles are placed
 
 ```html
 <head>
-    {! styles !}
+    {% styles %}
 </head>
 ```
 
@@ -28,10 +28,10 @@ If omitted, styles are placed at the end of the component
 ### Style Include
 
 ```html
-{!include post!}
+{%include post%}
 
 <head>
-    {! styles !}
+    {% styles %}
 </head>
 ```
 
@@ -47,8 +47,8 @@ This is useful for when you need to include the CSS for dynamically create compo
 Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 
 ```html
-{! param src: str !}
-{! param text: str !}
+{% param src: str %}
+{% param text: str %}
 
 <a src="{{src}}">
     {{ text }}
@@ -60,7 +60,7 @@ Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 Use `{% html %}` to include literal html without escaping
 
 ```html
-{!param markdown_html: str}
+{%param markdown_html: str}
 <div>
     {% html markdown_html %}
 </div>
@@ -83,7 +83,7 @@ Use `{% component  %}` for a component, call this like
 Use `{% set  %}` to set a variables
 
 ```html
-{!param post !}
+{%param post %}
 <div>
     {% set title = post.title.lower() %}
 </div>
@@ -97,7 +97,7 @@ This can also be paired with control flow
 Use `{%if %}` and `{% endif %}` for control flow, there are two control flow structures
 
 ```html
-{!param link: str|None = None}
+{%param link: str|None = None}
 
 {% if link %}
     <a href="{{link}}">
@@ -109,7 +109,7 @@ Use `{%if %}` and `{% endif %}` for control flow, there are two control flow str
 You can also have an else block
 
 ```html
-{!param src: str|None = None}
+{%param src: str|None = None}
 
 {% if src %}
     <img src="{{src}}" alt=""/>
@@ -121,7 +121,7 @@ You can also have an else block
 As well as an elif block
 
 ```html
-{!param number: int}
+{%param number: int}
 
 {% if number < 10 %}
     {{ number }} is less than 10
@@ -137,7 +137,7 @@ As well as an elif block
 Use `{%for %}`
 
 ```html
-{!param commments: list[str] !}
+{%param commments: list[str] %}
 
 {% for comment in comments %}
     <span>
@@ -147,7 +147,7 @@ Use `{%for %}`
 ```
 
 ```html
-{!param commments: list[str] }
+{%param commments: list[str] }
 
 <ul>
 {% for x in range(10) %}

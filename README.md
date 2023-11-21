@@ -18,8 +18,8 @@ pip install tempered
 
 ```html
 <!-- templates/image.html -->
-{!param src: str!}
-{!param alt: str = ""!}
+{%param src: str%}
+{%param alt: str = ""%}
 
 <img src="{{src}}" alt="{{alt}}">
 

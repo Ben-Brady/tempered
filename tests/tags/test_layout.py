@@ -11,7 +11,7 @@ def test_layout_extend_with_default_slot():
         </div>
     """)
     components.add_template("b", """
-        {! extends "a" !}
+        {% extends "a" %}
         Test
     """)
     module = components.build_memory()
@@ -25,11 +25,11 @@ def test_layout_migrates_css():
     CSS_KEY = "TEMPERED_CSS"
     components = Tempered()
     components.add_template("a", """
-        {!styles!}
+        {%styles%}
         {% slot %}
     """)
     components.add_template("b", """
-        {! extends "a" !}
+        {% extends "a" %}
         Test
 
         <style>

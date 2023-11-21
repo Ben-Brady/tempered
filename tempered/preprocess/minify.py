@@ -1,4 +1,4 @@
-from typing import cast, LiteralString
+from typing_extensions import cast, LiteralString
 from minify_html import minify
 from rcssmin import cssmin
 

@@ -3,7 +3,7 @@ from folder import types
 
 templates = tempered.Tempered()
 templates.add_template(name="test", template="""
-    {! param a: A !}
+    {% param a: A %}
     {{a}}
 """)
 templates.register_type(types.A)

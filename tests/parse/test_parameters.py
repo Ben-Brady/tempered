@@ -1,14 +1,14 @@
-from tempered.parser import parse_template, TemplateParameter, RequiredParameter, LiteralBlock
+from tempered.parser import parse_template, TemplateParameter, LiteralBlock
 import ast
 from typing import Any
 import pytest
 
-
+class Unset(): pass
 def _assert_single_parameter(
     template_str, *,
     name: str,
     type: str|None = None,
-    default: Any|RequiredParameter = RequiredParameter()
+    default: Any | Unset = Unset()
 ):
     template = parse_template("_", template_str)
     parameters = template.parameters
@@ -20,17 +20,17 @@ def _assert_single_parameter(
         assert param.type
         assert ast.unparse(param.type) == type
 
-    if isinstance(default, RequiredParameter):
-        assert isinstance(param.default, RequiredParameter)
+    if isinstance(default, Unset):
+        assert param.default == None
     else:
-        assert not isinstance(param.default, RequiredParameter)
+        assert param.default is not None
         assert ast.literal_eval(param.default) == default
 
 
 def test_parse_removes_parameters():
     template = parse_template("abc",
-        "{!param a!}"
-        "{!param b!}"
+        "{%param a%}"
+        "{%param b%}"
         "a"
     )
     block = template.body[0]
@@ -40,14 +40,14 @@ def test_parse_removes_parameters():
 
 def test_parse_parameter_single():
     _assert_single_parameter(
-        "{!param a !}",
+        "{%param a %}",
         name="a"
     )
 
 
 def test_parse_parameters_with_builtin_annotation():
     _assert_single_parameter(
-        "{!param a: str !}",
+        "{%param a: str %}",
         name="a",
         type="str",
     )
@@ -55,7 +55,7 @@ def test_parse_parameters_with_builtin_annotation():
 
 def test_parse_parameters_with_custom_annotation():
     _assert_single_parameter(
-        "{!param a: Post !}",
+        "{%param a: Post %}",
         name="a",
         type="Post"
     )
@@ -63,7 +63,7 @@ def test_parse_parameters_with_custom_annotation():
 
 def test_parse_parameters_with_default():
     _assert_single_parameter(
-        "{!param a = 1!}",
+        "{%param a = 1%}",
         name="a",
         default=1,
     )
@@ -71,7 +71,7 @@ def test_parse_parameters_with_default():
 
 def test_parse_parameters_with_none_default():
     _assert_single_parameter(
-        "{!param a: str|None = None !}",
+        "{%param a: str|None = None %}",
         name="a",
         type="str | None",
         default=None,
@@ -79,7 +79,7 @@ def test_parse_parameters_with_none_default():
 
 def test_parse_parameters_with_annotation_and_default():
     _assert_single_parameter(
-        "{!param a: int = 1!}",
+        "{%param a: int = 1%}",
         name="a",
         type="int",
         default=1,
@@ -88,7 +88,7 @@ def test_parse_parameters_with_annotation_and_default():
 
 def test_parse_parameters_with_complex_annotation():
     _assert_single_parameter(
-        "{!param a: list[str]!}",
+        "{%param a: list[str]%}",
         name="a",
         type="list[str]",
     )
@@ -97,20 +97,20 @@ def test_parse_parameters_with_complex_annotation():
 @pytest.mark.skip
 def test_parse_parameters_with_end_statement_default():
     _assert_single_parameter(
-        "{!param a = '!}' !}",
+        "{%param a = '%}' %}",
         name="a",
-        default="!}",
+        default="%}",
     )
 
 
 @pytest.mark.skip
 def test_parse_parameters_with_multiline_string_default():
     _assert_single_parameter(
-        """{!param a =
+        """{%param a =
         '''
         a
         '''
         """,
         name="a",
-        default="!}",
+        default="%}",
     )

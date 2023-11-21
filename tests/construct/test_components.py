@@ -20,20 +20,20 @@ def test_components_prevent_css_duplication():
             parser.ComponentBlock(
                 component_name="child",
                 keywords={
-                    "value": ast_utils.create_constant("a"),
-                    "with_styles": ast_utils.create_constant(True),
+                    "value": ast_utils.Constant("a"),
+                    "with_styles": ast_utils.Constant(True),
                 },
             ),
             parser.ComponentBlock(
                 component_name="child",
                 keywords={
-                    "value": ast_utils.create_constant("a"),
-                    "with_styles": ast_utils.create_constant(False),
+                    "value": ast_utils.Constant("a"),
+                    "with_styles": ast_utils.Constant(False),
                 },
             ),
             parser.StyleBlock(),
         ],
-        child_components=["child"],
+        child_components={"child"},
     )
 
     components.add_template_obj(child_template)
@@ -52,13 +52,13 @@ def test_components_calculated_nested_children():
             body=[
                 parser.StyleBlock()
             ],
-            child_components=["b"],
+            child_components={"b"},
         )
     )
     components.add_template_obj(
         parser.Template(
             name="b",
-            child_components=["c", "d"],
+            child_components={"c", "d"},
         )
     )
     components.add_template_obj(
@@ -70,7 +70,7 @@ def test_components_calculated_nested_children():
         parser.Template(
             name="d",
             css=f"div {{ content: '{CSS_KEY}'; }} ",
-            child_components=["b"],
+            child_components={"b"},
         )
     )
 

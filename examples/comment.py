@@ -1,6 +1,7 @@
 from tempered import Tempered
 from dataclasses import dataclass
 from datetime import datetime
+import bs4
 
 templates = Tempered()
 
@@ -13,17 +14,31 @@ class Comment:
 
 if __name__ == "__main__":
     templates.add_template("comment", """
-    {!param comment: Comment !}
+    {%param comment: Comment %}
     <div>
-        <span>
+        <span class="header">
             {{ comment.author }} - {{ comment.created_at.strftime("%d/%m/%y") }}
         </span>
-        <span>
+        <span class="body">
             {{ comment.text }}
         </span>
     </div>
+
+    <style>
+    div {
+        width: 10rem
+        height: fit-content;
+    }
+    .header {
+        width: 100%;
+        height: 1.5rem;
+    }
+    .body {
+        width: 100%;
+        height: fit-content;
+    }
+    </style>
     """)
-    templates.register_type(Comment)
 
     components = templates.build_static()
     comment = Comment(
@@ -31,4 +46,7 @@ if __name__ == "__main__":
         created_at=datetime.now(),
         text="This library is pretty goated",
     )
-    print(components.comment(comment=comment))
+
+    html = components.comment(comment=comment)
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    print(soup.prettify())

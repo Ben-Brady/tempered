@@ -1,4 +1,4 @@
-from tempered.parser import parse_template, TemplateParameter, RequiredParameter, LiteralBlock, IfBlock
+from tempered.parser import parse_template, TemplateParameter, LiteralBlock, IfBlock
 
 
 def test_parse_if_block():

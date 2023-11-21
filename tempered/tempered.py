@@ -5,7 +5,7 @@ import inspect
 from importlib.util import spec_from_loader, module_from_spec
 from pathlib import Path
 from types import ModuleType
-from typing import LiteralString, Any, cast, overload
+from typing_extensions import LiteralString, Any, cast, overload
 
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")

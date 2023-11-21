@@ -5,11 +5,7 @@ import keyword
 
 
 def parse_parameter(parameter: str) -> TemplateParameter:
-    module = ast.parse(parameter)
-    if not isinstance(module, ast.Module):
-        raise ValueError(f"Invalid Parameter: {parameter}")
-
-    expr = module.body[0]
+    expr = parse_stmt(parameter)
     match expr:
         case ast.AnnAssign(
             target=ast.Name(id=name),
@@ -19,7 +15,7 @@ def parse_parameter(parameter: str) -> TemplateParameter:
             return TemplateParameter(
                 name=name,
                 type=annotation,
-                default=default if default is not None else RequiredParameter()
+                default=default
             )
         case ast.AnnAssign(
             target=ast.Name(id=name),

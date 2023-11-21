@@ -4,7 +4,7 @@ import pytest
 
 def test_text_isnte_escaped():
     component = build_template("""
-        {!param foo!}
+        {%param foo%}
         <style></style>
         {% html foo %}
     """)

@@ -2,11 +2,12 @@ from .. import ast_utils
 import ast
 from typing import Protocol
 
+
 class Result(Protocol):
     def create_assignment(self) -> list[ast.AST]:
         ...
 
-    def create_add(self, value: ast.expr) -> ast.AST:
+    def create_add(self, value: ast.expr) -> ast.stmt:
         ...
 
     def create_build(self) -> ast.expr:
@@ -17,16 +18,16 @@ class StringResult(Result):
     _variable: ast.Name
 
     def __init__(self):
-        self._variable = ast_utils.create_name('__output')
+        self._variable = ast_utils.Name('__output')
 
     def create_assignment(self) -> list[ast.AST]:
-        return [ast_utils.create_assignment(
+        return [ast_utils.Assignment(
             target=self._variable,
             value="",
         )]
 
-    def create_add(self, value: ast.expr) -> ast.AST:
-        return ast_utils.create_add_assign(
+    def create_add(self, value: ast.expr) -> ast.stmt:
+        return ast_utils.AddAssign(
             target=self._variable,
             value=value,
         )
@@ -39,20 +40,20 @@ class ArrayResult(Result):
     _variable: ast.Name
 
     def __init__(self):
-        self._variable = ast_utils.create_name('__output')
+        self._variable = ast_utils.Name('__output')
 
     def create_assignment(self) -> list[ast.AST]:
-        return [ast_utils.create_assignment(
+        return [ast_utils.Assignment(
             target=self._variable,
             value=[],
         )]
 
-    def create_add(self, value: ast.expr) -> ast.AST:
-        return ast.Expr(value=ast_utils.create_call(
-            func=ast_utils.create_attribute(self._variable, 'append'),
+    def create_add(self, value: ast.expr) -> ast.stmt:
+        return ast.Expr(value=ast_utils.Call(
+            func=ast_utils.Attribute(self._variable, 'append'),
             args=[value],
         ))
 
     def create_build(self) -> ast.expr:
-        return ast_utils.create_array_join(self._variable)
+        return ast_utils.ArrayJoin(self._variable)
 

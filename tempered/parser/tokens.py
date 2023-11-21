@@ -40,13 +40,8 @@ class SlotToken(EasyParseToken):
 
 
 @dataclass
-class ExtendsToken(EasyParseToken):
+class ExtendsToken:
     layout: str
-
-    def into_tag(self) -> parse_ast.LayoutExtendsBlock:
-        return parse_ast.LayoutExtendsBlock(
-            template=self.layout,
-        )
 
 
 

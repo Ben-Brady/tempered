@@ -3,20 +3,20 @@ from typing import Any, Iterable, Sequence
 from types import NoneType, EllipsisType
 
 
-def _create_iterable_constant(iterable: Iterable[Any]) -> list[ast.expr]:
-    return [create_constant(item) for item in iterable]
+def _IterableConstant(iterable: Iterable[Any]) -> list[ast.expr]:
+    return [Constant(item) for item in iterable]
 
 
-def create_constant(value: Any) -> ast.expr:
+def Constant(value: Any) -> ast.expr:
     match value:
         case list():
-            return create_list(value)
+            return List(value)
         case set():
-            return create_tuple(value)
+            return Tuple(value)
         case tuple():
-            return create_set(value)
+            return Set(value)
         case dict():
-            return create_dict(value)
+            return Dict(value)
         case NoneType() | EllipsisType() | str() | bytes() | bool() | int() | float() | complex():
             return ast.Constant(value=value)
         case type():
@@ -24,22 +24,22 @@ def create_constant(value: Any) -> ast.expr:
         case _:
             raise ValueError(f"Cannot convert {value} to an ast constant")
 
-def create_list(value: Iterable) -> ast.List:
-    return ast.List(elts=_create_iterable_constant(value))
+def List(value: Iterable) -> ast.List:
+    return ast.List(elts=_IterableConstant(value))
 
-def create_tuple(value: Iterable) -> ast.Tuple:
-    return ast.Tuple(elts=_create_iterable_constant(value))
+def Tuple(value: Iterable) -> ast.Tuple:
+    return ast.Tuple(elts=_IterableConstant(value))
 
-def create_set(value: Iterable) -> ast.Set:
-    return ast.Set(elts=_create_iterable_constant(value))
+def Set(value: Iterable) -> ast.Set:
+    return ast.Set(elts=_IterableConstant(value))
 
-def create_dict(value: dict) -> ast.Dict:
+def Dict(value: dict) -> ast.Dict:
     return ast.Dict(
-        keys=_create_iterable_constant(value.keys()),
-        values=_create_iterable_constant(value.values()),
+        keys=_IterableConstant(value.keys()),
+        values=_IterableConstant(value.values()),
     )
 
-def create_call(
+def Call(
         func: ast.AST,
         args: Sequence[ast.expr] = [],
         keywords: dict[str, ast.expr] = {},
@@ -54,11 +54,11 @@ def create_call(
     )
 
 
-def create_name(target: str) -> ast.Name:
+def Name(target: str) -> ast.Name:
     return ast.Name(id=target)
 
 
-def create_module(body: Sequence[ast.AST]) -> ast.Module:
+def Module(body: Sequence[ast.AST]) -> ast.Module:
     module = ast.Module(
         body=body,
         type_ignores=[],
@@ -67,40 +67,31 @@ def create_module(body: Sequence[ast.AST]) -> ast.Module:
     return module
 
 
-def create_function(
+def Function(
         name: str,
         args: ast.arguments,
         body: Sequence[ast.AST],
-        returns: ast.expr | None = None
+        returns: ast.expr | None = None,
+        decorators: Sequence[ast.expr] = [],
     ) -> ast.FunctionDef:
     return ast.FunctionDef(
         name=name,
         args=args,
         body=body,
         returns=returns,
-        decorator_list=[],
+        decorator_list=decorators,
         type_params=[],
     )
 
 
-def create_if(
-        condition: ast.AST,
-        if_body: Sequence[ast.AST]|ast.AST,
-        else_body: Sequence[ast.AST] | None = None
-        ) -> ast.If:
-    if not isinstance(if_body, Sequence):
-        if_body = [if_body]
-
-    else_body = else_body or []
-    return ast.If(test=condition, body=if_body, orelse=else_body)
 
 
-def create_add_assign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssign:
+def AddAssign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssign:
     if isinstance(target, str):
-        target = create_name(target)
+        target = Name(target)
 
     if not isinstance(value, ast.AST):
-        value = create_constant(value)
+        value = Constant(value)
 
     return ast.AugAssign(
         op=ast.Add(),
@@ -109,12 +100,12 @@ def create_add_assign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssig
     )
 
 
-def create_assignment(target: str|ast.Name, value: Any) -> ast.Assign:
+def Assignment(target: str|ast.Name, value: Any) -> ast.Assign:
     if isinstance(target, str):
-        target = create_name(target)
+        target = Name(target)
 
     if not isinstance(value, ast.AST):
-        value = create_constant(value)
+        value = Constant(value)
 
     return ast.Assign(
         targets=[target],
@@ -123,30 +114,81 @@ def create_assignment(target: str|ast.Name, value: Any) -> ast.Assign:
     )
 
 
-def create_string_concat(*args: ast.expr) -> ast.expr:
+def StringConcat(*args: ast.expr) -> ast.expr:
     if len(args) == 1:
         return args[0]
     else:
         return ast.BinOp(
             left=args[0],
             op=ast.Add(),
-            right=create_string_concat(*args[1:]),
+            right=StringConcat(*args[1:]),
         )
 
 
-def create_attribute(value: ast.expr, attr: str):
+def Attribute(value: ast.expr, attr: str):
     return ast.Attribute(
         value=value,
         attr=attr,
     )
 
 
-def create_array_join(array: ast.expr) -> ast.Call:
+def ArrayJoin(array: ast.expr) -> ast.Call:
     return ast.Call(
         func=ast.Attribute(value=ast.Constant(value=''), attr='join'),
         args=[array],
         keywords=[]
     )
 
-def create_return(value: ast.expr | None = None) -> ast.Return:
+
+def Return(value: ast.expr | None = None) -> ast.Return:
     return ast.Return(value=value)
+
+
+def If(
+        condition: ast.expr,
+        if_body: Sequence[ast.stmt]|ast.stmt,
+        elif_blocks: Sequence[tuple[ast.expr, Sequence[ast.stmt]|ast.stmt]] = [],
+        else_body: Sequence[ast.stmt] | None = None
+        ) -> ast.If:
+    if isinstance(if_body, ast.AST):
+        if_body = [if_body]
+
+    def navigate_elif_chain(if_statement: ast.If) -> ast.If:
+        cur_if = if_statement
+        while len(cur_if.orelse) == 1 and isinstance(cur_if.orelse[0], ast.If):
+            cur_if = cur_if.orelse[0]
+
+        return cur_if
+
+    def insert_elif(
+        if_statement: ast.If,
+        condition: ast.expr,
+        body: Sequence[ast.AST]|ast.AST
+        ):
+        if isinstance(body, ast.AST):
+            body = [body]
+
+        bottom_if = navigate_elif_chain(if_statement)
+        bottom_if.orelse = [
+            ast.If(
+                test=condition,
+                body=body,
+                orelse=[],
+            )
+        ]
+
+
+    if_statement = ast.If(
+        test=condition,
+        body=if_body,
+        orelse=[],
+    )
+    for elif_cond, elif_block in elif_blocks:
+        insert_elif(if_statement, elif_cond, elif_block)
+
+    if else_body is not None:
+        bottom_if = navigate_elif_chain(if_statement)
+        bottom_if.orelse = list(else_body)
+
+    return if_statement
+

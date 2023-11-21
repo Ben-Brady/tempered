@@ -1,5 +1,5 @@
-from ..lexer.tokens import Token
-from typing import Sequence
+from ..tokens import Token
+from typing_extensions import Sequence, TypeVar
 
 
 class TokenScanner:
@@ -48,14 +48,16 @@ class TokenScanner:
             return False
 
 
-    def expect[T: Token](self, token: type[T]) -> T:
+    T = TypeVar("T", bound=Token)
+    def expect(self, token: type[T]) -> T:
         if not self.is_next(token):
             raise ValueError(f"Expected {token} but got {self.stream[0]!r}")
         else:
             return self.pop() # type: ignore
 
 
-    def take_while[T: Token](self, token: type[T]) -> Sequence[T]:
+    T = TypeVar("T", bound=Token)
+    def take_while(self, token: type[T]) -> Sequence[T]:
         tokens = []
         while self.is_next(token):
             tokens.append(self.pop())

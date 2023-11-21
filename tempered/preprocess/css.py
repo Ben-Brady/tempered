@@ -1,9 +1,8 @@
 from tempered.parser import *
 from .scope import apply_scope_to_css
 from bs4 import BeautifulSoup, Tag
-from tinycss2.ast import QualifiedRule, IdentToken, LiteralToken
 from rcssmin import cssmin
-from typing import cast, LiteralString, NamedTuple
+from typing_extensions import LiteralString, cast, NamedTuple
 from zlib import crc32
 
 import warnings

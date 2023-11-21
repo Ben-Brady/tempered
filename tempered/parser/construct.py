@@ -1,10 +1,11 @@
 from ..preprocess import generate_scoped_styles, minify_html
 from .parse_ast import *
 from .lexer import *
-from .lexer.text_scanner import TextScanner
+from .tokens import *
+from .text_scanner import TextScanner
 from .parse.token_scanner import TokenScanner
 from .parse.expr import parse_parameter
-from .parse.parser import create_body
+from .parse.parser import parse_tokens
 from typing import Any, Sequence, cast, Literal
 import random
 import warnings
@@ -29,80 +30,21 @@ def parse_template(
     # Reconvert the HTML back into tokens
     tokens = reparse_html(html, token_lookup)
 
-    # Token Inferance
-    type = get_type(tokens)
-    tokens, layout = extract_layout(tokens)
-    tokens, parameters = extract_parameters(tokens)
-    child_components = get_child_components(tokens)
-
     # Parse tokens into a body
     scanner = TokenScanner(tokens)
-    body = create_body(scanner)
-    body = add_default_style_block(body, child_components, css)
+    ctx = parse_tokens(scanner)
 
     return Template(
         name=name,
-        parameters=parameters,
+        parameters=ctx.parameters,
         context=context,
-        type=type,
-
-        body=body,
+        type=ctx.template_type,
+        body=ctx.body,
         css=css,
-        child_components=list(child_components),
-        layout=layout,
+        child_components=ctx.child_components,
+        layout=ctx.layout,
+        slots=ctx.slots,
     )
-
-
-def extract_parameters(
-    tokens: Sequence[Token],
-) -> tuple[Sequence[Token], list[TemplateParameter]]:
-    parameters = [
-        parse_parameter(token.parameter)
-        for token in tokens
-        if isinstance(token, ParameterToken)
-    ]
-    tokens = [token for token in tokens if not isinstance(token, ParameterToken)]
-    return tokens, parameters
-
-
-def get_child_components(tokens: Sequence[Token]) -> Sequence[str]:
-    return [token.call for token in tokens if isinstance(token, ComponentToken)]
-
-
-def add_default_style_block(
-    body: TemplateBlock, child_components: Sequence[str], css: str
-):
-    template_style_tag_count = len([t for t in body if isinstance(t, StyleBlock)])
-    if template_style_tag_count > 1:
-        raise ValueError("Templates can only have one style block")
-
-    has_styles = css != "" or len(child_components) > 0
-    if template_style_tag_count == 0 and has_styles:
-        return [*body, StyleBlock()]
-    else:
-        return body
-
-
-def extract_layout(tokens: Sequence[Token]) -> tuple[Sequence[Token], str | None]:
-    layout_tokens = [t for t in tokens if isinstance(t, ExtendsToken)]
-    tokens = [t for t in tokens if not isinstance(t, ExtendsToken)]
-    if len(layout_tokens) == 0:
-        return tokens, None
-    elif len(layout_tokens) == 1:
-        return tokens, layout_tokens[0].layout
-    else:
-        raise ValueError("Templates can only have one slot tag")
-
-
-def get_type(tokens: Sequence[Token]) -> TemplateType:
-    slots =[
-        t for t in tokens
-        if isinstance(t, SlotToken)
-    ]
-    if len(slots) > 0:
-        return "layout"
-    else:
-        return "component"
 
 
 def generate_token_id() -> str:
@@ -145,9 +87,8 @@ def reparse_html(html: str, token_lookup: dict[str, Token]) -> Sequence[Token]:
     if len(token_lookup) > 0:
         warnings.warn(
             "Some of the custom tags are not used,"
-            "this is either caused by HTML commenting a custom tag or a bug in the parser"
-
-            , RuntimeWarning
+            "this is either caused by HTML commenting a custom tag or a bug in the parser",
+            RuntimeWarning,
         )
 
     return tokens

@@ -34,12 +34,12 @@ def create_escape_call(value: ast.expr) -> ast.expr:
         value=ast.Name(id='__internals'),
         attr='escape',
     )
-    return ast_utils.create_call(ESCAPE_FUNC_NAME, [value])
+    return ast_utils.Call(ESCAPE_FUNC_NAME, [value])
 
 
 def create_style_name(template_name: str) -> ast.Name:
     name = "STYLE_" + template_name.upper()
-    return ast_utils.create_name(name)
+    return ast_utils.Name(name)
 
 
 def create_component_func_name(template_name: str) -> str:
@@ -59,8 +59,8 @@ def create_slot_param(slot_name: str | None) -> str:
 
 
 def create_layout_call(html: ast.expr, css: ast.expr, layout: str, slot: str | None) -> ast.expr:
-    return ast_utils.create_call(
-        func=ast_utils.create_name(create_layout_func_name(layout)),
+    return ast_utils.Call(
+        func=ast_utils.Name(create_layout_func_name(layout)),
         keywords={
             create_slot_param(slot): html,
             LAYOUT_CSS_PARAMETER: css,

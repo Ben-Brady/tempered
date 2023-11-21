@@ -1,4 +1,4 @@
-from tempered.parser import parse_template, TemplateParameter, RequiredParameter, LiteralBlock, ComponentBlock
+from tempered.parser import parse_template, TemplateParameter, LiteralBlock, ComponentBlock
 import ast
 
 
