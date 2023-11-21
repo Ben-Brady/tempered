@@ -1,11 +1,6 @@
 # Tempered (Beta)
 
-Generate native python functions from HTML templates
-
-- Scoped CSS
-- Type checked
-- Intelisense
-- Compiled
+Convert html templates into native python components
 
 [PyPi](https://pypi.org/project/tempered)
 [Github](https://github.com/Ben-Brady/tempered)
@@ -15,12 +10,29 @@ Generate native python functions from HTML templates
 pip install tempered
 ```
 
+## Features
+
+- **Scoped CSS**
+  - CSS is scoped per component
+- **Components**
+  - Each template is it's own components and can call other components
+- **Layouts**
+  - Templates can inherit layouts, based on jinja2's implementation
+- **Codegen**
+  - The native python out has the choice between being built in memeory or to a static file
+- **Type Checked**
+  - The compiled components can be checked by static analysers such as mypy
+- **Intelisense**
+  - Components have intelisense support
+- **HTMX Support**
+  - Designed to used with HTMX
+
 ## Example
 
 ```html
-<!-- templates/image.html -->
-{%param src: str%}
-{%param alt: str = ""%}
+<!-- templates/Image.html -->
+{% param src: str %}
+{% param alt: str = "" %}
 
 <img src="{{src}}" alt="{{alt}}">
 
@@ -38,10 +50,9 @@ import tempered
 tempered.add_template_folder("./templates")
 components = tempered.build()
 
-print(components.image(
+print(components.Image(
     src="/example.png",
     alt="Example Post",
-    with_styles=True,
 ))
 ```
 
