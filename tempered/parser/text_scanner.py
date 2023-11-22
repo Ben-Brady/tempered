@@ -1,3 +1,4 @@
+from ..errors import ParserException
 from typing_extensions import Self, TYPE_CHECKING
 from array import array
 from pathlib import Path
@@ -112,52 +113,3 @@ class TextScanner:
     def error(self, msg: str) -> Exception:
         return ParserException.create(msg, self.file, self.original, self.position)
 
-
-class ParserException(Exception):
-    @classmethod
-    def create(cls,
-            msg: str,
-            file: Path|None,
-            source: str,
-            position: int
-            ) -> Self:
-        line_index = source[:position].count("\n")
-
-        lines = source.split("\n")
-
-        err_line = lines[line_index]
-
-        try:
-            prev_line = lines[line_index - 1]
-            if len(prev_line) > 80:
-                prev_line = prev_line[:80] + "..."
-        except IndexError:
-            prev_line = ""
-
-        try:
-            next_line = lines[line_index + 1]
-            if len(next_line) > 80:
-                next_line = next_line[:80] + "..."
-        except IndexError:
-            next_line = ""
-
-        line_no = line_index + 1
-        line_start = source.rfind("\n", 0, position) + 1
-        offset = position - line_start
-
-        if file is None:
-            msg = f"{msg} on line {line_no}, offset {offset}"
-        else:
-            msg = (
-                f"{msg} in {file.name} on line {line_no}, offset {offset} \n"
-                f"{file.absolute()}:{line_no}:{offset}"
-            )
-
-        message = (
-            msg + "\n"
-            + prev_line + "\n"
-            + err_line + "\n"
-            + f"{offset * ' '}^" "\n"
-            + next_line
-        )
-        return cls(message)
