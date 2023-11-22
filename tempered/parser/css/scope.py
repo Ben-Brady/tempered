@@ -4,21 +4,21 @@ from tinycss2.ast import QualifiedRule, IdentToken, LiteralToken, HashToken
 # QualifiedRule = #a .b {}
 
 # https://geoffrich.net/posts/svelte-scoped-styles/
-def apply_scope_to_css(css: str, scope_id: str) -> str:
+def apply_scope_to_css(css: str, scope: str) -> str:
     css_tokens = tinycss2.parse_stylesheet(css)
     for token in list(css_tokens):
         if isinstance(token, QualifiedRule):
-            add_scope_to_rule(token, scope_id)
+            add_scope_to_rule(token, scope)
 
     return tinycss2.serialize(css_tokens)
 
 
 # QualifiedRule.prelude = #a .b
-def add_scope_to_rule(rule: QualifiedRule, scope_id: str):
+def add_scope_to_rule(rule: QualifiedRule, scope: str):
     checked_tokens = []
     # Find first scopable rule
-    def insert_scope(rule: QualifiedRule, scope_id: str, position: int):
-        scope_ident = IdentToken(0, 0, scope_id)
+    def insert_scope(rule: QualifiedRule, scope: str, position: int):
+        scope_ident = IdentToken(0, 0, scope)
         class_token = LiteralToken(0, 0, ".")
         rule.prelude.insert(position + 1, scope_ident)
         rule.prelude.insert(position + 1, class_token)
@@ -29,7 +29,7 @@ def add_scope_to_rule(rule: QualifiedRule, scope_id: str):
         checked_tokens.append(token)
 
         if isinstance(token, (IdentToken, HashToken)):
-            insert_scope(rule, scope_id, rule.prelude.index(token))
+            insert_scope(rule, scope, rule.prelude.index(token))
             break
 
     # Find last scopable rule
@@ -38,6 +38,6 @@ def add_scope_to_rule(rule: QualifiedRule, scope_id: str):
             break # We met in the middle
 
         if isinstance(token, (IdentToken, HashToken)):
-            insert_scope(rule, scope_id, rule.prelude.index(token))
+            insert_scope(rule, scope, rule.prelude.index(token))
             break
 
