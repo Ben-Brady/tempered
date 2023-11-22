@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Iterable, Sequence
+from typing import Any, Iterable, Sequence, TypeAlias
 from types import NoneType, EllipsisType
 
 
@@ -7,7 +7,12 @@ def _IterableConstant(iterable: Iterable[Any]) -> list[ast.expr]:
     return [Constant(item) for item in iterable]
 
 
-def Constant(value: Any) -> ast.expr:
+ConstantConvertable: TypeAlias = (
+    list|set|tuple|dict|NoneType|EllipsisType|str|bytes|bool|int|float|complex
+)
+
+
+def Constant(value: ConstantConvertable) -> ast.expr:
     match value:
         case list():
             return List(value)
@@ -22,7 +27,7 @@ def Constant(value: Any) -> ast.expr:
         case _:
             raise ValueError(f"Cannot convert {value} to an ast constant")
 
-
+EmptyStr = Constant("")
 None_ = Constant(None)
 True_ = Constant(True)
 False_ = Constant(False)
@@ -98,7 +103,7 @@ def Function(
     )
 
 
-def AddAssign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssign:
+def AddAssign(target: str | ast.Name, value: ConstantConvertable | ast.expr) -> ast.AugAssign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -112,7 +117,10 @@ def AddAssign(target: str|ast.Name, value: Any|ast.expr) -> ast.AugAssign:
     )
 
 
-def Assign(target: str|ast.Name, value: Any) -> ast.Assign:
+def Assign(
+        target: str | ast.Name,
+        value: ConstantConvertable | ast.AST
+        ) -> ast.Assign:
     if isinstance(target, str):
         target = Name(target)
 

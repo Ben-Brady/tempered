@@ -11,7 +11,7 @@ def test_layout_extend_with_default_slot():
         </div>
     """)
     components.add_template_from_string("b", """
-        {% extends "a" %}
+        {% layout "a" %}
         Test
     """)
     module = components.build_memory()
@@ -29,7 +29,7 @@ def test_layout_migrates_css():
         {% slot %}
     """)
     components.add_template_from_string("b", """
-        {% extends "a" %}
+        {% layout "a" %}
         Test
 
         <style>
@@ -39,7 +39,8 @@ def test_layout_migrates_css():
         </style>
     """)
     module = components.build_memory()
-    soup = bs4.BeautifulSoup(module.b(), "html.parser")
+    html = module.b()
+    soup = bs4.BeautifulSoup(html, "html.parser")
 
     assert soup.find("style")
     assert CSS_KEY in soup.find("style").text  # type:ignore
@@ -52,7 +53,7 @@ def test_layout_extend_with_named_slots():
         <title>{% slot title %}</title>
     """)
     components.add_template_from_string("child", """
-        {% extends "layout" %}
+        {% layout "layout" %}
         {% block title %}{% endblock %}
     """)
 
@@ -70,7 +71,7 @@ def test_layout_extend_with_many_named_slots():
         <b>{% slot a%}</b>
     """)
     components.add_template_from_string("child", """
-        {% extends "layout" %}
+        {% layout "layout" %}
         {% block a %}A{% endblock %}
         {% block b %}B{% endblock %}
     """)

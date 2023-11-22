@@ -4,7 +4,7 @@ from . import tokens
 from .parse_ast import *
 from .lexer import to_token_stream
 from .text_scanner import TextScanner
-from .parse import TokenScanner, parse_token_stream
+from .parse import parse_token_stream
 from pathlib import Path
 from typing import Any, Sequence
 import random
@@ -22,7 +22,7 @@ def parse_template(
         return _parse_template(
             name=name,
             html=html,
-            filepath=filepath,
+            file=filepath,
             context=context,
         )
     except ParserException as e:
@@ -37,12 +37,12 @@ def parse_template(
 def _parse_template(
     name: str,
     html: str,
-    filepath: Path|None,
+    file: Path|None,
     context: dict[str, Any],
 ) -> Template:
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
-    tokens = to_token_stream(html, filepath=filepath)
+    tokens = to_token_stream(html, filepath=file)
     html, token_lookup = reassmble_html(tokens)
 
     # Process HTML
@@ -53,17 +53,18 @@ def _parse_template(
     tokens = reparse_html(html, token_lookup)
 
     # Parse tokens into a body
-    scanner = TokenScanner(tokens)
-    ctx = parse_token_stream(scanner)
+    ctx = parse_token_stream(tokens)
 
     if ctx.is_layout:
         return LayoutTemplate(
             name=name,
+            file=file,
             parameters=ctx.parameters,
             context=context,
             body=ctx.body,
             css=css,
-            child_components=ctx.child_components,
+            components_calls=ctx.components_calls,
+            style_includes=ctx.style_includes,
             layout=ctx.layout,
             blocks=ctx.blocks,
             slots=ctx.slots,
@@ -72,11 +73,13 @@ def _parse_template(
     else:
         return Template(
             name=name,
+            file=file,
             parameters=ctx.parameters,
             context=context,
             body=ctx.body,
             css=css,
-            child_components=ctx.child_components,
+            components_calls=ctx.components_calls,
+            style_includes=ctx.style_includes,
             layout=ctx.layout,
             blocks=ctx.blocks,
         )

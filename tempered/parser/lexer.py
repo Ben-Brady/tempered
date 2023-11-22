@@ -71,8 +71,8 @@ def take_statement_token(scanner: TextScanner) -> tokens.Token:
             return tokens.StylesToken()
         case "include":
             return take_include_token(scanner)
-        case "extends":
-            return take_extends_token(scanner)
+        case "layout":
+            return take_layout_token(scanner)
         case "slot":
             return take_slot_token(scanner)
         case "endslot":
@@ -149,12 +149,12 @@ def take_html_token(scanner: TextScanner) -> tokens.HtmlExprToken:
 
 
 
-def take_extends_token(scanner: TextScanner) -> tokens.ExtendsToken:
+def take_layout_token(scanner: TextScanner) -> tokens.LayoutToken:
     layout = python_utils.take_string(scanner)
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return tokens.ExtendsToken(layout)
+    return tokens.LayoutToken(layout)
 
 
 def take_slot_token(scanner: TextScanner) -> tokens.SlotToken:

@@ -29,7 +29,7 @@ class StylesIncludeToken:
 
 
 @dataclass
-class ExtendsToken:
+class LayoutToken:
     layout: str
 
 
@@ -113,5 +113,5 @@ Token: TypeAlias = (
     ComponentToken | HtmlExprToken | EscapedExprToken |
     IfStartToken | ElIfToken | ElseToken | IfEndToken |
     ForStartToken | ForEndToken |
-    ExtendsToken | SlotToken | SlotEndToken |BlockToken | BlockEndToken
+    LayoutToken | SlotToken | SlotEndToken |BlockToken | BlockEndToken
 )

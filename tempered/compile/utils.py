@@ -26,8 +26,8 @@ IMPORTS = [
 
 
 WITH_STYLES_PARAMETER = "with_styles"
-COMPONENT_CSS = "__css"
 LAYOUT_CSS_PARAMETER = "__component_css"
+COMPONENT_CSS_VARIABLE = "__css"
 OUTPUT_VARIABLE = "__output"
 
 
@@ -38,10 +38,6 @@ def create_escape_call(value: ast.expr) -> ast.expr:
     )
     return ast_utils.Call(ESCAPE_FUNC_NAME, [value])
 
-
-def css_name(template_name: str) -> ast.Name:
-    name = "STYLE_" + template_name.upper()
-    return ast_utils.Name(name)
 
 
 def component_func_name(template_name: str) -> str:

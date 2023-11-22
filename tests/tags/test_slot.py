@@ -6,21 +6,21 @@ import tempered
 
 def test_default_slot():
     component = build_templates(
-        "{% extends 'layout' %}"
+        "{% layout 'layout' %}"
         "B"
     , (
         "layout",
         "<title>A{% slot %}C</title>",
     ))
-
-    soup = bs4.BeautifulSoup(component())
+    html = component()
+    soup = bs4.BeautifulSoup(html)
     tag = soup.find("title")
     assert tag and "ABC" in tag.text
 
 
 def test_single_named_slot():
     component = build_templates("""
-        {% extends "layout" %}
+        {% layout "layout" %}
         {% block title %}replace{%endblock%}
     """, ("layout", """
         <title>{% slot title%}{% endslot%}</title>
@@ -33,7 +33,7 @@ def test_single_named_slot():
 
 def test_single_named_required_slot():
     component = build_templates("""
-        {% extends "layout" %}
+        {% layout "layout" %}
         {% block title %}replace{%endblock%}
     """, ("layout", """
         <title>{% slot title required%}</title>
@@ -46,7 +46,7 @@ def test_single_named_required_slot():
 
 def test_single_named_slot_default():
     component = build_templates("""
-        {% extends "layout" %}
+        {% layout "layout" %}
     """, ("layout", """
         <title>{% slot title%}default value{% endslot%}</title>
     """))
@@ -58,7 +58,7 @@ def test_single_named_slot_default():
 
 def test_single_named_slot_replaces_default():
     component = build_templates("""
-        {% extends "layout" %}
+        {% layout "layout" %}
         {% block title %}replacement value{%endblock%}
     """, ("layout", """
         <title>{% slot title%}default value{% endslot%}</title>
@@ -71,7 +71,7 @@ def test_single_named_slot_replaces_default():
 
 def test_many_named_slots_replaces_default():
     component = build_templates("""
-        {% extends "layout" %}
+        {% layout "layout" %}
         {% block a %}A{%endblock%}
         {% block b %}B{%endblock%}
     """, ("layout", """

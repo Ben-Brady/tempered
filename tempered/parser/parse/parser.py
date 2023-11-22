@@ -17,13 +17,15 @@ class ParseContext:
     has_default_slot: bool = False
     slots: list[parse_ast.SlotBlock] = field(default_factory=list)
 
-    child_components: set[str] = field(default_factory=set)
+    components_calls: list[parse_ast.ComponentBlock] = field(default_factory=list)
+    style_includes: set[str] = field(default_factory=set)
     body: parse_ast.TemplateBlock = field(default_factory=list)
     styles_set: bool = False
     blocks: set[str] = field(default_factory=set)
 
 
-def parse_token_stream(scanner: TokenScanner) -> ParseContext:
+def parse_token_stream(tokens: Sequence[tokens.Token]) -> ParseContext:
+    scanner = TokenScanner(tokens)
     ctx = ParseContext()
     ctx.body = take_tags_until(ctx, scanner)
 
@@ -56,7 +58,7 @@ def next_tag(ctx: ParseContext, scanner: TokenScanner) -> parse_ast.TemplateTag 
         case tokens.LiteralToken() as tag:
             return tag.into_tag()
         case tokens.StylesIncludeToken() as tag:
-            ctx.child_components.add(tag.template)
+            ctx.style_includes.add(tag.template)
             return None
         case tokens.EscapedExprToken(expr_str):
             return parse_ast.ExprBlock(parse_expr(expr_str))
@@ -66,8 +68,8 @@ def next_tag(ctx: ParseContext, scanner: TokenScanner) -> parse_ast.TemplateTag 
             return next_component(ctx, token)
         case tokens.StylesToken():
             return parse_styles(ctx)
-        case tokens.ExtendsToken(layout):
-            parse_extends(ctx, layout)
+        case tokens.LayoutToken(layout):
+            parse_layout(ctx, layout)
             return None
         case tokens.ParameterToken() as token:
             parse_param(ctx, token)
@@ -139,7 +141,7 @@ def parse_styles(ctx: ParseContext) -> parse_ast.StyleBlock:
     return parse_ast.StyleBlock()
 
 
-def parse_extends(ctx: ParseContext, layout_str: str) -> None:
+def parse_layout(ctx: ParseContext, layout_str: str) -> None:
     if ctx.layout is not None:
         raise ValueError("Template cannot have multiple layout tags")
 
@@ -164,8 +166,7 @@ def next_component(ctx: ParseContext, token: tokens.ComponentToken) -> parse_ast
             func=ast.Name(id=component_name),
             keywords=keywords,
         ):
-            ctx.child_components.add(component_name)
-            return parse_ast.ComponentBlock(
+            call = parse_ast.ComponentBlock(
                 component_name=component_name,
                 keywords={
                     keyword.arg: keyword.value
@@ -173,6 +174,8 @@ def next_component(ctx: ParseContext, token: tokens.ComponentToken) -> parse_ast
                     if keyword.arg is not None
                 },
             )
+            ctx.components_calls.append(call)
+            return call
         case _:
             raise ValueError("Invalid Component Call")
 

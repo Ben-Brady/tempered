@@ -2,35 +2,36 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import ast
 from typing import Any, TypeAlias, Sequence, Literal
+from pathlib import Path
 from abc import ABC
 
 
-class Tag(ABC):
+class Block(ABC):
     pass
 
 
 @dataclass
-class LiteralBlock(Tag):
+class LiteralBlock(Block):
     body: str
 
 
 @dataclass
-class ExprBlock(Tag):
+class ExprBlock(Block):
     value: ast.expr
 
 
 @dataclass
-class HtmlBlock(Tag):
+class HtmlBlock(Block):
     value: ast.expr
 
 
 @dataclass
-class StyleBlock(Tag):
+class StyleBlock(Block):
     """Place styles in component here"""
 
 
 @dataclass
-class ComponentBlock(Tag):
+class ComponentBlock(Block):
     # Needed to prevent CSS from being created multiple times
     # Also to prevent HTML from being escaped
     component_name: str
@@ -38,7 +39,7 @@ class ComponentBlock(Tag):
 
 
 @dataclass
-class IfBlock(Tag):
+class IfBlock(Block):
     condition: ast.expr
     if_block: TemplateBlock
     else_block: TemplateBlock | None
@@ -46,26 +47,26 @@ class IfBlock(Tag):
 
 
 @dataclass
-class ForBlock(Tag):
+class ForBlock(Block):
     iterable: ast.expr
     loop_variable: ast.expr
     loop_block: TemplateBlock
 
 
 @dataclass
-class AssignmentBlock(Tag):
+class AssignmentBlock(Block):
     target: ast.expr
     value: ast.expr
 
 
 @dataclass
-class SlotBlock(Tag):
+class SlotBlock(Block):
     name: str | None
     default: TemplateBlock | None
 
 
 @dataclass
-class BlockBlock(Tag):
+class BlockBlock(Block):
     name: str | None
     body: TemplateBlock
 
@@ -94,13 +95,15 @@ class TemplateParameter:
 @dataclass
 class Template:
     name: str
+    file: Path|None = None
     parameters: list[TemplateParameter] = field(default_factory=list)
     context: dict[str, Any] = field(default_factory=dict)
 
     body: TemplateBlock = field(default_factory=list)
     css: str = ""
     layout: str|None = None
-    child_components: set[str] = field(default_factory=set)
+    components_calls: list[ComponentBlock] = field(default_factory=list)
+    style_includes: set[str] = field(default_factory=set)
 
     blocks: set[str] = field(default_factory=set)
 

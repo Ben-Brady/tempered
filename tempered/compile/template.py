@@ -1,23 +1,26 @@
 from .. import ast_utils
 from ..parser import Template, LayoutTemplate, TemplateParameter
 from .utils import (
-    css_name,
     slot_parameter,
     component_func_name,
     layout_func_name,
-    IMPORTS,
+    create_layout_call,
     WITH_STYLES_PARAMETER,
     LAYOUT_CSS_PARAMETER,
     OUTPUT_VARIABLE,
+    COMPONENT_CSS_VARIABLE,
 )
 from .tag import construct_tag, BuildContext
 from .accumulators import StringResult
-from .utils import css_name, create_layout_call, COMPONENT_CSS, LAYOUT_CSS_PARAMETER
 import ast
 from typing import Sequence, Any
 
 
-def create_template_function(template: Template, layout: LayoutTemplate | None):
+def create_template_function(
+    template: Template,
+    layout: LayoutTemplate | None,
+    css: str,
+    ) -> ast.FunctionDef:
     arguements = [*template.parameters]
     arguements.append(
         TemplateParameter(
@@ -61,11 +64,16 @@ def create_template_function(template: Template, layout: LayoutTemplate | None):
                 default=default,
             ))
 
-
+    ctx = BuildContext(
+        template=template,
+        result=StringResult(OUTPUT_VARIABLE),
+        layout=layout,
+        css=css,
+    )
     return ast_utils.Function(
         name=function_name,
         args=construct_arguments(arguements),
-        body=construct_body(template, layout),
+        body=construct_body(ctx),
         returns=ast_utils.Name("str"),
     )
 
@@ -89,35 +97,47 @@ def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
     )
 
 
-def construct_body(template: Template, layout: LayoutTemplate|None = None) -> Sequence[ast.AST]:
-    ctx = BuildContext(
-        template=template,
-        result=StringResult(OUTPUT_VARIABLE),
-        layout=layout,
-    )
-
+def construct_body(ctx: BuildContext) -> Sequence[ast.AST]:
     statements: list[ast.AST] = []
-    statements.extend(create_constants_variables(template.context))
-    statements.extend(create_style_constant(ctx))
+    statements.extend(create_context_variables(ctx.template.context))
+    statements.append(create_stlye_contant(ctx))
     statements.extend(ctx.result.create_init())
 
-    for block in template.body:
+    for block in ctx.template.body:
         statements.extend(construct_tag(block, ctx))
 
     output_value = ctx.result.create_value()
-    if layout is not None:
+    if ctx.layout is not None:
         output_value = create_layout_call(
-            layout_name=layout.name,
-            css=ast_utils.Name(COMPONENT_CSS),
-            has_default_slot=layout.has_default_slot,
-            blocks=template.blocks,
+            layout_name=ctx.layout.name,
+            css=ast_utils.Name(COMPONENT_CSS_VARIABLE),
+            has_default_slot=ctx.layout.has_default_slot,
+            blocks=ctx.template.blocks,
         )
 
     statements.append(ast_utils.Return(output_value))
     return statements
 
 
-def create_constants_variables(context: dict[str, Any]) -> list[ast.Assign]:
+def create_stlye_contant(ctx: BuildContext) -> ast.Assign:
+    if isinstance(ctx.template, LayoutTemplate):
+        if len(ctx.css) == 0:
+            value = ast_utils.Name(LAYOUT_CSS_PARAMETER)
+        else:
+            value = ast_utils.Add(
+                ast_utils.Constant(ctx.css),
+                ast_utils.Name(LAYOUT_CSS_PARAMETER),
+            )
+    else:
+        value = ast_utils.Constant(ctx.css)
+
+    return ast_utils.Assign(
+        target=COMPONENT_CSS_VARIABLE,
+        value=value
+    )
+
+
+def create_context_variables(context: dict[str, Any]) -> list[ast.Assign]:
     statements = []
     for name, value in context.items():
         if name.startswith("__"):
@@ -129,28 +149,3 @@ def create_constants_variables(context: dict[str, Any]) -> list[ast.Assign]:
 
     return statements
 
-
-def create_style_constant(ctx: BuildContext):
-    css_constants: list[ast.Name] = []
-    css_constants.append(css_name(ctx.template.name))
-    for name in ctx.template.child_components:
-        css_constants.append(css_name(name))
-
-    if isinstance(ctx.template, LayoutTemplate):
-        css_constants.append(ast_utils.Name(LAYOUT_CSS_PARAMETER))
-
-    return [ast_utils.If(
-        condition=ast_utils.Name("with_styles"),
-        if_body=[
-            ast_utils.Assign(
-                COMPONENT_CSS,
-                ast_utils.Add(*css_constants),
-            )
-        ],
-        else_body=[
-            ast_utils.Assign(
-                COMPONENT_CSS,
-                ast_utils.Constant(""),
-            )
-        ],
-    )]

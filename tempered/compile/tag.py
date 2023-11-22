@@ -6,8 +6,8 @@ from ..parser.parse_ast import (
 )
 from .. import ast_utils
 from .utils import (
-    css_name, create_escape_call, WITH_STYLES_PARAMETER,
-    slot_variable_name, slot_parameter, COMPONENT_CSS,
+    create_escape_call, slot_variable_name, slot_parameter,
+    WITH_STYLES_PARAMETER, LAYOUT_CSS_PARAMETER, COMPONENT_CSS_VARIABLE,
 )
 from .accumulators import Result, StringResult
 import ast
@@ -17,9 +17,11 @@ from dataclasses import dataclass
 
 @dataclass
 class BuildContext:
+    result: Result
+
     template: Template
     layout: LayoutTemplate | None
-    result: Result
+    css: str
 
 
 def construct_tag(tag: TemplateTag, ctx: BuildContext) -> Sequence[ast.stmt]:
@@ -59,33 +61,6 @@ def construct_block(ctx: BuildContext, tags: Sequence[TemplateTag]) -> Sequence[
     return block
 
 
-def construct_slot_tag(ctx: BuildContext, tag: SlotBlock) -> Sequence[ast.stmt]:
-    body: list[ast.stmt] = []
-    slot_param = ast_utils.Name(slot_parameter(tag.name))
-
-    if tag.default is not None:
-        if_body: list[ast.stmt] = []
-        if tag.default == []:
-            if_body.append(ast_utils.Assign(slot_param, ast_utils.Constant("")))
-        elif len(tag.default) == 1 and isinstance(tag.default[0], LiteralBlock):
-            literal = tag.default[0]
-            if_body.append(ast_utils.Assign(slot_param, ast_utils.Constant(literal.body)))
-        else:
-            original_result = ctx.result
-            ctx.result = StringResult(slot_param)
-            if_body.extend(ctx.result.create_init())
-            if_body.extend(construct_block(ctx, tag.default))
-            if_body.append(ast_utils.Assign(slot_param, ctx.result.create_value()))
-            ctx.result = original_result
-
-        body.append(ast_utils.If(
-            condition=ast_utils.Is(slot_param, ast_utils.None_),
-            if_body=if_body,
-        ))
-
-    body.append(ctx.result.create_add(slot_param))
-    return body
-
 
 def construct_component_tag(ctx: BuildContext, tag: ComponentBlock) -> Sequence[ast.stmt]:
     func = ast_utils.Name(tag.component_name)
@@ -104,18 +79,21 @@ def construct_assignment(ctx: BuildContext, tag: AssignmentBlock) -> Sequence[as
 
 
 def construct_style(ctx: BuildContext, tag: StyleBlock) -> Sequence[ast.stmt]:
+    if isinstance(ctx.template, LayoutTemplate):
+        css_variables = LAYOUT_CSS_PARAMETER, COMPONENT_CSS_VARIABLE
+    else:
+        css_variables = COMPONENT_CSS_VARIABLE,
     return [ast_utils.If(
         condition=ast_utils.And(
             ast_utils.Name(WITH_STYLES_PARAMETER),
-            ast_utils.Name(COMPONENT_CSS),
+            ast_utils.Name(COMPONENT_CSS_VARIABLE),
         ),
         if_body=[
-            ctx.result.create_add(
-                ast_utils.Add(
-                    ast_utils.Constant("<style>"),
-                    ast_utils.Name(COMPONENT_CSS),
-                    ast_utils.Constant("</style>"),
-                )
+            ctx.result.create_add(ast_utils.Add(
+                ast_utils.Constant("<style>"),
+                ast_utils.Name(COMPONENT_CSS_VARIABLE),
+                ast_utils.Constant("</style>"),
+            ),
             )
         ],
     )]
@@ -158,12 +136,72 @@ def construct_for(ctx: BuildContext, block: ForBlock) -> Sequence[ast.stmt]:
 
 
 def construct_block_tag(ctx: BuildContext, block: parse_ast.BlockBlock) -> Sequence[ast.stmt]:
-    body = []
-    original_result = ctx.result
-    slot_variable = slot_variable_name(block.name)
-    ctx.result = StringResult(slot_variable)
-    body.extend(ctx.result.create_init())
-    body.extend(construct_block(ctx, block.body))
-    body.append(ast_utils.Assign(slot_variable, ctx.result.create_value()))
-    ctx.result = original_result
+    return construct_block_assign(
+        ctx=ctx,
+        target=slot_variable_name(block.name),
+        block=block.body,
+    )
+
+
+def construct_slot_tag(ctx: BuildContext, tag: SlotBlock) -> Sequence[ast.stmt]:
+    body: list[ast.stmt] = []
+    slot_param = ast_utils.Name(slot_parameter(tag.name))
+
+    if tag.default is not None:
+        if_body = construct_block_assign(
+            ctx=ctx,
+            target=slot_param,
+            block=tag.default,
+        )
+
+        body.append(ast_utils.If(
+            condition=ast_utils.Is(slot_param, ast_utils.None_),
+            if_body=if_body,
+        ))
+
+    body.append(ctx.result.create_add(slot_param))
     return body
+
+
+def construct_block_assign(
+    ctx: BuildContext,
+    target:str|ast.Name,
+    block: parse_ast.TemplateBlock,
+    ) -> list[ast.stmt]:
+    body: list[ast.stmt] = []
+    if block == []:
+        return [
+            ast_utils.Assign(target, ast_utils.EmptyStr)
+        ]
+
+    if (
+        len(block) == 1 and
+        isinstance(block[0], LiteralBlock)
+        ):
+        return [
+            ast_utils.Assign(target, ast_utils.Constant(block[0].body))
+        ]
+    else:
+        with use_temporary_output(ctx, target):
+            ctx.result = StringResult(target)
+            body.extend(ctx.result.create_init())
+            body.extend(construct_block(ctx, block))
+            body.append(ast_utils.Assign(
+                target, ctx.result.create_value()))
+
+        return body
+
+
+from contextlib import contextmanager
+@contextmanager
+def use_temporary_output(
+    ctx: BuildContext,
+    name: str|ast.Name,
+    ):
+    original_result = ctx.result
+
+    try:
+        ctx.result = StringResult(name)
+        yield
+    finally:
+        ctx.result = original_result

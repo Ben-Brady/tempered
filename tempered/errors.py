@@ -2,7 +2,25 @@ from pathlib import Path
 from typing_extensions import Self
 
 
-class ParserException(Exception):
+class BuildError(Exception):
+    pass
+
+
+class InvalidTemplate(BuildError):
+    @classmethod
+    def create(
+            cls,
+            msg: str,
+            name: str,
+            file: Path | None,
+            ) -> Self:
+        if file:
+            return cls(f"{msg} in {name} \n{file.absolute()}")
+        else:
+            return cls(f"{msg} in {name}")
+
+
+class ParserException(BuildError):
     @classmethod
     def create(cls,
                msg: str,
