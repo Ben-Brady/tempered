@@ -26,7 +26,7 @@ IMPORTS = [
 
 
 WITH_STYLES_PARAMETER = "with_styles"
-COMPONENT_STYLES = "__css"
+COMPONENT_CSS = "__css"
 LAYOUT_CSS_PARAMETER = "__component_css"
 OUTPUT_VARIABLE = "__output"
 

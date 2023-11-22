@@ -12,7 +12,7 @@ from .utils import (
 )
 from .tag import construct_tag, BuildContext
 from .accumulators import StringResult
-from .utils import css_name, create_layout_call, COMPONENT_STYLES, LAYOUT_CSS_PARAMETER
+from .utils import css_name, create_layout_call, COMPONENT_CSS, LAYOUT_CSS_PARAMETER
 import ast
 from typing import Sequence, Any
 
@@ -108,7 +108,7 @@ def construct_body(template: Template, layout: LayoutTemplate|None = None) -> Se
     if layout is not None:
         output_value = create_layout_call(
             layout_name=layout.name,
-            css=ast_utils.Name(COMPONENT_STYLES),
+            css=ast_utils.Name(COMPONENT_CSS),
             has_default_slot=layout.has_default_slot,
             blocks=template.blocks,
         )
@@ -143,13 +143,13 @@ def create_style_constant(ctx: BuildContext):
         condition=ast_utils.Name("with_styles"),
         if_body=[
             ast_utils.Assign(
-                COMPONENT_STYLES,
+                COMPONENT_CSS,
                 ast_utils.Add(*css_constants),
             )
         ],
         else_body=[
             ast_utils.Assign(
-                COMPONENT_STYLES,
+                COMPONENT_CSS,
                 ast_utils.Constant(""),
             )
         ],

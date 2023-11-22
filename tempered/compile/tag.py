@@ -7,7 +7,7 @@ from ..parser.parse_ast import (
 from .. import ast_utils
 from .utils import (
     css_name, create_escape_call, WITH_STYLES_PARAMETER,
-    slot_variable_name, slot_parameter, COMPONENT_STYLES
+    slot_variable_name, slot_parameter, COMPONENT_CSS,
 )
 from .accumulators import Result, StringResult
 import ast
@@ -105,12 +105,15 @@ def construct_assignment(ctx: BuildContext, tag: AssignmentBlock) -> Sequence[as
 
 def construct_style(ctx: BuildContext, tag: StyleBlock) -> Sequence[ast.stmt]:
     return [ast_utils.If(
-        condition=ast_utils.Name("with_styles"),
+        condition=ast_utils.And(
+            ast_utils.Name(WITH_STYLES_PARAMETER),
+            ast_utils.Name(COMPONENT_CSS),
+        ),
         if_body=[
             ctx.result.create_add(
                 ast_utils.Add(
                     ast_utils.Constant("<style>"),
-                    ast_utils.Name(COMPONENT_STYLES),
+                    ast_utils.Name(COMPONENT_CSS),
                     ast_utils.Constant("</style>"),
                 )
             )

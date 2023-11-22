@@ -133,6 +133,17 @@ def UnaryOp(op:ast.unaryop, arg: ast.expr) -> ast.expr:
     )
 
 
+def BoolOp(op:ast.boolop, *args: ast.expr) -> ast.expr:
+    return ast.BoolOp(
+        op=op,
+        values=args
+    )
+
+
+def And(*args: ast.expr) -> ast.expr:
+    return BoolOp(ast.And(), *args)
+
+
 def BinOp(op:ast.operator, *args: ast.expr) -> ast.expr:
     if len(args) == 1:
         return args[0]
