@@ -13,32 +13,7 @@ class Comment:
 
 
 if __name__ == "__main__":
-    templates.add_template_from_string("comment", """
-    {%param comment: Comment %}
-    <div>
-        <span class="header">
-            {{ comment.author }} - {{ comment.created_at.strftime("%d/%m/%y") }}
-        </span>
-        <span class="body">
-            {{ comment.text }}
-        </span>
-    </div>
-
-    <style>
-    div {
-        width: 10rem
-        height: fit-content;
-    }
-    .header {
-        width: 100%;
-        height: 1.5rem;
-    }
-    .body {
-        width: 100%;
-        height: fit-content;
-    }
-    </style>
-    """)
+    templates.add_template_from_string("comment", )
 
     components = templates.build_static()
     comment = Comment(

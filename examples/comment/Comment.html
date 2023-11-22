@@ -1,0 +1,24 @@
+{%param comment: Comment %}
+<div>
+    <span class="header">
+        {{ comment.author }} - {{ comment.created_at.strftime("%d/%m/%y") }}
+    </span>
+    <span class="body">
+        {{ comment.text }}
+    </span>
+</div>
+
+<style>
+div {
+    width: 10rem
+    height: fit-content;
+}
+.header {
+    width: 100%;
+    height: 1.5rem;
+}
+.body {
+    width: 100%;
+    height: fit-content;
+}
+</style>

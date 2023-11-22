@@ -1,7 +1,127 @@
+# Tempered
 
-# Templating Documentation
+## Adding templates
 
-## Parameters
+```python
+import components
+from tempered import Tempered
+
+tempered = Tempered()
+
+tempered.add_template("./templates/comment.html")
+tempered.add_template_folder("./templates")
+tempered.add_template_from_string("TEMPLATE_NAME", """
+    TEMPLATE_CONTENTS
+""")
+```
+
+## Building
+
+Tempered offers several ways to build your templates, you can either:
+
+- Build in memory
+- Build to a static file
+- Build to a module
+
+### build_memory
+
+Building in memory provides the simplist build system, however it provides no-intelisense
+
+### build_static
+
+Building staticly saves the generated templates to a file inside the tempered folder, this means that the code can recieve intelisense and type checking. However, this relies on rather weak type inferance and doesn't work sometimes.
+
+### build_to
+
+Build module allows you have a local file built into. This provides the strongest guarentee of type saftey as a local file is always type checked.
+
+Additionally when building into this module, tempered will override the import cache meaning that this update will apply even if you've already imported
+
+```python
+# components.py
+# EMPTY
+```
+
+
+```python
+import components
+from tempered import Tempered
+
+tempered = Tempered()
+tempered.add_template_from_string("Comment", """
+    {% param author: str %}
+    {% param text: str %}
+    <div>
+        <h2>{{ author }}</h2>
+        <p>{{ text }}</p>
+    </div>
+""")
+
+tempered.build_to(components)
+print(components.Comment(
+    author="Ben Brady",
+    text="This library is pretty goated"
+))
+```
+
+
+```python
+# components.py AFTER
+from __future__ import annotations
+from tempered import _internals as __internals
+STYLE_COMMENT = ''
+
+
+def Comment(*, author: str, text: str, with_styles: bool = True) -> str:
+    if with_styles:
+        __css = STYLE_COMMENT
+    else:
+        __css = ''
+    __output = ''
+    __output += ' '
+    __output += ' <div><h2>'
+    __output += __internals.escape(author)
+    __output += '</h2><p>'
+    __output += __internals.escape(text)
+    __output += '</div>'
+    if with_styles:
+        __output += '<style>' + (__css + '</style>')
+    return __output
+```
+
+
+## Templates
+
+### Styles
+
+Style tags are automatically converted into CSS, By default css is scoped per component, this means you don't have to worry CSS name collisions. This is done by applying a component specific class to each
+
+Watch you, you cannot place dynamic attributes in the CSS, this is becuase CSS is shared per component
+
+Additionally, there can only be 2 style tags per component, one scoped and one global.
+
+#### `with_styles`
+
+If you want to use a component without including it's styles, you can use the `with_styles` parameter to prevent include the CSS. This is useful for when you place components into a page using javascript or HTMX.
+
+#### Global
+
+If you want to disable CSS scoping, you can place a global attribute on your style tag.
+
+```html
+<style global>
+    html {
+        --text: #262626;
+        --background: #ededed;
+        --primary: #91c0c0;
+        --secondary: #d5d5e7;
+        --accent: #579898;
+        --error: #FD2929;
+    }
+</style>
+```
+
+### Parameters
 
 Use `{%param %}` for parameters
 ```html
@@ -55,6 +175,9 @@ Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 </a>
 ```
 
+**Important**
+> Ensure you surround attributes in \"\" to prevent XSS, e.g. `<a href="{{src}}"/>`
+
 ### Raw HTML
 
 Use `{% html %}` to include literal html without escaping
@@ -68,15 +191,13 @@ Use `{% html %}` to include literal html without escaping
 
 ### Component
 
-Use `{% component  %}` for a component, call this like
+Use `{<Component()>}` for a component, call this like
 
 ```html
 <div>
-    {% component post(title=1) %}
+    {<Post(title=1)>}
 </div>
 ```
-**Important**
-> Ensure you surround attributes in \"\" to prevent XSS, e.g. `<a href="{{src}}"/>`
 
 ### Set
 
@@ -90,6 +211,7 @@ Use `{% set  %}` to set a variables
 ```
 
 This can also be paired with control flow
+
 ## Control Flow
 
 ### If
