@@ -1,4 +1,4 @@
-from ...preprocess import generate_scoped_styles, minify_html
+from ..css import tranform_css, minify_html
 from .. import parse_ast, tokens
 from ..lexer import *
 from .token_scanner import TokenScanner
@@ -23,7 +23,7 @@ class ParseContext:
     blocks: set[str] = field(default_factory=set)
 
 
-def parse_tokens(scanner: TokenScanner) -> ParseContext:
+def parse_token_stream(scanner: TokenScanner) -> ParseContext:
     ctx = ParseContext()
     ctx.body = take_tags_until(ctx, scanner)
 

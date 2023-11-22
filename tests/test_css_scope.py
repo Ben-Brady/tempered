@@ -1,6 +1,6 @@
 import pytest
 import tinycss2
-from tempered.preprocess.scope import apply_scope_to_css
+from tempered.parser.css import apply_scope_to_css
 
 
 def assert_rule_transformed(scope: str, css: str, expected: str):
@@ -16,6 +16,14 @@ def test_single_class():
         scope="scope",
         css=".div { }",
         expected=".div.scope { }"
+    )
+
+
+def test_single_id():
+    assert_rule_transformed(
+        scope="scope",
+        css="#div { }",
+        expected="#div.scope { }"
     )
 
 
@@ -51,7 +59,7 @@ def test_class_and_psuedo():
     )
 
 
-@pytest.mark.skip
+# @pytest.mark.skip
 def test_many_classes():
     assert_rule_transformed(
         scope="scope",

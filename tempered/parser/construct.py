@@ -1,13 +1,12 @@
+from ..errors import ParserException
+from .css import tranform_css, minify_html
 from . import tokens
-from ..preprocess import generate_scoped_styles, minify_html
 from .parse_ast import *
 from .lexer import to_token_stream
 from .text_scanner import TextScanner
-from .parse.token_scanner import TokenScanner
-from .parse.expr import parse_parameter
-from .parse.parser import parse_tokens
+from .parse import TokenScanner, parse_token_stream
 from pathlib import Path
-from typing import Any, Sequence, cast, Literal
+from typing import Any, Sequence
 import random
 import warnings
 
@@ -19,14 +18,35 @@ def parse_template(
     context: dict[str, Any] | None = None,
 ) -> Template:
     context = context or {}
+    try:
+        return _parse_template(
+            name=name,
+            html=html,
+            filepath=filepath,
+            context=context,
+        )
+    except ParserException as e:
+        raise e
+    except Exception as e:
+        msg = f"Failed to parse template {name}"
+        if filepath:
+            msg += f" in {filepath}"
+        raise ParserException(msg) from e
 
+
+def _parse_template(
+    name: str,
+    html: str,
+    filepath: Path|None,
+    context: dict[str, Any],
+) -> Template:
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
     tokens = to_token_stream(html, filepath=filepath)
     html, token_lookup = reassmble_html(tokens)
 
     # Process HTML
-    html, css = generate_scoped_styles(html, prefix=name)
+    html, css = tranform_css(html, prefix=name)
     html = minify_html(html)
 
     # Reconvert the HTML back into tokens
@@ -34,7 +54,7 @@ def parse_template(
 
     # Parse tokens into a body
     scanner = TokenScanner(tokens)
-    ctx = parse_tokens(scanner)
+    ctx = parse_token_stream(scanner)
 
     if ctx.is_layout:
         return LayoutTemplate(

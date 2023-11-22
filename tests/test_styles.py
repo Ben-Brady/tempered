@@ -33,3 +33,27 @@ def test_template_places_styles():
     html = func(with_styles=True)
     soup = bs4.BeautifulSoup(html, "html.parser")
     assert CSS_KEY in soup.find("style").text
+
+
+def test_empty_styles_arent_created():
+    func = build_template(f"""
+        {{% styles %}}
+        <style>
+        </style>
+    """)
+
+    html = func(with_styles=True)
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    assert soup.find("style") is None, html
+
+
+def test_empty_styles_arent_created():
+    func = build_template(f"""
+        {{% styles %}}
+        <style>
+        </style>
+    """)
+
+    html = func(with_styles=True)
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    assert soup.find("style") is None, html

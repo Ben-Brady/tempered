@@ -1,10 +1,9 @@
-from tempered.parser import *
 from .scope import apply_scope_to_css
 import bs4
 from rcssmin import cssmin
 from typing_extensions import LiteralString, cast, NamedTuple
 from zlib import crc32
-
+import sass
 import warnings
 from bs4 import MarkupResemblesLocatorWarning
 warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
@@ -15,12 +14,19 @@ class ScopedStyles(NamedTuple):
     css: str
 
 
-def generate_scoped_styles(body: str, prefix: str = "tempered") -> ScopedStyles:
+def tranform_css(body: str, prefix: str = "tempered") -> ScopedStyles:
     soup = bs4.BeautifulSoup(body, "html.parser")
     css = ""
 
     style_tags = cast(list[bs4.Tag], soup.find_all("style"))
     for tag in style_tags:
+        lang = tag.get("lang", None)
+        if lang and lang == "scss":
+            sass.compile(
+                string=tag.text,
+                output_style="compressed",
+            )
+
         is_global = tag.has_attr("global")
 
         if is_global:
@@ -31,7 +37,7 @@ def generate_scoped_styles(body: str, prefix: str = "tempered") -> ScopedStyles:
             css += apply_scope_to_css(tag.text, scope_id)
 
         tag.decompose()
-
+    
     return ScopedStyles(
         html=soup.prettify(formatter="minimal"),
         css=minify_css(css)
