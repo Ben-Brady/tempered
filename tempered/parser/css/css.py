@@ -16,13 +16,15 @@ class ScopedStyles(NamedTuple):
 
 def tranform_css(body: str, prefix: str = "tempered") -> ScopedStyles:
     soup = bs4.BeautifulSoup(body, "html.parser")
-    css = ""
+    styles = ""
 
     style_tags = cast(list[bs4.Tag], soup.find_all("style"))
     for tag in style_tags:
+        css = tag.text
+
         lang = tag.get("lang", None)
-        if lang and lang == "scss":
-            sass.compile(
+        if lang and (lang == "scss" or lang == "sass"):
+            css = sass.compile(
                 string=tag.text,
                 output_style="compressed",
             )
@@ -30,17 +32,17 @@ def tranform_css(body: str, prefix: str = "tempered") -> ScopedStyles:
         is_global = tag.has_attr("global")
 
         if is_global:
-            css += tag.text
+            styles += css
         else:
             scope_id = _generate_scoped_style_id(prefix)
             apply_scope_to_soup(soup, scope_id)
-            css += apply_scope_to_css(tag.text, scope_id)
+            styles += apply_scope_to_css(css, scope_id)
 
         tag.decompose()
-    
+
     return ScopedStyles(
         html=soup.prettify(formatter="minimal"),
-        css=minify_css(css)
+        css=minify_css(styles)
     )
 
 
@@ -59,9 +61,9 @@ def minify_css(css: str) -> str:
     minified_css = cssmin(css)
     match minified_css:
         case str():
-            return cast(LiteralString, minified_css)
+            return minified_css
         case bytes() | bytearray():
-            return cast(LiteralString, minified_css.decode())
+            return minified_css.decode()
         case _:
             raise TypeError("Expected str or bytes")
 

@@ -32,7 +32,8 @@ def test_template_places_styles():
 
     html = func(with_styles=True)
     soup = bs4.BeautifulSoup(html, "html.parser")
-    assert CSS_KEY in soup.find("style").text
+    style = soup.find("style")
+    assert style and CSS_KEY in style.text
 
 
 def test_empty_styles_arent_created():
@@ -47,13 +48,15 @@ def test_empty_styles_arent_created():
     assert soup.find("style") is None, html
 
 
-def test_empty_styles_arent_created():
-    func = build_template(f"""
-        {{% styles %}}
-        <style>
+def test_sass_styles_are_transpiled():
+    func = build_template("""
+        {% styles %}
+        <style global lang="scss">
+            a { b { color: red; }}
         </style>
     """)
 
     html = func(with_styles=True)
     soup = bs4.BeautifulSoup(html, "html.parser")
-    assert soup.find("style") is None, html
+    style = soup.find("style")
+    assert style and style.text == "a b{color:red}"

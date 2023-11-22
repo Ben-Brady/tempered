@@ -98,11 +98,24 @@ Style tags are automatically converted into CSS, By default css is scoped per co
 
 Watch you, you cannot place dynamic attributes in the CSS, this is becuase CSS is shared per component
 
-Additionally, there can only be 2 style tags per component, one scoped and one global.
-
 #### `with_styles`
 
 If you want to use a component without including it's styles, you can use the `with_styles` parameter to prevent include the CSS. This is useful for when you place components into a page using javascript or HTMX.
+
+#### Scss
+
+If you want to use sass, you can declar it on a style tag with `lang="scss"` or `lang="sass"`
+
+```html
+<style lang="scss">
+    a {
+        b {
+            color: red
+        }
+    }
+</style>
+```
+`a b {color: red;}`
 
 #### Global
 
