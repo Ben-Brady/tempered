@@ -8,6 +8,7 @@ from .utils import (
     WITH_STYLES_PARAMETER,
     LAYOUT_CSS_PARAMETER,
     OUTPUT_VARIABLE,
+    KWARGS_VARIABLE,
     COMPONENT_CSS_VARIABLE,
     TYPING_MODULE,
 )
@@ -103,11 +104,11 @@ def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
         kwonlyargs=args,
         kw_defaults=defaults,
         kwarg=ast.arg(
-            arg="kwargs",
+            arg=KWARGS_VARIABLE,
             annotation=ast_utils.Attribute(
                 value=ast_utils.Name(TYPING_MODULE),
                 attr="Any",
-            )
+            ),
         ),
         args=[],
         defaults=[],

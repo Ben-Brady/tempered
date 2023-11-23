@@ -1,6 +1,5 @@
 import ast
 from .. import ast_utils
-from ..parser import parse_ast
 
 
 UTILS_IMPORT = ast.ImportFrom(
@@ -10,9 +9,7 @@ UTILS_IMPORT = ast.ImportFrom(
 )
 
 TYPING_MODULE = "__typing"
-TYPING_IMPORT = ast.Import(
-    names=[ast.alias(name="typing", asname=TYPING_MODULE)]
-)
+TYPING_IMPORT = ast.Import(names=[ast.alias(name="typing", asname=TYPING_MODULE)])
 
 
 ANNOTATIONS_IMPORT = ast.ImportFrom(
@@ -32,6 +29,7 @@ WITH_STYLES_PARAMETER = "with_styles"
 LAYOUT_CSS_PARAMETER = "__component_css"
 COMPONENT_CSS_VARIABLE = "__css"
 OUTPUT_VARIABLE = "__output"
+KWARGS_VARIABLE = "kwargs"
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
@@ -82,5 +80,5 @@ def create_layout_call(
     return ast_utils.Call(
         func=ast_utils.Name(layout_func_name(layout_name)),
         keywords=kw_args,
-        kwargs=ast_utils.Name("kwargs"),
+        kwargs=ast_utils.Name(KWARGS_VARIABLE),
     )

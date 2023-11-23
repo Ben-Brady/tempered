@@ -1,4 +1,5 @@
 import ast
+from .utils import KWARGS_VARIABLE
 
 
 def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[str]):
@@ -9,7 +10,7 @@ def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[
     def transform(node: ast.Name) -> ast.expr:
         if any(
             (
-                node.id == "kwargs",
+                node.id == KWARGS_VARIABLE,
                 node.id.startswith("__"),
                 node.id in known_names,
                 is_builtin(node.id),
@@ -17,9 +18,8 @@ def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[
         ):
             return node
 
-
         return ast.Subscript(
-            value=ast.Name(id="kwargs", ctx=ast.Load()),
+            value=ast.Name(KWARGS_VARIABLE, ctx=ast.Load()),
             slice=ast.Constant(value=node.id),
             ctx=getattr(node, "ctx", ast.Load()),
         )

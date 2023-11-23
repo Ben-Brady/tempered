@@ -21,17 +21,31 @@ def test_kwargs_passed_to_layout():
         """
         {% layout "layout" %}
         """,
-        ("layout", """
+        (
+            "layout",
+            """
          {% slot %}
          {{ foo }}
-         """),
+         """,
+        ),
+    )
+
+    assert "TEMPERED" in func(foo="TEMPERED")
+
+
+def test_kwargs_passed_to_component():
+    func = build_templates(
+        "{<child()>}",
+        ("child","{{ foo }}"),
     )
 
     assert "TEMPERED" in func(foo="TEMPERED")
 
 
 def test_kwargs_lets_you_pass_functions():
-    func = build_template("""
+    func = build_template(
+        """
         {{ format_number(2000) }}
-    """)
+    """
+    )
     assert "2,000" in func(format_number=lambda x: f"{x:,}")

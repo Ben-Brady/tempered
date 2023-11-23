@@ -17,5 +17,5 @@ def build_templates(
     components.add_template_from_string("foo", template)
     for name, body in other_templates:
         components.add_template_from_string(name, body)
-    module = components.build_memory()
+    module = components.build_static()
     return getattr(module, "foo")
