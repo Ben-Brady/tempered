@@ -1,18 +1,37 @@
-import ast
 from .utils import KWARGS_VARIABLE
+import ast
+from typing import cast
+from functools import lru_cache
 
 
 def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[str]):
-    class NameTransformer(ast.NodeTransformer):
-        def visit_Name(self, node: ast.Name):
-            return transform(node)
+    transformer = NameTransformer(known_names)
+    for node in body:
+        transformer.visit(node)
 
-    def transform(node: ast.Name) -> ast.expr:
+
+class NameTransformer(ast.NodeTransformer):
+    def __init__(self, known_names: list[str]):
+        self.known_names = known_names
+
+    def visit_For(self, node: ast.For):
+        if not isinstance(node.target, ast.Name):
+            return self.generic_visit(node)
+
+        self.known_names.append(node.target.id)
+        node = cast(ast.For, self.generic_visit(node))
+        self.known_names.pop()
+        return node
+
+    def visit_Name(self, node: ast.Name):
+        return self.transform(node)
+
+    def transform(self, node: ast.Name) -> ast.expr:
         if any(
             (
                 node.id == KWARGS_VARIABLE,
                 node.id.startswith("__"),
-                node.id in known_names,
+                node.id in self.known_names,
                 is_builtin(node.id),
             )
         ):
@@ -24,11 +43,8 @@ def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[
             ctx=getattr(node, "ctx", ast.Load()),
         )
 
-    transformer = NameTransformer()
-    for node in body:
-        transformer.visit(node)
 
-
+@lru_cache(maxsize=512)
 def is_builtin(name: str):
     if name in dir(__builtins__):
         return True

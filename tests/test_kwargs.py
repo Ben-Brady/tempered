@@ -36,7 +36,7 @@ def test_kwargs_passed_to_layout():
 def test_kwargs_passed_to_component():
     func = build_templates(
         "{<child()>}",
-        ("child","{{ foo }}"),
+        ("child", "{{ foo }}"),
     )
 
     assert "TEMPERED" in func(foo="TEMPERED")
@@ -49,3 +49,17 @@ def test_kwargs_lets_you_pass_functions():
     """
     )
     assert "2,000" in func(format_number=lambda x: f"{x:,}")
+
+
+def test_kwargs_dont_affect_for_loops():
+    func = build_template(
+        """
+        {% for x in range(3) %}
+            {{ x }}
+        {% endfor %}
+        {{ x }}
+    """
+    )
+    html = func(x="TEMPERED")
+    assert "2" in html
+    assert "TEMPERED" in html
