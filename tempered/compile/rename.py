@@ -1,4 +1,4 @@
-from .utils import KWARGS_VARIABLE
+from .utils import KWARGS_VARIABLE, WITH_STYLES_PARAMETER
 import ast
 from typing import cast
 from functools import lru_cache
@@ -11,6 +11,10 @@ def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[
 
 
 class NameTransformer(ast.NodeTransformer):
+    RESERVED_NAMES = (
+        KWARGS_VARIABLE,
+        WITH_STYLES_PARAMETER,
+    )
     def __init__(self, known_names: list[str]):
         self.known_names = known_names
 
@@ -29,8 +33,8 @@ class NameTransformer(ast.NodeTransformer):
     def transform(self, node: ast.Name) -> ast.expr:
         if any(
             (
-                node.id == KWARGS_VARIABLE,
                 node.id.startswith("__"),
+                node.id in self.RESERVED_NAMES,
                 node.id in self.known_names,
                 is_builtin(node.id),
             )

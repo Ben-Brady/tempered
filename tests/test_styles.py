@@ -89,8 +89,8 @@ def test_sass_styles_are_transpiled_with_indent():
 
 @pytest.mark.skip("https://github.com/ndparker/rcssmin/issues/15")
 def test_font_imports_arent_mangled():
-    FONT_URL_1 = "https://fonts.googleapis.com/css?family=Open Sans:400|Open Sans:700"
-    FONT_URL_2 = "https://fonts.googleapis.com/css?family=Open Sans:400"
+    FONT_URL_1 = "https://fonts.googleapis.com/css?family=Open Sans:400"
+    FONT_URL_2 = "https://fonts.googleapis.com/css?family=Open Sans:400|Open Sans:700"
     func = build_template(
         f"""
         <style global>

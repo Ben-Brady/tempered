@@ -102,10 +102,6 @@ def construct_assignment(ctx: BuildContext, tag: AssignmentBlock) -> Sequence[as
 
 
 def construct_style(ctx: BuildContext, tag: StyleBlock) -> Sequence[ast.stmt]:
-    if isinstance(ctx.template, LayoutTemplate):
-        css_variables = LAYOUT_CSS_PARAMETER, COMPONENT_CSS_VARIABLE
-    else:
-        css_variables = (COMPONENT_CSS_VARIABLE,)
     return [
         ast_utils.If(
             condition=ast_utils.And(

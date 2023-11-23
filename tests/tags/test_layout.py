@@ -1,21 +1,19 @@
+import utils
 from tempered import Tempered
 import bs4
 import pytest
 
 
 def test_layout_extend_with_default_slot():
-    components = Tempered()
-    components.add_template_from_string("a", """
-        <div>
-        {% slot %}
-        </div>
-    """)
-    components.add_template_from_string("b", """
+    func = utils.build_templates(
+        """
         {% layout "a" %}
         Test
-    """)
-    module = components.build_memory()
-    soup = bs4.BeautifulSoup(module.b(), "html.parser")
+        """,
+        ("a", "<div>{% slot %}</div>"),
+    )
+
+    soup = bs4.BeautifulSoup(func(), "html.parser")
 
     tag = soup.find("div")
     assert tag and "Test" in tag.text  # type:ignore
@@ -23,60 +21,73 @@ def test_layout_extend_with_default_slot():
 
 def test_layout_migrates_css():
     CSS_KEY = "TEMPERED_CSS"
-    components = Tempered()
-    components.add_template_from_string("a", """
-        {%styles%}
-        {% slot %}
-    """)
-    components.add_template_from_string("b", """
-        {% layout "a" %}
-        Test
 
+    func = utils.build_templates(
+        f"""
+        {{% layout "a" %}}
+        Test
         <style>
-        a {
-            content: """ + CSS_KEY + """;
-        }
+        a {{ content: '{CSS_KEY}'; }}
         </style>
-    """)
-    module = components.build_memory()
-    html = module.b()
+        """,
+        ("a", "{%styles%} {% slot %}"),
+    )
+    html = func()
     soup = bs4.BeautifulSoup(html, "html.parser")
 
     assert soup.find("style")
     assert CSS_KEY in soup.find("style").text  # type:ignore
 
 
-@pytest.mark.xfail
 def test_layout_extend_with_named_slots():
-    components = Tempered()
-    components.add_template_from_string("layout", """
-        <title>{% slot title %}</title>
-    """)
-    components.add_template_from_string("child", """
+    func = utils.build_templates(
+        """
         {% layout "layout" %}
-        {% block title %}{% endblock %}
-    """)
+        {% block title %}Test{% endblock %}
+        """,
+        ("layout", "<title>{% slot title required %}</title>"),
+    )
+    soup = bs4.BeautifulSoup(func(), "html.parser")
+    assert soup.find("title")
+    assert "Test" in soup.find("title").text  # type:ignore
 
-    module = components.build_memory()
-    soup = bs4.BeautifulSoup(module.child(), "html.parser")
-    assert soup.find("html")
-    assert "Test" in soup.find("html").text  # type:ignore
 
-
-@pytest.mark.xfail
 def test_layout_extend_with_many_named_slots():
-    components = Tempered()
-    components.add_template_from_string("layout", """
-        <a>{% slot b%}</a>
-        <b>{% slot a%}</b>
-    """)
-    components.add_template_from_string("child", """
+    func = utils.build_templates(
+        """
         {% layout "layout" %}
         {% block a %}A{% endblock %}
         {% block b %}B{% endblock %}
-    """)
+        """,
+        (
+            "layout",
+            """
+                <b>{% slot b required %}</b>
+                <a>{% slot a required %}</a>
+                """,
+        ),
+    )
+    soup = bs4.BeautifulSoup(func(), "html.parser")
+    assert "A" in soup.find("a").text  # type:ignore
+    assert "B" in soup.find("b").text  # type:ignore
 
-    module = components.build_memory()
-    soup = bs4.BeautifulSoup(module.child(), "html.parser")
-    assert soup.find("a").text == "A"  # type:ignore
-    assert soup.find("b").text == "B"  # type:ignore
+
+def test_layout_respects_with_styles():
+    CSS_KEY = "TEMPERED"
+    func = utils.build_templates(
+        """
+        {% layout "layout" %}
+        """,
+        (
+            "layout",
+            f"""
+                {{% styles %}}
+                {{% slot %}}
+                <style>
+                    a {{ content: '{CSS_KEY}'; }}
+                </style>
+            """,
+        ),
+    )
+    assert CSS_KEY in func(with_styles=True)
+    assert CSS_KEY not in func(with_styles=False)
