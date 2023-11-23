@@ -17,7 +17,7 @@ def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[
         return ast.Subscript(
             value=ast.Name(id="kwargs", ctx=ast.Load()),
             slice=ast.Constant(value=node.id),
-            ctx=node.ctx,
+            ctx=getattr(node, "ctx", ast.Load()),
         )
 
 

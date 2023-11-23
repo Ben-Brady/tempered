@@ -4,25 +4,26 @@ from ..parser import parse_ast
 
 
 UTILS_IMPORT = ast.ImportFrom(
-    module='tempered',
-    names=[ast.alias(
-        name='_internals',
-        asname='__internals'
-    )],
-    level=0
+    module="tempered",
+    names=[ast.alias(name="_internals", asname="__internals")],
+    level=0,
+)
+
+TYPING_MODULE = "__typing"
+TYPING_IMPORT = ast.Import(
+    names=[ast.alias(name="typing", asname=TYPING_MODULE)]
 )
 
 
 ANNOTATIONS_IMPORT = ast.ImportFrom(
-    module='__future__',
-    names=[
-        ast.alias(name='annotations', asname='__annotations')
-    ],
+    module="__future__",
+    names=[ast.alias(name="annotations", asname="__annotations")],
     level=0,
 )
 
 IMPORTS = [
     ANNOTATIONS_IMPORT,
+    TYPING_IMPORT,
     UTILS_IMPORT,
 ]
 
@@ -35,11 +36,10 @@ OUTPUT_VARIABLE = "__output"
 
 def create_escape_call(value: ast.expr) -> ast.expr:
     ESCAPE_FUNC_NAME = ast.Attribute(
-        value=ast.Name(id='__internals'),
-        attr='escape',
+        value=ast.Name(id="__internals"),
+        attr="escape",
     )
     return ast_utils.Call(ESCAPE_FUNC_NAME, [value])
-
 
 
 def component_func_name(template_name: str) -> str:
@@ -69,7 +69,7 @@ def create_layout_call(
     css: ast.expr,
     has_default_slot: bool,
     blocks: set[str],
-    ) -> ast.expr:
+) -> ast.expr:
     kw_args = {}
     kw_args[LAYOUT_CSS_PARAMETER] = css
 

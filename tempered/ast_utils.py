@@ -197,6 +197,7 @@ def Attribute(value: ast.expr, attr: str):
     return ast.Attribute(
         value=value,
         attr=attr,
+        ctx=ast.Load(),
     )
 
 

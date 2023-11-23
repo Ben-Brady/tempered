@@ -9,6 +9,7 @@ from .utils import (
     LAYOUT_CSS_PARAMETER,
     OUTPUT_VARIABLE,
     COMPONENT_CSS_VARIABLE,
+    TYPING_MODULE,
 )
 from .rename import convert_unknown_variables_to_kwargs
 from .tag import construct_tag, BuildContext
@@ -78,7 +79,7 @@ def create_template_function(
         body=construct_body(ctx),
         returns=ast_utils.Name("str"),
     )
-    
+
     parameter_names = [param.name for param in ctx.template.parameters]
     component_names = [comp.component_name for comp in ctx.template.components_calls]
     convert_unknown_variables_to_kwargs(func.body, [*parameter_names, *component_names])
@@ -101,7 +102,13 @@ def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
     return ast.arguments(
         kwonlyargs=args,
         kw_defaults=defaults,
-        kwarg=ast.arg(arg="kwargs"),
+        kwarg=ast.arg(
+            arg="kwargs",
+            annotation=ast_utils.Attribute(
+                value=ast_utils.Name(TYPING_MODULE),
+                attr="Any",
+            )
+        ),
         args=[],
         defaults=[],
         posonlyargs=[],
@@ -110,7 +117,6 @@ def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
 
 def construct_body(ctx: BuildContext) -> Sequence[ast.AST]:
     statements: list[ast.AST] = []
-    statements.extend(create_context_variables(ctx.template.context))
     statements.append(create_stlye_contant(ctx))
     statements.extend(ctx.result.create_init())
 
@@ -143,16 +149,3 @@ def create_stlye_contant(ctx: BuildContext) -> ast.Assign:
         value = ast_utils.Constant(ctx.css)
 
     return ast_utils.Assign(target=COMPONENT_CSS_VARIABLE, value=value)
-
-
-def create_context_variables(context: dict[str, Any]) -> list[ast.Assign]:
-    statements = []
-    for name, value in context.items():
-        if name.startswith("__"):
-            raise ValueError("Template context names cannot start with '__'")
-        if name == "with_styles":
-            raise ValueError("Template context names cannot be 'with_styles'")
-
-        statements.append(ast_utils.Assign(name, value))
-
-    return statements

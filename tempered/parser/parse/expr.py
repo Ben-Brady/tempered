@@ -1,5 +1,5 @@
-from ..parse_ast import *
-from ..lexer import *
+from ... import ast_utils
+from ..parse_ast import TemplateParameter
 import ast
 import keyword
 
@@ -64,4 +64,4 @@ def parse_ident(expr: str) -> ast.Name:
     if keyword.iskeyword(expr):
         raise ValueError(f"Invalid identifier: {expr}")
 
-    return ast.Name(id=expr)
+    return ast_utils.Name(expr)
