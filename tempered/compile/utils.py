@@ -15,7 +15,9 @@ UTILS_IMPORT = ast.ImportFrom(
 
 ANNOTATIONS_IMPORT = ast.ImportFrom(
     module='__future__',
-    names=[ast.alias(name='annotations')],
+    names=[
+        ast.alias(name='annotations', asname='__annotations')
+    ],
     level=0,
 )
 
@@ -80,4 +82,5 @@ def create_layout_call(
     return ast_utils.Call(
         func=ast_utils.Name(layout_func_name(layout_name)),
         keywords=kw_args,
+        kwargs=ast_utils.Name("kwargs"),
     )

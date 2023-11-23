@@ -10,6 +10,7 @@ from .utils import (
     OUTPUT_VARIABLE,
     COMPONENT_CSS_VARIABLE,
 )
+from .rename import convert_unknown_variables_to_kwargs
 from .tag import construct_tag, BuildContext
 from .accumulators import StringResult
 import ast
@@ -20,7 +21,7 @@ def create_template_function(
     template: Template,
     layout: LayoutTemplate | None,
     css: str,
-    ) -> ast.FunctionDef:
+) -> ast.FunctionDef:
     arguements = [*template.parameters]
     arguements.append(
         TemplateParameter(
@@ -49,7 +50,6 @@ def create_template_function(
                 )
             )
 
-
         for slot in template.slots:
             if slot.default:
                 type = ast_utils.Union(ast_utils.Str, ast_utils.None_)
@@ -58,11 +58,13 @@ def create_template_function(
                 type = ast_utils.Str
                 default = None
 
-            arguements.append(TemplateParameter(
-                name=slot_parameter(slot.name),
-                type=type,
-                default=default,
-            ))
+            arguements.append(
+                TemplateParameter(
+                    name=slot_parameter(slot.name),
+                    type=type,
+                    default=default,
+                )
+            )
 
     ctx = BuildContext(
         template=template,
@@ -70,27 +72,34 @@ def create_template_function(
         layout=layout,
         css=css,
     )
-    return ast_utils.Function(
+    func = ast_utils.Function(
         name=function_name,
         args=construct_arguments(arguements),
         body=construct_body(ctx),
         returns=ast_utils.Name("str"),
     )
+    parameter_names = [param.name for param in ctx.template.parameters]
+    convert_unknown_variables_to_kwargs(func.body, parameter_names)
+    ast.fix_missing_locations(func)
+    return func
 
 
 def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
     args = []
     defaults = []
     for arguement in arguments:
-        args.append(ast.arg(
-            arg=arguement.name,
-            annotation=arguement.type,
-        ))
+        args.append(
+            ast.arg(
+                arg=arguement.name,
+                annotation=arguement.type,
+            )
+        )
         defaults.append(arguement.default)
 
     return ast.arguments(
         kwonlyargs=args,
         kw_defaults=defaults,
+        kwarg=ast.arg(arg="kwargs"),
         args=[],
         defaults=[],
         posonlyargs=[],
@@ -131,10 +140,7 @@ def create_stlye_contant(ctx: BuildContext) -> ast.Assign:
     else:
         value = ast_utils.Constant(ctx.css)
 
-    return ast_utils.Assign(
-        target=COMPONENT_CSS_VARIABLE,
-        value=value
-    )
+    return ast_utils.Assign(target=COMPONENT_CSS_VARIABLE, value=value)
 
 
 def create_context_variables(context: dict[str, Any]) -> list[ast.Assign]:
@@ -148,4 +154,3 @@ def create_context_variables(context: dict[str, Any]) -> list[ast.Assign]:
         statements.append(ast_utils.Assign(name, value))
 
     return statements
-

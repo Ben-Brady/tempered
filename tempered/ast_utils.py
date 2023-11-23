@@ -54,21 +54,27 @@ def Dict(value: dict) -> ast.Dict:
 
 def Call(
         func: ast.AST,
-        args: Sequence[ast.expr] = [],
+        arguments: Sequence[ast.expr] = [],
         keywords: dict[str, ast.expr] = {},
+        kwargs: ast.Name|None = None,
         ) -> ast.Call:
+
+    call_keywords = [
+        ast.keyword(arg=name, value=value)
+        for name, value in keywords.items()
+    ]
+    if kwargs is not None:
+        call_keywords.append(ast.keyword(value=kwargs))
+
     return ast.Call(
         func=func,
-        args=args,
-        keywords=[
-            ast.keyword(arg=name, value=value)
-            for name, value in keywords.items()
-        ],
+        args=arguments,
+        keywords=call_keywords,
     )
 
 
 def Name(target: str) -> ast.Name:
-    return ast.Name(id=target)
+    return ast.Name(id=target, ctx=ast.Load())
 
 
 Str = Name('str')

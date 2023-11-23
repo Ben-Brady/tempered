@@ -2,9 +2,10 @@ from .scope import apply_scope_to_css
 from ... import errors
 import bs4
 from rcssmin import cssmin
-from typing_extensions import LiteralString, cast, NamedTuple
 from zlib import crc32
 import sass
+from typing_extensions import cast, NamedTuple
+
 import warnings
 from bs4 import MarkupResemblesLocatorWarning
 
@@ -32,10 +33,8 @@ def tranform_css(body: str, prefix: str = "tempered") -> ScopedStyles:
             lang = lang[0]
 
         # Remove shared indent from being in a <style> tag
-        css = remove_shared_ident(css)
-        print(css)
         try:
-            css = parse_css(css, scope, is_global, lang)
+            css = transform_css(css, scope, is_global, lang)
         except Exception as e:
             warnings.warn(message="Failed to parse CSS", category=errors.ParsingWarning)
             css = ""
@@ -43,7 +42,10 @@ def tranform_css(body: str, prefix: str = "tempered") -> ScopedStyles:
         styles += css
         tag.decompose()
 
-    return ScopedStyles(html=soup.prettify(formatter="minimal"), css=minify_css(styles))
+    return ScopedStyles(
+        html=soup.prettify(formatter="minimal"),
+        css=minify_css(styles),
+    )
 
 
 def remove_shared_ident(css: str) -> str:
@@ -71,7 +73,8 @@ def remove_shared_ident(css: str) -> str:
 
     return "\n".join(lines)
 
-def parse_css(css: str, scope: str, is_global: bool, lang: str | None) -> str:
+
+def transform_css(css: str, scope: str, is_global: bool, lang: str | None) -> str:
     if lang == "scss":
         css = sass.compile(
             string=css,
@@ -79,6 +82,7 @@ def parse_css(css: str, scope: str, is_global: bool, lang: str | None) -> str:
             indented=False,  # scss rules
         )
     elif lang == "sass":
+        css = remove_shared_ident(css)
         css = sass.compile(
             string=css,
             output_style="compressed",

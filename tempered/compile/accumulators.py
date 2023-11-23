@@ -54,7 +54,7 @@ class ArrayResult(Result):
     def create_add(self, value: ast.expr) -> ast.stmt:
         return ast.Expr(value=ast_utils.Call(
             func=ast_utils.Attribute(self._variable, 'append'),
-            args=[value],
+            arguments=[value],
         ))
 
     def create_value(self) -> ast.expr:
