@@ -14,16 +14,13 @@ import warnings
 def parse_template(
     name: str,
     html: str,
-    filepath: Path|None = None,
-    context: dict[str, Any] | None = None,
+    filepath: Path | None = None,
 ) -> Template:
-    context = context or {}
     try:
         return _parse_template(
             name=name,
             html=html,
             file=filepath,
-            context=context,
         )
     except ParserException as e:
         raise e
@@ -31,14 +28,14 @@ def parse_template(
         msg = f"Failed to parse template {name}"
         if filepath:
             msg += f" in {filepath}"
+
         raise ParserException(msg) from e
 
 
 def _parse_template(
     name: str,
     html: str,
-    file: Path|None,
-    context: dict[str, Any],
+    file: Path | None,
 ) -> Template:
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
@@ -60,7 +57,6 @@ def _parse_template(
             name=name,
             file=file,
             parameters=ctx.parameters,
-            context=context,
             body=ctx.body,
             css=css,
             components_calls=ctx.components_calls,
@@ -75,7 +71,6 @@ def _parse_template(
             name=name,
             file=file,
             parameters=ctx.parameters,
-            context=context,
             body=ctx.body,
             css=css,
             components_calls=ctx.components_calls,
@@ -85,15 +80,14 @@ def _parse_template(
         )
 
 
-
 def generate_token_id() -> str:
     id = random.randbytes(32).hex().upper()
     return f"TEMPEREDED_{id}"
 
 
 def reassmble_html(
-    _tokens: Sequence[tokens.Token]
-    ) -> tuple[str, dict[str, tokens.Token]]:
+    _tokens: Sequence[tokens.Token],
+) -> tuple[str, dict[str, tokens.Token]]:
     html = ""
     token_lookup: dict[str, tokens.Token] = {}
     for token in _tokens:
@@ -109,8 +103,7 @@ def reassmble_html(
 
 
 def reparse_html(
-    html: str,
-    token_lookup: dict[str, tokens.Token]
+    html: str, token_lookup: dict[str, tokens.Token]
 ) -> Sequence[tokens.Token]:
     TOKEN_ID_LENGTH = len(generate_token_id())
 

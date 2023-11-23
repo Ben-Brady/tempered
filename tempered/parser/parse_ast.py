@@ -97,7 +97,6 @@ class Template:
     name: str
     file: Path|None = None
     parameters: list[TemplateParameter] = field(default_factory=list)
-    context: dict[str, Any] = field(default_factory=dict)
 
     body: TemplateBlock = field(default_factory=list)
     css: str = ""

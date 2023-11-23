@@ -23,10 +23,7 @@ class Tempered:
             self.add_template_folder(template_folder)
 
 
-    def add_template_folder(self,
-            folder: Path|str,
-            context: dict[str, Any] = {}
-            ):
+    def add_template_folder(self, folder: Path|str):
         folder = Path(folder)
         for file in folder.glob("**/*.*"):
             name = file.stem
@@ -35,16 +32,12 @@ class Tempered:
                 name,
                 template,
                 filepath=file,
-                context=context,
             )
             self.template_files.append(file)
             self._templates.append(template_obj)
 
 
-    def add_template(self,
-            file: Path|str,
-            context: dict[str, Any] = {}
-            ):
+    def add_template(self, file: Path|str):
         file = Path(file)
         name = file.stem
         template = cast(LiteralString, file.read_text())
@@ -52,18 +45,13 @@ class Tempered:
             name,
             template,
             filepath=file,
-            context=context,
         )
         self._templates.append(template_obj)
         self.template_files.append(file)
 
 
-    def add_template_from_string(self,
-            name: str,
-            template: LiteralString,
-            context: dict[str, Any] = {}
-            ):
-        template_obj = parser.parse_template(name, template, context=context)
+    def add_template_from_string(self, name: str, template: LiteralString):
+        template_obj = parser.parse_template(name, template)
         self._templates.append(template_obj)
 
 
