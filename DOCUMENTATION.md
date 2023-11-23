@@ -69,14 +69,10 @@ print(components.Comment(
 # components.py AFTER
 from __future__ import annotations
 from tempered import _internals as __internals
-STYLE_COMMENT = ''
 
 
 def Comment(*, author: str, text: str, with_styles: bool = True) -> str:
-    if with_styles:
-        __css = STYLE_COMMENT
-    else:
-        __css = ''
+    __css = ''
     __output = ''
     __output += ' '
     __output += ' <div><h2>'
@@ -84,7 +80,7 @@ def Comment(*, author: str, text: str, with_styles: bool = True) -> str:
     __output += '</h2><p>'
     __output += __internals.escape(text)
     __output += '</div>'
-    if with_styles:
+    if with_styles and __css:
         __output += '<style>' + (__css + '</style>')
     return __output
 ```
@@ -104,15 +100,21 @@ If you want to use a component without including it's styles, you can use the `w
 
 #### Scss
 
-If you want to use sass, you can declar it on a style tag with `lang="scss"` or `lang="sass"`
+If you want to use sass, you can declare it on a style tag with `lang="scss"` or `lang="sass"` to get sass or scss respectively
 
 ```html
 <style lang="scss">
     a {
         b {
-            color: red
+            color: red;
         }
     }
+</style>
+
+<style lang="sass">
+    a
+        b
+            color: red
 </style>
 ```
 `a b {color: red;}`
