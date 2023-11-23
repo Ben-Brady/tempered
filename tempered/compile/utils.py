@@ -44,10 +44,6 @@ def component_func_name(template_name: str) -> str:
     return template_name
 
 
-def layout_func_name(template_name: str) -> str:
-    return f"__{template_name}_layout"
-
-
 def slot_variable_name(slot_name: str | None) -> str:
     if slot_name is None:
         return OUTPUT_VARIABLE
@@ -62,14 +58,19 @@ def slot_parameter(slot_name: str | None) -> str:
         return "__default_slot"
 
 
+def layout_func_name(template_name: str) -> str:
+    return f"__{template_name}_layout"
+
+
 def create_layout_call(
     layout_name: str,
     css: ast.expr,
     has_default_slot: bool,
     blocks: set[str],
 ) -> ast.expr:
-    kw_args = {}
+    kw_args: dict[str, ast.expr] = {}
     kw_args[LAYOUT_CSS_PARAMETER] = css
+    kw_args[WITH_STYLES_PARAMETER] = ast_utils.Name(WITH_STYLES_PARAMETER)
 
     if has_default_slot:
         kw_args[slot_parameter(None)] = ast_utils.Name(OUTPUT_VARIABLE)
