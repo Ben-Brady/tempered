@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Example Page - {% slot title required %}</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    {% styles %}
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact Us</a>
+    </nav>
+    {% slot %}
+</body>
+</html>
+
+<style lang="scss">
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans:700|Open+Sans:400');
+
+    :root {
+        --background: #1b263b;
+        --secondary: #415a77;
+        --tertiary: #778da9;
+        --text: #e0e1dd;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        background: var(--background);
+    }
+
+    nav {
+        width: 100dvw;
+        height: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+
+        background: var(--background);
+
+        a {
+            width: 10rem;
+            text-align: center;
+            color: var(--text);
+            font-size: 1.2rem;
+            text-decoration: underline solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+
+        a:hover {
+            text-decoration: underline solid var(--text) .05rem;
+        }
+    }
+
+    /* Fonts */
+    body {
+        font-family: 'Open Sans';
+        font-weight: 400;
+    }
+
+    h1, h2, h3, h4, h5 {
+        font-family: 'Open Sans';
+        font-weight: 700;
+    }
+
+    html {font-size: 100%;} /* 16px */
+
+    h1 {font-size: 4.210rem; /* 67.36px */}
+
+    h2 {font-size: 3.158rem; /* 50.56px */}
+
+    h3 {font-size: 2.369rem; /* 37.92px */}
+
+    h4 {font-size: 1.777rem; /* 28.48px */}
+
+    h5 {font-size: 1.333rem; /* 21.28px */}
+
+    small {font-size: 0.750rem; /* 12px */}
+</style>
