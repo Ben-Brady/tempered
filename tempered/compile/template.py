@@ -78,8 +78,10 @@ def create_template_function(
         body=construct_body(ctx),
         returns=ast_utils.Name("str"),
     )
+    
     parameter_names = [param.name for param in ctx.template.parameters]
-    convert_unknown_variables_to_kwargs(func.body, parameter_names)
+    component_names = [comp.component_name for comp in ctx.template.components_calls]
+    convert_unknown_variables_to_kwargs(func.body, [*parameter_names, *component_names])
     ast.fix_missing_locations(func)
     return func
 
