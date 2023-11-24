@@ -1,5 +1,5 @@
 from ..errors import ParserException
-from typing_extensions import Self, TYPE_CHECKING
+from typing_extensions import TYPE_CHECKING
 from array import array
 from pathlib import Path
 

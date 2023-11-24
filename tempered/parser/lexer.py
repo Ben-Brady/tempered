@@ -1,6 +1,6 @@
 from . import python_utils, tokens
 from .text_scanner import TextScanner
-from typing_extensions import Sequence, TypeVar
+from typing_extensions import Sequence
 import string
 from pathlib import Path
 

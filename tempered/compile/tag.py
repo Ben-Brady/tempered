@@ -19,13 +19,12 @@ from .utils import (
     slot_variable_name,
     slot_parameter,
     WITH_STYLES_PARAMETER,
-    LAYOUT_CSS_PARAMETER,
     COMPONENT_CSS_VARIABLE,
     KWARGS_VARIABLE,
 )
 from .accumulators import Result, StringResult
 import ast
-from typing_extensions import Sequence, assert_never, Protocol
+from typing_extensions import Sequence, assert_never
 from dataclasses import dataclass
 
 

@@ -1,5 +1,4 @@
 from ..errors import InvalidTemplate
-from ..parser import parse_ast
 from ..parser.parse_ast import Template
 from typing_extensions import Sequence
 

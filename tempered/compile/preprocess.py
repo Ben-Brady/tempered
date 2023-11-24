@@ -1,4 +1,3 @@
-from .. import ast_utils
 from ..parser import Template
 from typing import Sequence
 
