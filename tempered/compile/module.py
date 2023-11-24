@@ -4,7 +4,7 @@ from .utils import IMPORTS
 from . import validate, preprocess
 from .template import create_template_function
 import ast
-from typing import Sequence, cast
+from typing import Sequence
 
 
 def compile_module(

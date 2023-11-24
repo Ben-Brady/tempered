@@ -1,7 +1,6 @@
 from . import parser
 from .compile.module import compile_module
 import ast
-import inspect
 import importlib
 from importlib.util import spec_from_loader, module_from_spec
 from pathlib import Path

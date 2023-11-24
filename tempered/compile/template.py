@@ -16,7 +16,7 @@ from .rename import convert_unknown_variables_to_kwargs
 from .tag import construct_tag, BuildContext
 from .accumulators import StringResult
 import ast
-from typing import Sequence, Any
+from typing import Sequence
 
 
 def create_template_function(

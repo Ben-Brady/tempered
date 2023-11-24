@@ -6,7 +6,7 @@ from .lexer import to_token_stream
 from .text_scanner import TextScanner
 from .parse import parse_token_stream
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Sequence
 import random
 import warnings
 

@@ -35,7 +35,7 @@ def tranform_css(body: str, prefix: str = "tempered") -> ScopedStyles:
         # Remove shared indent from being in a <style> tag
         try:
             css = transform_css(css, scope, is_global, lang)
-        except Exception as e:
+        except Exception:
             warnings.warn(message="Failed to parse CSS", category=errors.ParsingWarning)
             css = ""
 
