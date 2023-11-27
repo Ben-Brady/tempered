@@ -3,16 +3,23 @@ from typing import Any, Iterable, Sequence, TypeAlias
 from types import NoneType, EllipsisType
 
 
-def _IterableConstant(iterable: Iterable[Any]) -> list[ast.expr]:
-    return [Constant(item) for item in iterable]
-
-
-ConstantConvertable: TypeAlias = (
-    list|set|tuple|dict|NoneType|EllipsisType|str|bytes|bool|int|float|complex
+LiteralType: TypeAlias = (
+    list
+    | set
+    | tuple
+    | dict
+    | NoneType
+    | EllipsisType
+    | str
+    | bytes
+    | bool
+    | int
+    | float
+    | complex
 )
 
 
-def Constant(value: ConstantConvertable) -> ast.expr:
+def Constant(value: LiteralType) -> ast.expr:
     match value:
         case list():
             return List(value)
@@ -27,21 +34,22 @@ def Constant(value: ConstantConvertable) -> ast.expr:
         case _:
             raise ValueError(f"Cannot convert {value} to an ast constant")
 
+
 EmptyStr = Constant("")
 None_ = Constant(None)
 True_ = Constant(True)
 False_ = Constant(False)
 
 
-def List(value: Iterable) -> ast.List:
+def List(value: Iterable[LiteralType | ast.expr]) -> ast.List:
     return ast.List(elts=_IterableConstant(value))
 
 
-def Tuple(value: Iterable) -> ast.Tuple:
+def Tuple(value: Iterable[LiteralType | ast.expr]) -> ast.Tuple:
     return ast.Tuple(elts=_IterableConstant(value))
 
 
-def Set(value: Iterable) -> ast.Set:
+def Set(value: Iterable[LiteralType | ast.expr]) -> ast.Set:
     return ast.Set(elts=_IterableConstant(value))
 
 
@@ -52,16 +60,24 @@ def Dict(value: dict) -> ast.Dict:
     )
 
 
-def Call(
-        func: ast.AST,
-        arguments: Sequence[ast.expr] = [],
-        keywords: dict[str, ast.expr] = {},
-        kwargs: ast.Name|None = None,
-        ) -> ast.Call:
+def _IterableConstant(iterable: Iterable[LiteralType | ast.expr]) -> list[ast.expr]:
+    values = []
+    for item in iterable:
+        if not isinstance(item, ast.AST):
+            item = Constant(item)
+        values.append(item)
 
+    return values
+
+
+def Call(
+    func: ast.AST,
+    arguments: Sequence[ast.expr] = [],
+    keywords: dict[str, ast.expr] = {},
+    kwargs: ast.Name | None = None,
+) -> ast.Call:
     call_keywords = [
-        ast.keyword(arg=name, value=value)
-        for name, value in keywords.items()
+        ast.keyword(arg=name, value=value) for name, value in keywords.items()
     ]
     if kwargs is not None:
         call_keywords.append(ast.keyword(value=kwargs))
@@ -73,14 +89,14 @@ def Call(
     )
 
 
-def Name(target: str) -> ast.Name:
-    return ast.Name(id=target, ctx=ast.Load())
+def Name(ident: str) -> ast.Name:
+    return ast.Name(id=ident, ctx=ast.Load())
 
 
-Str = Name('str')
-Int = Name('int')
-Float = Name('float')
-Bool = Name('bool')
+Str = Name("str")
+Int = Name("int")
+Float = Name("float")
+Bool = Name("bool")
 
 
 def Module(body: Sequence[ast.AST]) -> ast.Module:
@@ -93,12 +109,12 @@ def Module(body: Sequence[ast.AST]) -> ast.Module:
 
 
 def Function(
-        name: str,
-        args: ast.arguments,
-        body: Sequence[ast.AST],
-        returns: ast.expr | None = None,
-        decorators: Sequence[ast.expr] = [],
-    ) -> ast.FunctionDef:
+    name: str,
+    args: ast.arguments,
+    body: Sequence[ast.AST],
+    returns: ast.expr | None = None,
+    decorators: Sequence[ast.expr] = [],
+) -> ast.FunctionDef:
     return ast.FunctionDef(
         name=name,
         args=args,
@@ -109,7 +125,7 @@ def Function(
     )
 
 
-def AddAssign(target: str | ast.Name, value: ConstantConvertable | ast.expr) -> ast.AugAssign:
+def AddAssign(target: str | ast.Name, value: LiteralType | ast.expr) -> ast.AugAssign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -123,10 +139,7 @@ def AddAssign(target: str | ast.Name, value: ConstantConvertable | ast.expr) -> 
     )
 
 
-def Assign(
-        target: str | ast.Name,
-        value: ConstantConvertable | ast.AST
-        ) -> ast.Assign:
+def Assign(target: str | ast.Name, value: LiteralType | ast.AST) -> ast.Assign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -140,25 +153,22 @@ def Assign(
     )
 
 
-def UnaryOp(op:ast.unaryop, arg: ast.expr) -> ast.expr:
+def UnaryOp(op: ast.unaryop, arg: ast.expr) -> ast.expr:
     return ast.UnaryOp(
         op=op,
         operand=arg,
     )
 
 
-def BoolOp(op:ast.boolop, *args: ast.expr) -> ast.expr:
-    return ast.BoolOp(
-        op=op,
-        values=args
-    )
+def BoolOp(op: ast.boolop, *args: ast.expr) -> ast.expr:
+    return ast.BoolOp(op=op, values=args)
 
 
 def And(*args: ast.expr) -> ast.expr:
     return BoolOp(ast.And(), *args)
 
 
-def BinOp(op:ast.operator, *args: ast.expr) -> ast.expr:
+def BinOp(op: ast.operator, *args: ast.expr) -> ast.expr:
     if len(args) == 1:
         return args[0]
     else:
@@ -177,7 +187,7 @@ def Union(*args: ast.expr) -> ast.expr:
     return BinOp(ast.BitOr(), *args)
 
 
-def Compare(op:ast.cmpop, left: ast.expr, right: ast.expr) -> ast.expr:
+def Compare(op: ast.cmpop, left: ast.expr, right: ast.expr) -> ast.expr:
     return ast.Compare(
         left=left,
         ops=[op],
@@ -203,9 +213,9 @@ def Attribute(value: ast.expr, attr: str):
 
 def ArrayJoin(array: ast.expr) -> ast.Call:
     return ast.Call(
-        func=ast.Attribute(value=ast.Constant(value=''), attr='join'),
+        func=ast.Attribute(value=ast.Constant(value=""), attr="join"),
         args=[array],
-        keywords=[]
+        keywords=[],
     )
 
 
@@ -214,11 +224,11 @@ def Return(value: ast.expr | None = None) -> ast.Return:
 
 
 def If(
-        condition: ast.expr,
-        if_body: Sequence[ast.stmt]|ast.stmt,
-        elif_blocks: Sequence[tuple[ast.expr, Sequence[ast.stmt]|ast.stmt]] = [],
-        else_body: Sequence[ast.stmt] | None = None
-        ) -> ast.If:
+    condition: ast.expr,
+    if_body: Sequence[ast.stmt] | ast.stmt,
+    elif_blocks: Sequence[tuple[ast.expr, Sequence[ast.stmt] | ast.stmt]] = [],
+    else_body: Sequence[ast.stmt] | None = None,
+) -> ast.If:
     if isinstance(if_body, ast.AST):
         if_body = [if_body]
 
@@ -230,10 +240,8 @@ def If(
         return cur_if
 
     def insert_elif(
-        if_statement: ast.If,
-        condition: ast.expr,
-        body: Sequence[ast.AST]|ast.AST
-        ):
+        if_statement: ast.If, condition: ast.expr, body: Sequence[ast.AST] | ast.AST
+    ):
         if isinstance(body, ast.AST):
             body = [body]
 
@@ -245,7 +253,6 @@ def If(
                 orelse=[],
             )
         ]
-
 
     if_statement = ast.If(
         test=condition,
