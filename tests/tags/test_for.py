@@ -33,3 +33,15 @@ def test_for_each_loop():
     for item in items:
         assert item in html
 
+
+def test_for_range_loop_with_unroll():
+    component = build_template(
+        """
+        {% for x in range(5) %}
+            {{ x }}
+        {% endfor %}
+    """
+    )
+    html = component()
+    for i in range(5):
+        assert str(i) in html

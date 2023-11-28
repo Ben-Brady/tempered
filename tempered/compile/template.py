@@ -123,14 +123,13 @@ def construct_body(ctx: CodeBuilder) -> Sequence[ast.AST]:
     for tag in ctx.template.body:
         ctx.construct_tag(tag)
 
-    statements.extend(ctx.body)
-
     if ctx.variable.assigned:
         ctx.flush_expressions()
         output_value = ctx.variable.variable
     else:
         output_value = ctx.buffer.flush() or ast_utils.EmptyStr
 
+    statements.extend(ctx.body)
 
     if ctx.layout:
         output_value = create_layout_call(

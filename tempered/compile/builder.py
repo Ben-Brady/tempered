@@ -34,7 +34,7 @@ class CodeBuilder:
     variable: StringVariable
     template: Template
     layout: LayoutTemplate | None
-    css: str|None
+    css: str | None
     body: list[ast.stmt] = field(default_factory=list)
     buffer: ExprBuffer = field(default_factory=ExprBuffer)
 
@@ -83,7 +83,9 @@ class CodeBuilder:
 
     def create_block(self, tags: Sequence[TemplateTag]) -> Sequence[ast.stmt]:
         if not self.buffer.empty():
-            raise RuntimeError("Internal Error, must flush buffer before creating block")
+            raise RuntimeError(
+                "Internal Error, must flush buffer before creating block"
+            )
 
         ctx_block = self.create_subcontext(self.variable.variable.id + "_block")
         for tag in tags:
@@ -185,14 +187,14 @@ class CodeBuilder:
             )
         )
 
-    def construct_for(self, block: ForTag):
+    def construct_for(self, tag: ForTag):
         self.enter_block()
-        for_body = self.create_block(block.loop_block)
+        for_body = self.create_block(tag.loop_block)
         if len(for_body) > 0:
             self.body.append(
                 ast.For(
-                    target=block.loop_variable,
-                    iter=block.iterable,
+                    target=tag.loop_variable,
+                    iter=tag.iterable,
                     body=for_body,
                     orelse=[],
                 )

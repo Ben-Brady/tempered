@@ -38,6 +38,13 @@ class NameTransformer(ast.NodeTransformer):
             self.known_names.pop()
         return output_node
 
+    def visit_Assign(self, node: ast.Assign):
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                self.known_names.append(target.id)
+
+        return self.generic_visit(node)
+
     def visit_Name(self, node: ast.Name):
         return self.transform(node)
 

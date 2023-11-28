@@ -23,7 +23,7 @@ def test_assignment_with_if():
             {% set type = "odd" %}
         {% endif %}
 
-        {{x}} is {{type}}
+        {{ x }} is {{type}}
     """)
 
     assert "1 is odd" in component()

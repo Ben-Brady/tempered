@@ -175,3 +175,4 @@ scripts/
 tempered/generated/*
 !tempered/generated/__init__.py
 TODO.md
+examples/build_to/components.py
