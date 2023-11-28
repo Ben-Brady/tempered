@@ -13,14 +13,14 @@ class EasyParseToken(Protocol):
 class LiteralToken(EasyParseToken):
     body: str
 
-    def into_tag(self) -> parse_ast.LiteralBlock:
-        return parse_ast.LiteralBlock(self.body)
+    def into_tag(self) -> parse_ast.LiteralTag:
+        return parse_ast.LiteralTag(self.body)
 
 
 @dataclass
 class StylesToken(EasyParseToken):
-    def into_tag(self) -> parse_ast.StyleBlock:
-        return parse_ast.StyleBlock()
+    def into_tag(self) -> parse_ast.StyleTag:
+        return parse_ast.StyleTag()
 
 
 @dataclass

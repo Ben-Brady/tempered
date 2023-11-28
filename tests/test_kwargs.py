@@ -63,3 +63,18 @@ def test_kwargs_dont_affect_for_loops():
     html = func(x="TEMPERED")
     assert "2" in html
     assert "TEMPERED" in html
+
+
+def test_kwargs_loop_variable():
+    func = build_template(
+        """
+        {% for x in items %}
+            {{ x }}
+        {% endfor %}
+    """
+    )
+    items = ["a", "b", "c"]
+    html = func(items=items)
+    for item in items:
+
+        assert item in html

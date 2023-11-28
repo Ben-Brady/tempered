@@ -6,32 +6,32 @@ from pathlib import Path
 from abc import ABC
 
 
-class Block(ABC):
+class Tag(ABC):
     pass
 
 
 @dataclass
-class LiteralBlock(Block):
+class LiteralTag(Tag):
     body: str
 
 
 @dataclass
-class ExprBlock(Block):
+class ExprTag(Tag):
     value: ast.expr
 
 
 @dataclass
-class HtmlBlock(Block):
+class HtmlTag(Tag):
     value: ast.expr
 
 
 @dataclass
-class StyleBlock(Block):
+class StyleTag(Tag):
     """Place styles in component here"""
 
 
 @dataclass
-class ComponentBlock(Block):
+class ComponentTag(Tag):
     # Needed to prevent CSS from being created multiple times
     # Also to prevent HTML from being escaped
     component_name: str
@@ -39,7 +39,7 @@ class ComponentBlock(Block):
 
 
 @dataclass
-class IfBlock(Block):
+class IfTag(Tag):
     condition: ast.expr
     if_block: TemplateBlock
     else_block: TemplateBlock | None
@@ -47,41 +47,41 @@ class IfBlock(Block):
 
 
 @dataclass
-class ForBlock(Block):
+class ForTag(Tag):
     iterable: ast.expr
     loop_variable: ast.expr
     loop_block: TemplateBlock
 
 
 @dataclass
-class AssignmentBlock(Block):
+class AssignmentTag(Tag):
     target: ast.expr
     value: ast.expr
 
 
 @dataclass
-class SlotBlock(Block):
+class SlotTag(Tag):
     name: str | None
     default: TemplateBlock | None
 
 
 @dataclass
-class BlockBlock(Block):
+class BlockTag(Tag):
     name: str | None
     body: TemplateBlock
 
 
 TemplateTag: TypeAlias = (
-    LiteralBlock
-    | HtmlBlock
-    | ExprBlock
-    | ComponentBlock
-    | StyleBlock
-    | IfBlock
-    | ForBlock
-    | AssignmentBlock
-    | SlotBlock
-    | BlockBlock
+    LiteralTag
+    | HtmlTag
+    | ExprTag
+    | ComponentTag
+    | StyleTag
+    | IfTag
+    | ForTag
+    | AssignmentTag
+    | SlotTag
+    | BlockTag
 )
 
 
@@ -95,13 +95,14 @@ class TemplateParameter:
 @dataclass
 class Template:
     name: str
+    is_layout = False
     file: Path|None = None
     parameters: list[TemplateParameter] = field(default_factory=list)
 
     body: TemplateBlock = field(default_factory=list)
     css: str = ""
     layout: str|None = None
-    components_calls: list[ComponentBlock] = field(default_factory=list)
+    components_calls: list[ComponentTag] = field(default_factory=list)
     style_includes: set[str] = field(default_factory=set)
 
     blocks: set[str] = field(default_factory=set)
@@ -109,8 +110,9 @@ class Template:
 
 @dataclass
 class LayoutTemplate(Template):
+    is_layout = True
     has_default_slot: bool = False
-    slots: list[SlotBlock] = field(default_factory=list)
+    slots: list[SlotTag] = field(default_factory=list)
 
 
 TemplateBlock: TypeAlias = Sequence[TemplateTag]

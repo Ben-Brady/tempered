@@ -57,10 +57,9 @@ print(components.Image(
 ))
 ```
 
+Output:
 ```html
-<!-- Generated -->
-<style>img.tempered-1ad5be0d {width: 100px;height: 100px;}</style>
-<img class='tempered-1ad5be0d' src="/example.png" alt="Example Post">
+<img alt="Example Post" src="/example.png" class=image-83dc><style>img.image-83dc{width:100px;height:100px}</style>
 ```
 
 
@@ -74,18 +73,16 @@ Additionally, it allows IDEs to provide intelisense to components
 ```python
 # __components.py
 # This file is dynamicly generated when you build the templates
-from tempered import _internals  as __internals
+from __future__ import annotations as __annotations
+import typing as __typing
+from tempered._internals import escape as __escape
 
-IMAGE_STYLE = "<style>img.tempered-1ad5be0d {width: 100px;height: 100px;}</style>"
 
-def image(*, src: str, alt: str = "", with_styles: bool = True) -> str:
-    __html = ""
-    if with_styles:
-        __html += IMAGE_STYLE
-    __html += "<img class='tempered-1ad5be0d' src=\""
-    __html += __internals.escape(src)
-    __html += "\" alt=\""
-    __html += __internals.escape(alt)
-    __html += "\">"
+def Image(*, src: str, alt: str = '', with_styles: bool = True, **kwargs: __typing.Any) -> str:
+    __css = 'img.image-83dc{width:100px;height:100px}'
+    __html = f'  <img alt="{__escape(alt)}" src="{__escape(src)}" class=image-83dc>'
+    if with_styles and __css:
+        __html += '<style>' + (__css + '</style>')
     return __html
+
 ```

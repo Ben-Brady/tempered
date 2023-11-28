@@ -16,6 +16,7 @@ def test_single_constant_assignment():
 def test_assignment_with_if():
     component = build_template("""
         {% set x = 1 %}
+
         {% if x % 2 == 0%}
             {% set type = "even" %}
         {% else %}

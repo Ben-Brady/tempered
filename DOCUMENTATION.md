@@ -67,24 +67,15 @@ print(components.Comment(
 
 ```python
 # components.py AFTER
-from __future__ import annotations
-from tempered import _internals as __internals
+from __future__ import annotations as __annotations
+import typing as __typing
+from tempered._internals import escape as __escape
 
 
-def Comment(*, author: str, text: str, with_styles: bool = True) -> str:
-    __css = ''
-    __output = ''
-    __output += ' '
-    __output += ' <div><h2>'
-    __output += __internals.escape(author)
-    __output += '</h2><p>'
-    __output += __internals.escape(text)
-    __output += '</div>'
-    if with_styles and __css:
-        __output += '<style>' + (__css + '</style>')
-    return __output
+def Comment(*, author: str, text: str, with_styles: bool = True, **kwargs: __typing.Any) -> str:
+    return f'  <div><h2>{__escape(author)}</h2><p>{__escape(text)}</div>'
+
 ```
-
 
 ## Templates
 

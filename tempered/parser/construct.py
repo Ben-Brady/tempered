@@ -44,7 +44,7 @@ def _parse_template(
     tokens = html_.tokenised_html_to_tokens(html, token_lookup)
 
     # Parse tokens into a body
-    ctx = parse_token_stream(tokens)
+    ctx = parse_token_stream(tokens, has_css=len(css) > 0)
 
     if ctx.is_layout:
         return parse_ast.LayoutTemplate(

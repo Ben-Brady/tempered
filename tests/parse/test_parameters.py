@@ -34,7 +34,7 @@ def test_parse_removes_parameters():
         "a"
     )
     block = template.body[0]
-    assert isinstance(block, parse_ast.LiteralBlock)
+    assert isinstance(block, parse_ast.LiteralTag)
     assert "a" in block.body
 
 

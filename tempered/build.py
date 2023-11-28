@@ -1,6 +1,7 @@
 from . import parser
 from .compile.module import compile_module
 import ast
+import sys
 import importlib
 from importlib.util import spec_from_loader, module_from_spec
 from pathlib import Path
@@ -8,7 +9,7 @@ from types import ModuleType
 import autopep8  # type: ignore
 
 
-BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
+BUILD_FILE = Path(__file__).parent.joinpath("generated/_components.py")
 
 
 def _build_python(
@@ -52,6 +53,7 @@ def build_static(
     try:
         components = _load_static_file()
     except Exception:
+        # sys.modules.pop("tempered.generated")
         BUILD_FILE.unlink(missing_ok=True)
         BUILD_FILE.touch()
         components = _load_static_file()

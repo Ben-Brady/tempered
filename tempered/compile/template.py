@@ -13,8 +13,8 @@ from .utils import (
     TYPING_MODULE,
 )
 from .rename import convert_unknown_variables_to_kwargs
-from .tag import construct_tag, BuildContext
-from .accumulators import StringResult
+from .builder import CodeBuilder
+from .accumulators import StringVariable
 import ast
 from typing import Sequence
 
@@ -68,11 +68,11 @@ def create_template_function(
                 )
             )
 
-    ctx = BuildContext(
+    ctx = CodeBuilder(
         template=template,
-        result=StringResult(OUTPUT_VARIABLE),
+        variable=StringVariable(OUTPUT_VARIABLE),
         layout=layout,
-        css=css,
+        css=css if len(css) > 0 else None,
     )
     func = ast_utils.Function(
         name=function_name,
@@ -116,18 +116,26 @@ def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
     )
 
 
-def construct_body(ctx: BuildContext) -> Sequence[ast.AST]:
+def construct_body(ctx: CodeBuilder) -> Sequence[ast.AST]:
     statements: list[ast.AST] = []
-    statements.append(create_stlye_contant(ctx))
-    statements.extend(ctx.result.create_init())
+    statements.extend(create_style_contant(ctx))
 
-    for block in ctx.template.body:
-        statements.extend(construct_tag(block, ctx))
+    for tag in ctx.template.body:
+        ctx.construct_tag(tag)
 
-    output_value = ctx.result.create_value()
-    if ctx.layout is not None:
+    statements.extend(ctx.body)
+
+    if ctx.variable.assigned:
+        ctx.flush_expressions()
+        output_value = ctx.variable.variable
+    else:
+        output_value = ctx.buffer.flush() or ast_utils.EmptyStr
+
+
+    if ctx.layout:
         output_value = create_layout_call(
             layout_name=ctx.layout.name,
+            default_slot=output_value,
             css=ast_utils.Name(COMPONENT_CSS_VARIABLE),
             has_default_slot=ctx.layout.has_default_slot,
             blocks=ctx.template.blocks,
@@ -137,16 +145,21 @@ def construct_body(ctx: BuildContext) -> Sequence[ast.AST]:
     return statements
 
 
-def create_stlye_contant(ctx: BuildContext) -> ast.Assign:
-    if isinstance(ctx.template, LayoutTemplate):
-        if len(ctx.css) == 0:
+def create_style_contant(ctx: CodeBuilder) -> list[ast.stmt]:
+    if ctx.template.is_layout:
+        if ctx.css is None:
             value = ast_utils.Name(LAYOUT_CSS_PARAMETER)
         else:
             value = ast_utils.Add(
-                ast_utils.Constant(ctx.css),
                 ast_utils.Name(LAYOUT_CSS_PARAMETER),
+                ast_utils.Constant(ctx.css),
             )
+    elif ctx.css is not None or ctx.layout:
+        value = ast_utils.Constant(ctx.css or "")
     else:
-        value = ast_utils.Constant(ctx.css)
+        return []
 
-    return ast_utils.Assign(target=COMPONENT_CSS_VARIABLE, value=value)
+    return [ast_utils.Assign(
+        target=COMPONENT_CSS_VARIABLE,
+        value=value
+    )]

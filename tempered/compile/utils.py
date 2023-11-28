@@ -3,8 +3,8 @@ from .. import ast_utils
 
 
 UTILS_IMPORT = ast.ImportFrom(
-    module="tempered",
-    names=[ast.alias(name="_internals", asname="__internals")],
+    module="tempered._internals",
+    names=[ast.alias(name="escape", asname="__escape")],
     level=0,
 )
 
@@ -28,15 +28,12 @@ IMPORTS = [
 WITH_STYLES_PARAMETER = "with_styles"
 LAYOUT_CSS_PARAMETER = "__component_css"
 COMPONENT_CSS_VARIABLE = "__css"
-OUTPUT_VARIABLE = "__output"
+OUTPUT_VARIABLE = "__html"
 KWARGS_VARIABLE = "kwargs"
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
-    ESCAPE_FUNC_NAME = ast.Attribute(
-        value=ast.Name(id="__internals"),
-        attr="escape",
-    )
+    ESCAPE_FUNC_NAME = ast.Name(id="__escape")
     return ast_utils.Call(ESCAPE_FUNC_NAME, [value])
 
 
@@ -64,6 +61,7 @@ def layout_func_name(template_name: str) -> str:
 
 def create_layout_call(
     layout_name: str,
+    default_slot: ast.expr,
     css: ast.expr,
     has_default_slot: bool,
     blocks: set[str],
@@ -73,7 +71,7 @@ def create_layout_call(
     kw_args[WITH_STYLES_PARAMETER] = ast_utils.Name(WITH_STYLES_PARAMETER)
 
     if has_default_slot:
-        kw_args[slot_parameter(None)] = ast_utils.Name(OUTPUT_VARIABLE)
+        kw_args[slot_parameter(None)] = default_slot
 
     for slot in blocks:
         kw_args[slot_parameter(slot)] = ast_utils.Name(slot_variable_name(slot))

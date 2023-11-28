@@ -7,6 +7,6 @@ def test_parse_component_block():
         "{<Post(a=1)>}"
     )
     block = template.body[0]
-    assert isinstance(block, parse_ast.ComponentBlock)
+    assert isinstance(block, parse_ast.ComponentTag)
     assert "a" in block.keywords
 

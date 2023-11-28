@@ -2,6 +2,7 @@ from .utils import KWARGS_VARIABLE, WITH_STYLES_PARAMETER
 import ast
 from typing import cast
 from functools import lru_cache
+import builtins
 
 
 def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[str]):
@@ -15,29 +16,37 @@ class NameTransformer(ast.NodeTransformer):
         KWARGS_VARIABLE,
         WITH_STYLES_PARAMETER,
     )
+
     def __init__(self, known_names: list[str]):
         self.known_names = known_names
 
     def visit_For(self, node: ast.For):
-        if not isinstance(node.target, ast.Name):
-            return self.generic_visit(node)
+        if isinstance(node.target, ast.Name):
+            loop_vars = [node.target.id]
+        elif isinstance(node.target, ast.Tuple):
+            loop_vars = [
+                elt.id for elt in node.target.elts if isinstance(elt, ast.Name)
+            ]
+        else:
+            # TODO: Deal with case for loop is non standard
+            # e.g. not `for x in y:` or `for a, b in y:`
+            loop_vars = []
 
-        self.known_names.append(node.target.id)
-        node = cast(ast.For, self.generic_visit(node))
-        self.known_names.pop()
-        return node
+        self.known_names.extend(loop_vars)
+        output_node = self.generic_visit(node)
+        for _ in range(len(loop_vars)):
+            self.known_names.pop()
+        return output_node
 
     def visit_Name(self, node: ast.Name):
         return self.transform(node)
 
     def transform(self, node: ast.Name) -> ast.expr:
-        if any(
-            (
-                node.id.startswith("__"),
-                node.id in self.RESERVED_NAMES,
-                node.id in self.known_names,
-                is_builtin(node.id),
-            )
+        if (
+            node.id.startswith("__")
+            or node.id in self.RESERVED_NAMES
+            or node.id in self.known_names
+            or is_builtin(node.id)
         ):
             return node
 
@@ -48,9 +57,9 @@ class NameTransformer(ast.NodeTransformer):
         )
 
 
-@lru_cache(maxsize=512)
+@lru_cache(maxsize=2048)
 def is_builtin(name: str):
-    if name in dir(__builtins__):
+    if name in dir(builtins):
         return True
 
     try:

@@ -1,62 +1,54 @@
 from .. import ast_utils
 import ast
-from typing import Protocol
+from typing_extensions import Self
 
 
-class Result(Protocol):
-    def create_init(self) -> list[ast.stmt]:
-        ...
+class ExprBuffer:
+    _stack: list[ast.expr]
 
-    def create_add(self, value: ast.expr) -> ast.stmt:
-        ...
+    def __init__(self):
+        self._stack = []
 
-    def create_value(self) -> ast.expr:
-        ...
+    def add(self, value: ast.expr):
+        self._stack.append(value)
+
+    def empty(self) -> bool:
+        return len(self._stack) == 0
+
+    def flush(self) -> ast.expr | None:
+        if len(self._stack) == 0:
+            return None
+
+        if len(self._stack) == 1:
+            expr = self._stack[0]
+        elif len(self._stack) < 100:
+            expr = ast_utils.FormatString(self._stack)
+        else:
+            expr = ast_utils.ArrayJoin(ast_utils.List(self._stack))
+
+        self._stack.clear()
+        return expr
 
 
-class StringResult(Result):
-    _variable: ast.Name
+class StringVariable:
+    variable: ast.Name
+    assigned: bool = False
 
-    def __init__(self, name: str|ast.Name):
+    def __init__(self, name: str | ast.Name):
         if isinstance(name, str):
             name = ast_utils.Name(name)
-
-        self._variable = name
-
-    def create_init(self) -> list[ast.stmt]:
-        return [ast_utils.Assign(
-            target=self._variable,
-            value="",
-        )]
+        self.variable = name
 
     def create_add(self, value: ast.expr) -> ast.stmt:
-        return ast_utils.AddAssign(
-            target=self._variable,
-            value=value,
-        )
+        if self.assigned:
+            return ast_utils.AddAssign(target=self.variable, value=value)
+        else:
+            self.assigned = True
+            return ast_utils.Assign(target=self.variable, value=value)
 
-    def create_value(self) -> ast.expr:
-        return self._variable
+    def ensure_assigned(self) -> list[ast.stmt]:
+        if self.assigned:
+            return []
 
-
-class ArrayResult(Result):
-    _variable: ast.Name
-
-    def __init__(self, name: str):
-        self._variable = ast_utils.Name(name)
-
-    def create_init(self) -> list[ast.stmt]:
-        return [ast_utils.Assign(
-            target=self._variable,
-            value=[],
-        )]
-
-    def create_add(self, value: ast.expr) -> ast.stmt:
-        return ast.Expr(value=ast_utils.Call(
-            func=ast_utils.Attribute(self._variable, 'append'),
-            arguments=[value],
-        ))
-
-    def create_value(self) -> ast.expr:
-        return ast_utils.ArrayJoin(self._variable)
-
+        self.assigned = True
+        return [ast_utils.Assign(target=self.variable, value=ast_utils.EmptyStr)]
