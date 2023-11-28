@@ -13,11 +13,11 @@ dependencies = [
     "rcssmin",
     "autopep8",
     "typing_extensions",
-    "libsass",
 ]
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
+sass = ["libsass"]
 test = [
     "pytest",
     "pytest-asyncio",

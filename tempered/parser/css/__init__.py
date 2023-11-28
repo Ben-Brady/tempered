@@ -1,9 +1,8 @@
-from .css import tranform_css
-from .minify import minify_css
-from .scope import apply_scope_to_css
+from .css import extract_css, minify_css
+from .scoped import apply_scope_to_css
 
 __all__ = [
-    "tranform_css",
+    "extract_css",
     "minify_css",
     "apply_scope_to_css",
 ]

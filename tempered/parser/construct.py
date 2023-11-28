@@ -1,5 +1,5 @@
 from ..errors import ParserException
-from .css import tranform_css
+from .css import extract_css
 from . import html_, lexer, parse_ast
 from .parse import parse_token_stream
 from pathlib import Path
@@ -37,7 +37,7 @@ def _parse_template(
     html, token_lookup = html_.convert_tokens_to_valid_html(tokens)
 
     # Process HTML
-    html, css = tranform_css(html, prefix=name)
+    html, css = extract_css(html, prefix=name)
     html = html_.minify_html(html)
 
     # Reconvert the HTML back into tokens

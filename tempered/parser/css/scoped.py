@@ -1,7 +1,10 @@
 import tinycss2
 from tinycss2.ast import QualifiedRule, IdentToken, LiteralToken, HashToken
+from zlib import crc32
+import bs4
 
 # QualifiedRule = #a .b {}
+
 
 # https://geoffrich.net/posts/svelte-scoped-styles/
 def apply_scope_to_css(css: str, scope: str) -> str:
@@ -16,6 +19,7 @@ def apply_scope_to_css(css: str, scope: str) -> str:
 # QualifiedRule.prelude = #a .b
 def add_scope_to_rule(rule: QualifiedRule, scope: str):
     checked_tokens = []
+
     # Find first scopable rule
     def insert_scope(rule: QualifiedRule, scope: str, position: int):
         scope_ident = IdentToken(0, 0, scope)
@@ -23,7 +27,6 @@ def add_scope_to_rule(rule: QualifiedRule, scope: str):
         rule.prelude.insert(position + 1, scope_ident)
         rule.prelude.insert(position + 1, class_token)
         checked_tokens.extend((scope_ident, class_token))
-
 
     for token in list(rule.prelude):
         checked_tokens.append(token)
@@ -35,9 +38,44 @@ def add_scope_to_rule(rule: QualifiedRule, scope: str):
     # Find last scopable rule
     for token in reversed(list(rule.prelude)):
         if token in checked_tokens:
-            break # We met in the middle
+            break  # We met in the middle
 
         if isinstance(token, (IdentToken, HashToken)):
             insert_scope(rule, scope, rule.prelude.index(token))
             break
 
+
+counter = 0
+
+
+def _generate_scoped_style_id(prefix: str) -> str:
+    global counter
+    counter += 1
+    id = str(counter).encode()
+
+    prefix = prefix.replace("-", "_").lower()
+    hash = hex(crc32(id))[2:6]
+    return f"{prefix}-{hash}"
+
+
+def apply_scope_to_soup(soup: bs4.BeautifulSoup, scope_id: str):
+    for tag in soup.find_all():
+        if is_tag_in_head(tag):
+            continue
+
+        classes = tag.attrs.get("class", "")
+
+        if isinstance(classes, list):
+            classes = " ".join(classes)
+
+        tag.attrs["class"] = classes + " " + scope_id
+
+
+def is_tag_in_head(tag: bs4.Tag) -> bool:
+    if tag.parent is None:
+        return False
+
+    if tag.name == "head" or tag.parent.name == "head":
+        return True
+
+    return is_tag_in_head(tag.parent)
