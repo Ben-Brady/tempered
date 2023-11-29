@@ -1,6 +1,6 @@
 from .. import ast_utils
-from ..parser import parse_ast
-from ..parser.parse_ast import (
+from ..parser import template_ast
+from ..parser.template_ast import (
     Template,
     LayoutTemplate,
     TemplateTag,
@@ -63,7 +63,7 @@ class CodeBuilder:
                 self.add_expr(tag.value)
             case ComponentTag():
                 self.construct_component_tag(tag)
-            case parse_ast.BlockTag():
+            case template_ast.BlockTag():
                 self.construct_block_tag(tag)
             case IfTag():
                 self.construct_if(tag)
@@ -200,7 +200,7 @@ class CodeBuilder:
                 )
             )
 
-    def construct_block_tag(self, block: parse_ast.BlockTag):
+    def construct_block_tag(self, block: template_ast.BlockTag):
         self.body.extend(
             self.create_variable(
                 name=slot_variable_name(block.name),

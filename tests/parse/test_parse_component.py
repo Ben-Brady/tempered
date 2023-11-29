@@ -1,4 +1,4 @@
-from tempered.parser import parse_template, parse_ast
+from tempered.parser import parse_template, template_ast
 import ast
 
 
@@ -7,6 +7,6 @@ def test_parse_component_block():
         "{<Post(a=1)>}"
     )
     block = template.body[0]
-    assert isinstance(block, parse_ast.ComponentTag)
+    assert isinstance(block, template_ast.ComponentTag)
     assert "a" in block.keywords
 

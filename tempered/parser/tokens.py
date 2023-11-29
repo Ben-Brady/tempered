@@ -1,11 +1,11 @@
-from . import parse_ast
+from . import template_ast
 from typing import TypeAlias, Protocol, runtime_checkable
 from dataclasses import dataclass
 
 
 @runtime_checkable
 class EasyParseToken(Protocol):
-    def into_tag(self) -> parse_ast.TemplateTag:
+    def into_tag(self) -> template_ast.TemplateTag:
         ...
 
 
@@ -13,14 +13,14 @@ class EasyParseToken(Protocol):
 class LiteralToken(EasyParseToken):
     body: str
 
-    def into_tag(self) -> parse_ast.LiteralTag:
-        return parse_ast.LiteralTag(self.body)
+    def into_tag(self) -> template_ast.LiteralTag:
+        return template_ast.LiteralTag(self.body)
 
 
 @dataclass
 class StylesToken(EasyParseToken):
-    def into_tag(self) -> parse_ast.StyleTag:
-        return parse_ast.StyleTag()
+    def into_tag(self) -> template_ast.StyleTag:
+        return template_ast.StyleTag()
 
 
 @dataclass

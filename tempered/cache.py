@@ -1,6 +1,6 @@
 import sys
 from tempered import __version__
-from .parser.parse_ast import Template
+from .parser.template_ast import Template
 import tempfile
 import pickle
 import ast

@@ -1,5 +1,5 @@
 from ... import ast_utils
-from ..parse_ast import TemplateParameter
+from ..template_ast import TemplateParameter
 import ast
 import keyword
 

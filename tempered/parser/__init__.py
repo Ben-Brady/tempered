@@ -1,8 +1,8 @@
-from .construct import parse_template
-from . import parse_ast, tokens
-from .parse_ast import Template, LayoutTemplate, TemplateParameter
+from .parse import parse_template
+from . import template_ast, tokens
+from .template_ast import Template, LayoutTemplate, TemplateParameter
 
 __all__ = [
-    "parse_ast", "tokens", "parse_template",
+    "template_ast", "tokens", "parse_template",
     "Template", "LayoutTemplate", "TemplateParameter",
 ]

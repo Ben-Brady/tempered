@@ -1,7 +1,7 @@
-from .. import ast_utils
+from .. import ast_utils, validate
 from ..parser import Template, LayoutTemplate
 from .utils import IMPORTS
-from . import validate, preprocess
+from . import preprocess
 from .template import create_template_function
 import ast
 from typing import Sequence

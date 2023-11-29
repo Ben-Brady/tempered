@@ -1,7 +1,7 @@
 from .. import cache, errors
 from .css import extract_css
-from . import html_, lexer, parse_ast
-from .parse import parse_token_stream
+from . import html_, lexer, template_ast
+from .parser import parse_token_stream
 from pathlib import Path
 
 
@@ -9,7 +9,7 @@ def parse_template(
     name: str,
     html: str,
     filepath: Path | None = None,
-) -> parse_ast.Template:
+) -> template_ast.Template:
     try:
         cached = cache.get_parse_cache(html)
         if cached:
@@ -36,7 +36,7 @@ def _parse_template(
     name: str,
     html: str,
     filepath: Path | None,
-) -> parse_ast.Template:
+) -> template_ast.Template:
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
     tokens = lexer.to_token_stream(html, filepath=filepath)
@@ -53,7 +53,7 @@ def _parse_template(
     ctx = parse_token_stream(tokens, has_css=len(css) > 0)
 
     if ctx.is_layout:
-        return parse_ast.LayoutTemplate(
+        return template_ast.LayoutTemplate(
             name=name,
             file=filepath,
             parameters=ctx.parameters,
@@ -67,7 +67,7 @@ def _parse_template(
             has_default_slot=ctx.has_default_slot,
         )
     else:
-        return parse_ast.Template(
+        return template_ast.Template(
             name=name,
             file=filepath,
             parameters=ctx.parameters,

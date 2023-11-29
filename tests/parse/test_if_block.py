@@ -1,4 +1,4 @@
-from tempered.parser import parse_template, TemplateParameter, parse_ast
+from tempered.parser import parse_template, TemplateParameter, template_ast
 
 
 def test_parse_if_block():
@@ -10,10 +10,10 @@ def test_parse_if_block():
         "{% endif %}"
     )
     block = template.body[0]
-    assert isinstance(block, parse_ast.IfTag)
+    assert isinstance(block, template_ast.IfTag)
     assert len(block.if_block) == 1
-    assert isinstance(block.if_block[0], parse_ast.LiteralTag)
-    assert block.else_block and len(block.else_block) == 1 and isinstance(block.else_block[0], parse_ast.LiteralTag)
+    assert isinstance(block.if_block[0], template_ast.LiteralTag)
+    assert block.else_block and len(block.else_block) == 1 and isinstance(block.else_block[0], template_ast.LiteralTag)
 
 
 def test_parse_if_block_with_condition():
@@ -25,8 +25,8 @@ def test_parse_if_block_with_condition():
         "{% endif %}"
     )
     block = template.body[0]
-    assert isinstance(block, parse_ast.IfTag)
+    assert isinstance(block, template_ast.IfTag)
     assert len(block.if_block) == 1
-    assert isinstance(block.if_block[0], parse_ast.LiteralTag)
+    assert isinstance(block.if_block[0], template_ast.LiteralTag)
     assert block.else_block and len(block.else_block) == 1
-    assert isinstance(block.else_block[0], parse_ast.LiteralTag)
+    assert isinstance(block.else_block[0], template_ast.LiteralTag)
