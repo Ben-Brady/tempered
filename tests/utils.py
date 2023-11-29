@@ -4,7 +4,9 @@ from typing_extensions import Callable, LiteralString
 import pytest
 
 
-pytest.fixture(autouse=True)(cache.clear_cache)
+@pytest.fixture(autouse=True)
+def clear_cache():
+    cache.clear_cache()
 
 
 def build_template(template: LiteralString) -> Callable:
