@@ -45,14 +45,14 @@ def slot_variable_name(slot_name: str | None) -> str:
     if slot_name is None:
         return OUTPUT_VARIABLE
     else:
-        return f"__{slot_name}_slot_content"
+        return f"__slot_{slot_name}_content"
 
 
 def slot_parameter(slot_name: str | None) -> str:
     if slot_name:
-        return f"__{slot_name}_slot"
+        return f"__slot_{slot_name}"
     else:
-        return "__default_slot"
+        return "__slot_default"
 
 
 def layout_func_name(template_name: str) -> str:
