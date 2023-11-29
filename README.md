@@ -13,6 +13,8 @@ pip install tempered
 
 ## Features
 
+- **Fast**
+  - Roughly 3x faster than jinja
 - **Scoped CSS**
   - CSS is scoped per component
 - **Components**
