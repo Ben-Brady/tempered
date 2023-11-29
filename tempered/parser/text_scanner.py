@@ -1,6 +1,7 @@
 from ..errors import ParserException
 from typing_extensions import TYPE_CHECKING
 from array import array
+import sys
 from pathlib import Path
 
 
@@ -16,8 +17,10 @@ class TextScanner:
     def __init__(self, html: str, file: Path | None = None):
         self.file = file
         self.original = html
-        self.text = array("u")
-        self.text.fromunicode(html[::-1])
+        if sys.version_info >= (3, 13):
+            self.text = array("w", html[::-1])
+        else:
+            self.text = array("u", html[::-1])
 
     @property
     def has_text(self) -> bool:
