@@ -149,7 +149,7 @@ class CodeBuilder:
         if_body = [
             ast_utils.AddAssign(
                 target=self.variable.variable,
-                value=ast_utils.Add(
+                value=ast_utils.FormatString(
                     ast_utils.Constant("<style>"),
                     ast_utils.Name(COMPONENT_CSS_VARIABLE),
                     ast_utils.Constant("</style>"),

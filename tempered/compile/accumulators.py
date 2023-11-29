@@ -22,7 +22,7 @@ class ExprBuffer:
         if len(self._stack) == 1:
             expr = self._stack[0]
         elif len(self._stack) < 100:
-            expr = ast_utils.FormatString(self._stack)
+            expr = ast_utils.FormatString(*self._stack)
         else:
             expr = ast_utils.ArrayJoin(ast_utils.List(self._stack))
 

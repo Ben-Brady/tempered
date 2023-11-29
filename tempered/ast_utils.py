@@ -223,7 +223,7 @@ def Return(value: ast.expr | None = None) -> ast.Return:
     return ast.Return(value=value)
 
 
-def FormatString(expressions: Sequence[ast.expr]) -> ast.expr:
+def FormatString(*expressions: ast.expr) -> ast.expr:
     values = []
     for expr in expressions:
         if isinstance(expr, ast.Constant) and isinstance(expr.value, str):
