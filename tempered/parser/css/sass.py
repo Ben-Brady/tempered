@@ -18,13 +18,13 @@ def transform_sass(css: str, lang: Literal["sass", "scss"]) -> str:
 
     if lang == "sass":
         css = remove_shared_ident(css)
-        css = sass.compile(
+        return sass.compile(
             string=css,
             output_style="compressed",
             indented=True,  # sass rules
         )
     else:
-        css = sass.compile(
+        return sass.compile(
             string=css,
             output_style="compressed",
             indented=False,  # scss rules
