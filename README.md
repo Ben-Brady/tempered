@@ -2,13 +2,14 @@
 
 Convert html templates into native python components
 
-[PyPi](https://pypi.org/project/tempered)
-[Github](https://github.com/Ben-Brady/tempered)
-[Documentation](https://github.com/Ben-Brady/tempered/blob/main/DOCUMENTATION.md)
 
 ```python
 pip install tempered
 ```
+
+|   |   |   |
+| - | - | - |
+| [PyPi](https://pypi.org/project/tempered) | [Github](https://github.com/Ben-Brady/tempered) | [Documentation](https://github.com/Ben-Brady/tempered/blob/main/DOCUMENTATION.md) |
 
 ## Features
 

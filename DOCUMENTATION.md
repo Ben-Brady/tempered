@@ -25,7 +25,7 @@ Tempered offers several ways to build your templates, you can either:
 
 ### build_memory
 
-Building in memory provides the simplist build system, however it provides no-intelisense
+Building in memory provides the simplist build system, however it provides no-intelisense. It runs the python coded through exec and transforms it into a module.
 
 ### build_static
 
@@ -81,9 +81,27 @@ def Comment(*, author: str, text: str, with_styles: bool = True, **kwargs: __typ
 
 ### Styles
 
+#### Scoping
 Style tags are automatically converted into CSS, By default css is scoped per component, this means you don't have to worry CSS name collisions. This is done by applying a component specific class to each
 
 Watch you, you cannot place dynamic attributes in the CSS, this is becuase CSS is shared per component
+
+#### Global
+
+If you want to disable CSS scoping, you can place a global attribute on your style tag.
+
+```html
+<style global>
+    html {
+        --text: #262626;
+        --background: #ededed;
+        --primary: #91c0c0;
+        --secondary: #d5d5e7;
+        --accent: #579898;
+        --error: #FD2929;
+    }
+</style>
+```
 
 #### `with_styles`
 
@@ -110,22 +128,8 @@ If you want to use sass, you can declare it on a style tag with `lang="scss"` or
 ```
 `a b {color: red;}`
 
-#### Global
 
-If you want to disable CSS scoping, you can place a global attribute on your style tag.
-
-```html
-<style global>
-    html {
-        --text: #262626;
-        --background: #ededed;
-        --primary: #91c0c0;
-        --secondary: #d5d5e7;
-        --accent: #579898;
-        --error: #FD2929;
-    }
-</style>
-```
+## Template Tags
 
 ### Parameters
 
@@ -136,9 +140,6 @@ Use `{%param %}` for parameters
 {% param b = 2 %}        <!-- Default Value Parameter-->
 {% param a: str = "A" %} <!-- Typed Default Value Parameter-->
 ```
-
-## Styles
-
 ### Style Placement
 
 Use `{%styles}` for styles, this is where styles are placed
@@ -163,12 +164,10 @@ If omitted, styles are placed at the end of the component
 
 Manually add a component styles to the HTML, should be placed at the top of the component
 
-This is useful for when you need to include the CSS for dynamically create components, such as with HTMX
+This is useful for when you need to include the CSS for components that aren't inside the template, such as with HTMX
 
 
-## Values
-
-### Escaped Expressions
+### Expressions
 
 Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 
@@ -181,8 +180,7 @@ Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 </a>
 ```
 
-**Important**
-> Ensure you surround attributes in \"\" to prevent XSS, e.g. `<a href="{{src}}"/>`
+> Important: Ensure you surround attributes in \"\" to prevent XSS, e.g. `<a href="{{src}}"/>` vs `<a href={{src}}/>`
 
 ### Raw HTML
 
@@ -201,7 +199,7 @@ Use `{<Component()>}` for a component, call this like
 
 ```html
 <div>
-    {<Post(title=1)>}
+    {<Post(title="Lorum Ipsum")>}
 </div>
 ```
 
@@ -251,13 +249,15 @@ As well as an elif block
 ```html
 {%param number: int}
 
-{% if number < 10 %}
-    {{ number }} is less than 10
-{% elif number < 100 %}
-    {{ number }} is less than 100
-{% else %}
-    {{ number }} is bigger than 100
-{% endif %}
+<span>
+    {% if number < 10 %}
+        {{ number }} is less than 10
+    {% elif number < 100 %}
+        {{ number }} is less than 100
+    {% else %}
+        {{ number }} is bigger than 100
+    {% endif %}
+</span>
 ```
 
 ### For
@@ -289,16 +289,16 @@ Use `{%for %}`
 ```html
 <div class="table">
     {% for x in range(10) %}
-    {% if x % 2 == 0 %}
-        <div class="row even">
-            {{x}}
-        </div>
-    {% else %}
-        <div class="row odd">
-            {{x}}
-        </div>
-    {% endif %}
-{% endfor %}
+        {% if x % 2 == 0 %}
+            <div class="row even">
+                {{x}}
+            </div>
+        {% else %}
+            <div class="row odd">
+                {{x}}
+            </div>
+        {% endif %}
+    {% endfor %}
 </div>
 
 <style>
