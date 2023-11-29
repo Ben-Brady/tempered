@@ -1,4 +1,4 @@
-from ..errors import ParserException
+from .. import cache, errors
 from .css import extract_css
 from . import html_, lexer, parse_ast
 from .parse import parse_token_stream
@@ -11,19 +11,25 @@ def parse_template(
     filepath: Path | None = None,
 ) -> parse_ast.Template:
     try:
-        return _parse_template(
+        cached = cache.get_parse_cache(html)
+        if cached:
+            return cached
+
+        template = _parse_template(
             name=name,
             html=html,
             filepath=filepath,
         )
-    except ParserException as e:
+        cache.set_parse_cache(html, template)
+        return template
+    except errors.ParserException as e:
         raise e
     except Exception as e:
         msg = f"Failed to parse template {name}"
         if filepath:
             msg += f" in {filepath}"
 
-        raise ParserException(msg) from e
+        raise errors.ParserException(msg) from e
 
 
 def _parse_template(
