@@ -6,7 +6,6 @@ import importlib
 from importlib.util import spec_from_loader, module_from_spec
 from pathlib import Path
 from types import ModuleType
-import autopep8  # type: ignore
 
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/_components.py")
@@ -37,7 +36,6 @@ def build_to(
         templates: list[parser.Template],
         ):
     source = _build_python(templates)
-    source = autopep8.fix_code(source)
     if not hasattr(module, "__file__") or module.__file__ is None:
         raise ValueError("Module must be loaded from a file")
 
