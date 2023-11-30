@@ -45,3 +45,17 @@ def test_for_range_loop_with_unroll():
     html = component()
     for i in range(5):
         assert str(i) in html
+
+
+def test_for_loop_with_set():
+    component = build_template(
+        """
+        {% for x in range(5) %}
+            {% set squared = x * x %}
+            {{ squared }}
+        {% endfor %}
+    """
+    )
+    html = component()
+    for i in range(5):
+        assert str(i * i) in html
