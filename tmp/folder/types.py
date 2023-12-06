@@ -1,2 +1,0 @@
-class A(str):
-    pass
