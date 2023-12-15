@@ -1,8 +1,16 @@
-from markupsafe import escape_silent
 from typing import Any
-from functools import lru_cache
 
 
-@lru_cache(maxsize=1024, typed=True)
+SAFE_CONVERSIONS = (int, float)
+
 def escape(value: Any) -> str:
-    return str(escape_silent(value))
+    if type(value) in SAFE_CONVERSIONS:
+        return str(value)
+    return (
+        str(value)
+        .replace("&", "&amp;")
+        .replace(">", "&gt;")
+        .replace("<", "&lt;")
+        .replace("'", "&#39;")
+        .replace('"', "&#34;")
+    )

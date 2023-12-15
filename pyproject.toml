@@ -8,7 +8,6 @@ dynamic = ["version", "description"]
 dependencies = [
     "bs4",
     "minify-html",
-    "markupsafe",
     "tinycss2",
     "rcssmin",
     "typing_extensions",
