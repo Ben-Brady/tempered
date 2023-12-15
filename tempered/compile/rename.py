@@ -1,7 +1,8 @@
 from .utils import KWARGS_VARIABLE, WITH_STYLES_PARAMETER
 import ast
-from functools import lru_cache
 import builtins
+from functools import lru_cache
+from typing import cast
 
 
 def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[str]):
@@ -65,6 +66,11 @@ class NameTransformer(ast.NodeTransformer):
         else:
             node.elt = self.visit(node.elt)
 
+        node.generators = [
+            cast(ast.comprehension, self.generic_visit(generator))
+            for generator in node.generators
+        ]
+
         for _ in range(len(loop_vars)):
             self.known_names.pop()
 
@@ -92,11 +98,7 @@ def extract_loop_variables(target: ast.expr) -> list[str]:
         return [target.id]
     elif isinstance(target, ast.Tuple):
         # `for a, b in x:`
-        return [
-            elt.id
-            for elt in target.elts
-            if isinstance(elt, ast.Name)
-        ]
+        return [elt.id for elt in target.elts if isinstance(elt, ast.Name)]
     else:
         # ¯\_(ツ)_/¯
         # TODO: Deal with case for loop is non standard
