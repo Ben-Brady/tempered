@@ -48,7 +48,7 @@ def add_scope_to_rule(rule: QualifiedRule, scope: str):
 counter = 0
 
 
-def _generate_scoped_style_id(prefix: str) -> str:
+def generate_scope_id(prefix: str) -> str:
     global counter
     counter += 1
     id = str(counter).encode()
