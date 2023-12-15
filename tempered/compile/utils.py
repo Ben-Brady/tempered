@@ -14,7 +14,7 @@ TYPING_IMPORT = ast.Import(names=[ast.alias(name="typing", asname=TYPING_MODULE)
 
 ANNOTATIONS_IMPORT = ast.ImportFrom(
     module="__future__",
-    names=[ast.alias(name="annotations", asname="__annotations")],
+    names=[ast.alias(name="annotations", asname="_")],
     level=0,
 )
 
