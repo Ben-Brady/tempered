@@ -129,8 +129,8 @@ class CodeBuilder:
     def construct_assignment(self, tag: AssignmentTag):
         self.flush_expressions()
         self.body.append(
-            ast.Assign(
-                targets=[tag.target],
+            ast_utils.Assign(
+                target=tag.target,
                 value=tag.value,
             )
         )
@@ -189,8 +189,22 @@ class CodeBuilder:
 
     def construct_for(self, tag: ForTag):
         self.enter_block()
-        for_body = self.create_block(tag.loop_block)
-        if len(for_body) > 0:
+
+        ctx_for = self.create_subcontext(self.variable.variable.id + "_block")
+        for tag_ in tag.loop_block:
+            ctx_for.construct_tag(tag_)
+
+        if len(ctx_for.body) == 0:
+            loop_expr = ctx_for.buffer.flush()
+            if loop_expr:
+                generator = ast_utils.GeneratorExp(
+                    expr=loop_expr,
+                    loop_var=tag.loop_variable,
+                    iterable=tag.iterable,
+                )
+                self.add_expr(ast_utils.ArrayJoin(generator))
+        elif len(ctx_for.body) >= 1:
+            for_body = self.create_block(tag.loop_block)
             self.body.append(
                 ast.For(
                     target=tag.loop_variable,

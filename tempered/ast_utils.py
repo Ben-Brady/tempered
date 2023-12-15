@@ -139,7 +139,7 @@ def AddAssign(target: str | ast.Name, value: LiteralType | ast.expr) -> ast.AugA
     )
 
 
-def Assign(target: str | ast.Name, value: LiteralType | ast.AST) -> ast.Assign:
+def Assign(target: str | ast.expr, value: LiteralType | ast.AST) -> ast.Assign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -216,6 +216,43 @@ def ArrayJoin(array: ast.expr) -> ast.Call:
         func=ast.Attribute(value=ast.Constant(value=""), attr="join"),
         args=[array],
         keywords=[],
+    )
+
+
+def Comprehension(
+    loop_var: str | ast.Name,
+    iterable: ast.expr,
+) -> ast.comprehension:
+    if isinstance(loop_var, str):
+        loop_var = Name(loop_var)
+
+    return ast.comprehension(
+        target=loop_var,
+        iter=iterable,
+        ifs=[],
+        is_async=0,
+    )
+
+
+def GeneratorExp(
+    expr: ast.expr,
+    loop_var: str | ast.Name,
+    iterable: ast.expr,
+) -> ast.GeneratorExp:
+    return ast.GeneratorExp(
+        elt=expr,
+        generators=[Comprehension(loop_var, iterable)],
+    )
+
+
+def ListComp(
+    expr: ast.expr,
+    loop_var: str | ast.Name,
+    iterable: ast.expr,
+) -> ast.ListComp:
+    return ast.ListComp(
+        elt=expr,
+        generators=[Comprehension(loop_var, iterable)],
     )
 
 

@@ -49,7 +49,7 @@ class IfTag(Tag):
 @dataclass
 class ForTag(Tag):
     iterable: ast.expr
-    loop_variable: ast.expr
+    loop_variable: ast.Name
     loop_block: TemplateBlock
 
 
@@ -92,7 +92,7 @@ class TemplateParameter:
     default: ast.expr | None = None
 
 
-@dataclass
+@dataclass(unsafe_hash=)
 class Template:
     name: str
     is_layout = False
