@@ -2,7 +2,6 @@ from ..parser import Template
 from typing import Sequence
 
 
-
 def calculate_required_css(
     template: Template,
     lookup: dict[str, Template]) -> str:

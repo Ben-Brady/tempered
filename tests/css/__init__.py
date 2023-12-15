@@ -6,7 +6,7 @@ import pytest
 def build_template(template: LiteralString) -> Callable:
     components = tempered.Tempered()
     components.add_template_from_string("foo", template)
-    module = components.build_static()
+    module = components.build_memory()
     return getattr(module, "foo")
 
 

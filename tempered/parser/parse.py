@@ -1,5 +1,4 @@
-from .. import cache, errors
-from .css import extract_css
+from .. import errors, preprocess
 from . import html_, lexer, template_ast
 from .parser import parse_token_stream
 from pathlib import Path
@@ -11,17 +10,11 @@ def parse_template(
     filepath: Path | None = None,
 ) -> template_ast.Template:
     try:
-        cached = cache.get_parse_cache(html)
-        if cached:
-            return cached
-
-        template = _parse_template(
+        return _parse_template(
             name=name,
             html=html,
             filepath=filepath,
         )
-        cache.set_parse_cache(html, template)
-        return template
     except errors.ParserException as e:
         raise e
     except Exception as e:
@@ -43,7 +36,7 @@ def _parse_template(
     html, token_lookup = html_.convert_tokens_to_valid_html(tokens)
 
     # Process HTML
-    html, css = extract_css(html, prefix=name)
+    html, css = preprocess.extract_css(html, prefix=name)
     html = html_.minify_html(html)
 
     # Reconvert the HTML back into tokens

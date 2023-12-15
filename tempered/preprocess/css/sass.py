@@ -1,6 +1,7 @@
 from ... import errors
 from typing_extensions import Literal
 import warnings
+import textwrap
 
 try:
     import sass

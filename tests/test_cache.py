@@ -1,8 +1,10 @@
-from utils import build_template, clear_cache
+from utils import build_template
 import time
+import pytest
 
 
-def test_parse_runs_are_cached(clear_cache):
+@pytest.mark.skip("Cache removed temporarily")
+def test_parse_runs_are_cached():
     template = "A {{a}}" * 500
     start = time.time()
     build_template(template)
@@ -16,7 +18,8 @@ def test_parse_runs_are_cached(clear_cache):
     assert (first_duration / secondary_duration) > 1.5
 
 
-def test_different_templates_arent_cached(clear_cache):
+@pytest.mark.skip("Cache removed temporarily")
+def test_different_templates_arent_cached():
     template_a = "A {{a}}" * 200
     template_b = "A {{a}}" * 199
     start = time.time()

@@ -92,7 +92,7 @@ class TemplateParameter:
     default: ast.expr | None = None
 
 
-@dataclass(unsafe_hash=)
+@dataclass
 class Template:
     name: str
     is_layout = False
