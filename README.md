@@ -14,7 +14,7 @@ pip install tempered
 ## Features
 
 - **Fast**
-  - Roughly 3x faster than jinja
+  - Roughly 5x faster than jinja, 50x faster than django
 - **Scoped CSS**
   - CSS is scoped per component
 - **Components**
@@ -65,13 +65,9 @@ Output:
 <img alt="Example Post" src="/example.png" class=image-83dc><style>img.image-83dc{width:100px;height:100px}</style>
 ```
 
-
 ## Compiled
 
-Since tempered is runtime compiled and loaded, it provides increase speed compared to jinja. From initial benchmarks, it's roughly 10x faster than jinja2.
-
-Additionally, it allows IDEs to provide intelisense to components
-
+Tempered is runtime compiled and loaded, this provides increased performance as well as intelisense and type checking.
 
 ```python
 # __components.py
