@@ -1,0 +1,118 @@
+{% from "usericon.html" import UserIcon%}
+{% macro Thumbnail(video) -%}
+<div class="thumbnail">
+    <a href="/video/{{video.id}}" class="image">
+        <img
+
+        src="https://placehold.co/{{video.thumbnail.width}}x{{video.thumbnail.height}}"
+        width="{{video.thumbnail.width}}"
+        height="{{video.thumbnail.height}}"
+        alt="{{video.title}}"
+        />
+    </a>
+    <div class="metadata">
+        <div class="account">
+        {{ UserIcon(profile=video.uploader) }}
+        </div>
+        <a href="/video/{{video.id}}" class="text">
+        <span class="title">
+            {{ video.title }}
+        </span>
+        <div class="info">
+            <small>Milky</small>
+            <small>{{ video.views }} views</small>
+        </div>
+        </a>
+    </div>
+</div>
+{% endmacro -%}
+
+<style>
+    .thumbnail {
+        width: 18rem;
+        height: fit-content;
+        padding: 0.5rem;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .thumbnail a:link,
+    .thumbnail a:visited {
+        text-decoration: inherit;
+        color: inherit;
+    }
+
+    .thumbnail {
+        border-radius: var(--border-radius, 10px);
+        background: var(--secondary);
+    }
+
+    .thumbnail .image {
+        display: block;
+        width: 100%;
+        height: 10rem;
+    }
+
+    .thumbnail .image {
+        border-radius: var(--border-radius, 10px);
+        border: 2px solid var(--accent, #67A8A8);
+    }
+
+    .thumbnail .image>img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: var(--border-radius, 10px);
+    }
+
+
+    .thumbnail .metadata {
+        display: grid;
+        grid-template-columns: 2.5rem 1fr;
+        gap: .5rem;
+        width: 100%;
+        height: 2.5rem;
+    }
+
+    .thumbnail .account {
+        display: block;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .thumbnail .account>img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .thumbnail .text {
+        height: 100%;
+        width: calc(100% - 1.5rem);
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    .thumbnail .title {
+        display: block;
+        width: 100%;
+        height: fit-content;
+        max-height: 1.5rem;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-break: anywhere;
+    }
+
+    .thumbnail .info {
+        display: flex;
+        height: 15px;
+        align-items: center;
+        gap: 5px;
+        align-self: stretch;
+    }
+</style>
