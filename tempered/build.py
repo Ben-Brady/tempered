@@ -51,7 +51,7 @@ def build_static(
     try:
         components = _load_static_file()
     except Exception:
-        # sys.modules.pop("tempered.generated")
+        sys.modules.pop("tempered.generated")
         BUILD_FILE.unlink(missing_ok=True)
         BUILD_FILE.touch()
         components = _load_static_file()
