@@ -1,5 +1,5 @@
-from . import tokens
-from .text_scanner import TextScanner
+from ..parser import tokens
+from ..parser.text_scanner import TextScanner
 from typing import Sequence
 import random
 from minify_html import minify

@@ -1,5 +1,6 @@
+from ..preprocess import htmlify
 from .. import errors, preprocess
-from . import html_, lexer, template_ast
+from . import lexer, template_ast
 from .parser import parse_token_stream
 from pathlib import Path
 
@@ -33,14 +34,14 @@ def _parse_template(
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
     tokens = lexer.to_token_stream(html, filepath=filepath)
-    html, token_lookup = html_.convert_tokens_to_valid_html(tokens)
+    html, token_lookup = htmlify.convert_tokens_to_valid_html(tokens)
 
     # Process HTML
     html, css = preprocess.extract_css(html, prefix=name)
-    html = html_.minify_html(html)
+    html = htmlify.minify_html(html)
 
     # Reconvert the HTML back into tokens
-    tokens = html_.tokenised_html_to_tokens(html, token_lookup)
+    tokens = htmlify.tokenised_html_to_tokens(html, token_lookup)
 
     # Parse tokens into a body
     ctx = parse_token_stream(tokens, has_css=len(css) > 0)
@@ -60,6 +61,8 @@ def _parse_template(
             has_default_slot=ctx.has_default_slot,
         )
     else:
+
+
         return template_ast.Template(
             name=name,
             file=filepath,
