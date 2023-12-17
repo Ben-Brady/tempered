@@ -2,10 +2,15 @@ import ast
 from .. import ast_utils
 
 
+ESCAPE_FUNC = "__escape"
+CACHE_DECORATOR = "__template_cache"
 UTILS_IMPORT = ast.ImportFrom(
     module="tempered._internals",
-    names=[ast.alias(name="escape", asname="__escape")],
     level=0,
+    names=[
+        ast.alias(name="escape", asname=ESCAPE_FUNC),
+        ast.alias(name="template_cache", asname=CACHE_DECORATOR),
+    ],
 )
 
 TYPING_MODULE = "__typing"
@@ -18,11 +23,7 @@ ANNOTATIONS_IMPORT = ast.ImportFrom(
     level=0,
 )
 
-IMPORTS = [
-    ANNOTATIONS_IMPORT,
-    TYPING_IMPORT,
-    UTILS_IMPORT,
-]
+IMPORTS = [ANNOTATIONS_IMPORT, TYPING_IMPORT, UTILS_IMPORT]
 
 
 WITH_STYLES_PARAMETER = "with_styles"

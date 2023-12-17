@@ -11,6 +11,7 @@ from .utils import (
     KWARGS_VARIABLE,
     COMPONENT_CSS_VARIABLE,
     TYPING_MODULE,
+    CACHE_DECORATOR,
 )
 from .rename import convert_unknown_variables_to_kwargs
 from .builder import CodeBuilder
@@ -79,6 +80,7 @@ def create_template_function(
         args=construct_arguments(arguements),
         body=construct_body(ctx),
         returns=ast_utils.Name("str"),
+        decorators=[ast_utils.Name(CACHE_DECORATOR)],
     )
 
     parameter_names = [param.name for param in ctx.template.parameters]
@@ -158,7 +160,4 @@ def create_style_contant(ctx: CodeBuilder) -> list[ast.stmt]:
     else:
         return []
 
-    return [ast_utils.Assign(
-        target=COMPONENT_CSS_VARIABLE,
-        value=value
-    )]
+    return [ast_utils.Assign(target=COMPONENT_CSS_VARIABLE, value=value)]
