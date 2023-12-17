@@ -25,6 +25,7 @@ from .utils import (
 from .accumulators import StringVariable, ExprBuffer
 from copy import copy
 import ast
+import sys
 from typing_extensions import Sequence, assert_never, Generator
 from dataclasses import dataclass, field
 
@@ -194,7 +195,9 @@ class CodeBuilder:
         for tag_ in tag.loop_block:
             ctx_for.construct_tag(tag_)
 
-        if len(ctx_for.body) == 0:
+        has_expr = not ctx_for.buffer.empty()
+        is_single_expr = has_expr and len(ctx_for.body) == 0
+        if is_single_expr and sys.version_info >= (3, 12):  # python3.12 comprehensions are faster
             loop_expr = ctx_for.buffer.flush()
             if loop_expr:
                 generator = ast_utils.GeneratorExp(
@@ -203,7 +206,7 @@ class CodeBuilder:
                     iterable=tag.iterable,
                 )
                 self.add_expr(ast_utils.ArrayJoin(generator))
-        elif len(ctx_for.body) >= 1:
+        elif len(ctx_for.body) >= 1 or has_expr:
             for_body = self.create_block(tag.loop_block)
             self.body.append(
                 ast.For(
