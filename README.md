@@ -67,6 +67,8 @@ Output:
 
 ## Compiled
 
+[![Benchmark(1)](https://github.com/Ben-Brady/tempered/assets/64110708/456540e2-cdeb-4ebb-a6f5-c2f82b33f499)](https://github.com/Ben-Brady/tempered/tree/main/benchmarks)
+
 Tempered is runtime compiled and loaded, this provides increased performance as well as intelisense and type checking.
 
 ```python
