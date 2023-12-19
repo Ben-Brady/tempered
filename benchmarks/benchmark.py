@@ -1,23 +1,40 @@
 from real_world import user
+from typing import Callable
 import timeit
+from django
+
+def assert_imports():
+    try:
+        import django as _
+    except:
+        print("Django not installed, run `pip install django`")
+        exit()
+    try:
+        import jinja2 as _
+    except:
+        print("Jinja2 not installed, run `pip install jinja2`")
+        exit()
+    try:
+        import tempered as _
+    except:
+        print("Tempered not installed, run `pip install tempered`")
+        exit()
 
 
-def folder_benchmark(
+def benchmark(
     *,
     name: str,
     count: int,
     context: dict,
     entry_point: str,
-    jinja_folder: str,
-    django_folder: str,
-    tempered_folder: str,
+    folder: str,
 ):
     # Setup jinja2
     from jinja2 import Environment, FileSystemLoader
 
-    env = Environment(loader=FileSystemLoader(jinja_folder))
+    env = Environment(loader=FileSystemLoader(f"{folder}/jinja"))
     jinja_template = env.get_template(f"{entry_point}.html")
-    jinja2 = lambda: jinja_template.render(**context)
+    render_jinja2 = lambda: jinja_template.render(**context)
 
     # Setup django
     from django.template.backends.django import DjangoTemplates
@@ -28,38 +45,52 @@ def folder_benchmark(
     django.setup()
     DJANGO_SETTINGS = {
         "NAME": "bench",
-        "DIRS": [django_folder],
+        "DIRS": [f"{folder}/django"],
         "APP_DIRS": False,
         "OPTIONS": {},
     }
     django_templates = DjangoTemplates(DJANGO_SETTINGS)
     django_template = django_templates.get_template(f"{entry_point}.html")
     assert django_template
-    django = lambda: django_template.render(context)
+    render_django = lambda: django_template.render(context)
 
     # Setup Tempered
     from tempered import Tempered
 
-    tempered_module = Tempered(tempered_folder).build_static()
+    tempered_module = Tempered(f"{folder}/tempered").build_static()
     tempered_template = getattr(tempered_module, entry_point)
-    tempered = lambda: tempered_template(**context)
+    render_tempered = lambda: tempered_template(**context)
 
-    format = lambda time_taken: int(1 / (time_taken / count))
-    print(name.title())
-    django_ps = format(timeit.timeit(django, number=count))
-    print(f"    Django: {django_ps:,}/s")
-    jinja2_ps = format(timeit.timeit(jinja2, number=count))
-    print(f"    Jinja2: {jinja2_ps:,}/s")
-    tempered_ps = format(timeit.timeit(tempered, number=count))
-    print(f"    Tempered: {tempered_ps:,}/s")
+    def bench(name, func):
+        time = timeit.timeit(func, number=count)
+        per_second = int(1 / (time / count))
+        print(f" {name:>10}: {time:>5.2f}s {per_second:,}/s")
+
+    print(f"{name.title()} ({count:,}x)")
+    bench("Tempered", render_tempered)
+    bench("Jinja2", render_jinja2)
+    bench("Django", render_django)
 
 
-folder_benchmark(
-    name="Real World Example",
+assert_imports()
+benchmark(
+    name="Full Page Application",
     context={"user": user},
     count=10_000,
     entry_point="page",
-    django_folder="./real_world/django",
-    jinja_folder="./real_world/jinja",
-    tempered_folder="./real_world/tempered",
+    folder="./real_world",
+)
+benchmark(
+    name="Partials",
+    context={"profile": user},
+    count=250_000,
+    entry_point="page",
+    folder="./partials",
+)
+benchmark(
+    name="Static Pages",
+    context={"profile": user},
+    count=250_000,
+    entry_point="page",
+    folder="./static",
 )
