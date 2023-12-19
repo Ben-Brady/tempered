@@ -3,13 +3,11 @@ from .. import ast_utils
 
 
 ESCAPE_FUNC = "__escape"
-CACHE_DECORATOR = "__template_cache"
 UTILS_IMPORT = ast.ImportFrom(
     module="tempered._internals",
     level=0,
     names=[
         ast.alias(name="escape", asname=ESCAPE_FUNC),
-        ast.alias(name="template_cache", asname=CACHE_DECORATOR),
     ],
 )
 
