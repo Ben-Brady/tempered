@@ -42,7 +42,6 @@ Additionally when building into this module, tempered will override the import c
 # EMPTY
 ```
 
-
 ```python
 import components
 from tempered import Tempered
@@ -64,7 +63,6 @@ print(components.Comment(
 ))
 ```
 
-
 ```python
 # components.py AFTER
 from __future__ import annotations as __annotations
@@ -82,6 +80,7 @@ def Comment(*, author: str, text: str, with_styles: bool = True, **kwargs: __typ
 ### Styles
 
 #### Scoping
+
 Style tags are automatically converted into CSS, By default css is scoped per component, this means you don't have to worry CSS name collisions. This is done by applying a component specific class to each
 
 Watch you, you cannot place dynamic attributes in the CSS, this is becuase CSS is shared per component
@@ -126,20 +125,22 @@ If you want to use sass, you can declare it on a style tag with `lang="scss"` or
             color: red
 </style>
 ```
-`a b {color: red;}`
 
+`a b {color: red;}`
 
 ## Template Tags
 
 ### Parameters
 
 Use `{%param %}` for parameters
+
 ```html
 {% param d %}            <!-- Parameter -->
 {% param c: list %}      <!-- Typed Parameter-->
 {% param b = 2 %}        <!-- Default Value Parameter-->
 {% param a: str = "A" %} <!-- Typed Default Value Parameter-->
 ```
+
 ### Style Placement
 
 Use `{%styles}` for styles, this is where styles are placed
@@ -165,7 +166,6 @@ If omitted, styles are placed at the end of the component
 Manually add a component styles to the HTML, should be placed at the top of the component
 
 This is useful for when you need to include the CSS for components that aren't inside the template, such as with HTMX
-
 
 ### Expressions
 
@@ -321,10 +321,10 @@ Use `{%for %}`
 </style>
 ```
 
-
 ## Grammar
 
 The template grammar specified in [Backus-Naur Form](https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form)
+
 ```bnf
 <template> ::= (<tag> | <html>)*
 
