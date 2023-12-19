@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import datetime
+import typing_extensions as t
 
 
 @dataclass
@@ -17,8 +18,8 @@ class Profile(User):
     created_at: datetime.datetime
     username: str
     settings: str
-    videos: list[Video]
-    comments: list[Comment]
+    videos: t.List[Video]
+    comments: t.List[Comment]
 
 
 @dataclass
@@ -49,7 +50,7 @@ class Video:
     thumbnail: Image
     file: VideoFile
     uploader: User
-    comments: list[Comment]
+    comments: t.List[Comment]
 
 
 @dataclass
@@ -57,7 +58,7 @@ class Comment:
     id: int
     author: User
     created_at: datetime.datetime
-    editted_at: datetime.datetime | None
+    editted_at: t.Union[datetime.datetime, None]
     text: str
 
 

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing_extensions import Self
+import typing_extensions as t
 
 
 class BuildError(Exception):
@@ -16,8 +16,8 @@ class InvalidTemplate(BuildError):
         cls,
         msg: str,
         name: str,
-        file: Path | None,
-    ) -> Self:
+        file: t.Union[Path, None],
+    ) -> t.Self:
         if file:
             return cls(f"{msg} in {name} \n{file.absolute()}")
         else:
@@ -28,13 +28,13 @@ class InvalidTemplate(BuildError):
 
 class ParserException(BuildError):
     @classmethod
-    def create(cls, msg: str, file: Path | None, source: str, position: int) -> Self:
+    def create(cls, msg: str, file: t.Union[Path, None], source: str, position: int) -> t.Self:
         msg = create_parse_error_message(msg, file, source, position)
         return cls(msg)
 
 
 def create_parse_error_message(
-    msg: str, file: Path | None, source: str, position: int
+    msg: str, file: t.Union[Path, None], source: str, position: int
 ) -> str:
     MAX_LINE_LENGTH = 80
     line_index = source[:position].count("\n")

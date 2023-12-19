@@ -1,5 +1,6 @@
 import ast
 from .. import ast_utils
+import typing_extensions as t
 
 
 ESCAPE_FUNC = "__escape"
@@ -40,14 +41,14 @@ def component_func_name(template_name: str) -> str:
     return template_name
 
 
-def slot_variable_name(slot_name: str | None) -> str:
+def slot_variable_name(slot_name: t.Union[str, None]) -> str:
     if slot_name is None:
         return OUTPUT_VARIABLE
     else:
         return f"__slot_{slot_name}_content"
 
 
-def slot_parameter(slot_name: str | None) -> str:
+def slot_parameter(slot_name: t.Union[str, None]) -> str:
     if slot_name:
         return f"__slot_{slot_name}"
     else:
@@ -63,9 +64,9 @@ def create_layout_call(
     default_slot: ast.expr,
     css: ast.expr,
     has_default_slot: bool,
-    blocks: set[str],
+    blocks: t.Set[str],
 ) -> ast.expr:
-    kw_args: dict[str, ast.expr] = {}
+    kw_args: t.Dict[str, ast.expr] = {}
     kw_args[LAYOUT_CSS_PARAMETER] = css
     kw_args[WITH_STYLES_PARAMETER] = ast_utils.Name(WITH_STYLES_PARAMETER)
 

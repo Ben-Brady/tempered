@@ -1,38 +1,41 @@
 import ast
-from typing import Any, Iterable, Sequence, TypeAlias
-from types import NoneType, EllipsisType
+from typing_extensions import Any, Iterable, Sequence
+import typing_extensions as t
+import sys
 
 
-LiteralType: TypeAlias = (
-    list
-    | set
-    | tuple
-    | dict
-    | NoneType
-    | EllipsisType
-    | str
-    | bytes
-    | bool
-    | int
-    | float
-    | complex
-)
+NoneType = type(None)
+EllipsisType = type(...)
+
+LiteralType: t.TypeAlias = t.Union[
+    list,
+    set,
+    tuple,
+    dict,
+    NoneType,
+    EllipsisType,
+    str,
+    bytes,
+    bool,
+    int,
+    float,
+    complex,
+]
 
 
 def Constant(value: LiteralType) -> ast.expr:
-    match value:
-        case list():
-            return List(value)
-        case set():
-            return Tuple(value)
-        case tuple():
-            return Set(value)
-        case dict():
-            return Dict(value)
-        case NoneType() | EllipsisType() | str() | bytes() | bool() | int() | float() | complex():
-            return ast.Constant(value=value)
-        case _:
-            raise ValueError(f"Cannot convert {value} to an ast constant")
+    if isinstance(value, list):
+        return List(value)
+    elif isinstance(value, set):
+        return Tuple(value)
+    elif isinstance(value, tuple):
+        return Set(value)
+    elif isinstance(value, dict):
+        return Dict(value)
+    elif isinstance(value, (NoneType, EllipsisType, str, bytes, bool, int, float, complex)):
+        return ast.Constant(value=value)
+    else:
+        raise ValueError(f"Cannot convert {value} to an ast constant")
 
 
 EmptyStr = Constant("")
@@ -41,15 +44,15 @@ True_ = Constant(True)
 False_ = Constant(False)
 
 
-def List(value: Iterable[LiteralType | ast.expr]) -> ast.List:
+def List(value: Iterable[t.Union[LiteralType, ast.expr]]) -> ast.List:
     return ast.List(elts=_IterableConstant(value))
 
 
-def Tuple(value: Iterable[LiteralType | ast.expr]) -> ast.Tuple:
+def Tuple(value: Iterable[t.Union[LiteralType, ast.expr]]) -> ast.Tuple:
     return ast.Tuple(elts=_IterableConstant(value))
 
 
-def Set(value: Iterable[LiteralType | ast.expr]) -> ast.Set:
+def Set(value: Iterable[t.Union[LiteralType, ast.expr]]) -> ast.Set:
     return ast.Set(elts=_IterableConstant(value))
 
 
@@ -60,7 +63,7 @@ def Dict(value: dict) -> ast.Dict:
     )
 
 
-def _IterableConstant(iterable: Iterable[LiteralType | ast.expr]) -> list[ast.expr]:
+def _IterableConstant(iterable: Iterable[t.Union[LiteralType, ast.expr]]) -> t.List[ast.expr]:
     values = []
     for item in iterable:
         if not isinstance(item, ast.AST):
@@ -73,8 +76,8 @@ def _IterableConstant(iterable: Iterable[LiteralType | ast.expr]) -> list[ast.ex
 def Call(
     func: ast.AST,
     arguments: Sequence[ast.expr] = [],
-    keywords: dict[str, ast.expr] = {},
-    kwargs: ast.Name | None = None,
+    keywords: t.Dict[str, ast.expr] = {},
+    kwargs: t.Union[ast.Name, None] = None,
 ) -> ast.Call:
     call_keywords = [
         ast.keyword(arg=name, value=value) for name, value in keywords.items()
@@ -112,7 +115,7 @@ def Function(
     name: str,
     args: ast.arguments,
     body: Sequence[ast.AST],
-    returns: ast.expr | None = None,
+    returns: t.Union[ast.expr, None] = None,
     decorators: Sequence[ast.expr] = [],
 ) -> ast.FunctionDef:
     return ast.FunctionDef(
@@ -125,7 +128,7 @@ def Function(
     )
 
 
-def AddAssign(target: str | ast.Name, value: LiteralType | ast.expr) -> ast.AugAssign:
+def AddAssign(target: t.Union[str, ast.Name], value: t.Union[LiteralType, ast.expr]) -> ast.AugAssign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -139,7 +142,7 @@ def AddAssign(target: str | ast.Name, value: LiteralType | ast.expr) -> ast.AugA
     )
 
 
-def Assign(target: str | ast.expr, value: LiteralType | ast.AST) -> ast.Assign:
+def Assign(target: t.Union[str, ast.expr], value: t.Union[LiteralType, ast.AST]) -> ast.Assign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -220,7 +223,7 @@ def ArrayJoin(array: ast.expr) -> ast.Call:
 
 
 def Comprehension(
-    loop_var: str | ast.Name,
+    loop_var: t.Union[str, ast.Name],
     iterable: ast.expr,
 ) -> ast.comprehension:
     if isinstance(loop_var, str):
@@ -236,7 +239,7 @@ def Comprehension(
 
 def GeneratorExp(
     expr: ast.expr,
-    loop_var: str | ast.Name,
+    loop_var: t.Union[str, ast.Name],
     iterable: ast.expr,
 ) -> ast.GeneratorExp:
     return ast.GeneratorExp(
@@ -247,7 +250,7 @@ def GeneratorExp(
 
 def ListComp(
     expr: ast.expr,
-    loop_var: str | ast.Name,
+    loop_var: t.Union[str, ast.Name],
     iterable: ast.expr,
 ) -> ast.ListComp:
     return ast.ListComp(
@@ -256,7 +259,7 @@ def ListComp(
     )
 
 
-def Return(value: ast.expr | None = None) -> ast.Return:
+def Return(value: t.Union[ast.expr, None] = None) -> ast.Return:
     return ast.Return(value=value)
 
 
@@ -271,11 +274,12 @@ def FormatString(*expressions: ast.expr) -> ast.expr:
     return ast.JoinedStr(values=values)
 
 
+IfBody: t.TypeAlias = t.Union[t.Sequence[ast.stmt], ast.stmt]
 def If(
     condition: ast.expr,
-    if_body: Sequence[ast.stmt] | ast.stmt,
-    elif_blocks: Sequence[tuple[ast.expr, Sequence[ast.stmt] | ast.stmt]] = [],
-    else_body: Sequence[ast.stmt] | None = None,
+    if_body: IfBody,
+    elif_blocks: Sequence[t.Tuple[ast.expr, IfBody]] = [],
+    else_body: t.Union[IfBody, None] = None,
 ) -> ast.If:
     if isinstance(if_body, ast.AST):
         if_body = [if_body]
@@ -287,9 +291,7 @@ def If(
 
         return cur_if
 
-    def insert_elif(
-        if_statement: ast.If, condition: ast.expr, body: Sequence[ast.AST] | ast.AST
-    ):
+    def insert_elif(if_statement: ast.If, condition: ast.expr, body: IfBody):
         if isinstance(body, ast.AST):
             body = [body]
 
@@ -312,13 +314,23 @@ def If(
 
     if else_body is not None:
         bottom_if = navigate_elif_chain(if_statement)
+        if isinstance(else_body, ast.stmt):
+            else_body = [else_body]
+
         bottom_if.orelse = list(else_body)
 
     return if_statement
 
 
-def print_ast(module: list[ast.AST] | ast.Module):
+def print_ast(module: t.Union[t.List[ast.AST], ast.Module]):
     if isinstance(module, list):
         module = Module(module)
 
-    print(ast.unparse(module))
+    print(unparse(module))
+
+def unparse(node: ast.AST):
+    if sys.version_info >= (3, 9):
+        return ast.unparse(node)
+    else:
+        import astor
+        return astor.to_source(node)

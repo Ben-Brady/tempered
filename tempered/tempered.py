@@ -1,29 +1,29 @@
 from . import parser, build
 from pathlib import Path
 from types import ModuleType
-from typing_extensions import LiteralString, cast
+import typing_extensions as t
 
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 
 
 class Tempered:
-    _templates: list[parser.Template]
-    template_files: list[Path]
+    _templates: t.List[parser.Template]
+    template_files: t.List[Path]
 
 
-    def __init__(self, template_folder: str|Path|None = None):
+    def __init__(self, template_folder: t.Union[str, Path, None] = None):
         self._templates = []
         self.template_files = []
         if template_folder:
             self.add_template_folder(template_folder)
 
 
-    def add_template_folder(self, folder: Path|str):
+    def add_template_folder(self, folder: t.Union[Path, str]):
         folder = Path(folder)
         for file in folder.glob("**/*.*"):
             name = file.stem
-            template = cast(LiteralString, file.read_text())
+            template = file.read_text()
             template_obj = parser.parse_template(
                 name,
                 template,
@@ -33,10 +33,10 @@ class Tempered:
             self._templates.append(template_obj)
 
 
-    def add_template(self, file: Path|str):
+    def add_template(self, file: t.Union[Path, str]):
         file = Path(file)
         name = file.stem
-        template = cast(LiteralString, file.read_text())
+        template = file.read_text()
         template_obj = parser.parse_template(
             name,
             template,
@@ -46,7 +46,7 @@ class Tempered:
         self.template_files.append(file)
 
 
-    def add_template_from_string(self, name: str, template: LiteralString):
+    def add_template_from_string(self, name: str, template: str):
         template_obj = parser.parse_template(name, template)
         self._templates.append(template_obj)
 

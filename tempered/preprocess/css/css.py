@@ -2,14 +2,14 @@ from . import sass, scoped
 from ... import errors
 import bs4
 from rcssmin import cssmin
-from typing_extensions import cast, NamedTuple
+import typing_extensions as t
 import warnings
 from bs4 import MarkupResemblesLocatorWarning
 
 warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 
-class ExtractedCss(NamedTuple):
+class ExtractedCss(t.NamedTuple):
     html: str
     css: str
 
@@ -18,7 +18,7 @@ def extract_css(body: str, prefix: str = "tempered") -> ExtractedCss:
     soup = bs4.BeautifulSoup(body, "html.parser")
     styles = ""
 
-    style_tags = cast(list[bs4.Tag], soup.find_all("style"))
+    style_tags = t.cast(t.List[bs4.Tag], soup.find_all("style"))
     for tag in style_tags:
         scope_id = scoped.generate_scope_id(prefix)
         scoped.apply_scope_to_soup(soup, scope_id)
@@ -43,7 +43,12 @@ def extract_css(body: str, prefix: str = "tempered") -> ExtractedCss:
     )
 
 
-def transform_css(css: str, scope: str, is_global: bool, lang: str | None) -> str:
+def transform_css(
+        css: str,
+        scope: str,
+        is_global: bool,
+        lang: t.Union[str, None]
+        ) -> str:
     if lang == "scss" or lang == "sass":
         css = sass.transform_sass(css, lang)
 
@@ -55,10 +60,9 @@ def transform_css(css: str, scope: str, is_global: bool, lang: str | None) -> st
 
 def minify_css(css: str) -> str:
     minified_css = cssmin(css)
-    match minified_css:
-        case str():
-            return minified_css
-        case bytes() | bytearray():
-            return minified_css.decode()
-        case _:
-            raise TypeError("Expected str or bytes")
+    if isinstance(minified_css, str):
+        return minified_css
+    elif isinstance(minified_css, (bytes, bytearray)):
+        return minified_css.decode()
+    else:
+        raise TypeError("Expected str or bytes")

@@ -3,12 +3,13 @@ from .. import errors, preprocess
 from . import lexer, template_ast
 from .parser import parse_token_stream
 from pathlib import Path
+import typing_extensions as t
 
 
 def parse_template(
     name: str,
     html: str,
-    filepath: Path | None = None,
+    filepath: t.Union[Path, None] = None,
 ) -> template_ast.Template:
     try:
         return _parse_template(
@@ -29,7 +30,7 @@ def parse_template(
 def _parse_template(
     name: str,
     html: str,
-    filepath: Path | None,
+    filepath: t.Union[Path, None],
 ) -> template_ast.Template:
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
@@ -61,8 +62,6 @@ def _parse_template(
             has_default_slot=ctx.has_default_slot,
         )
     else:
-
-
         return template_ast.Template(
             name=name,
             file=filepath,

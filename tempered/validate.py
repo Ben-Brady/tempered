@@ -1,9 +1,9 @@
 from .errors import InvalidTemplate
 from .parser.template_ast import Template, LayoutTemplate
-from typing_extensions import Sequence, cast
+import typing_extensions as t
 
 
-def validate_templates(templates: Sequence[Template]):
+def validate_templates(templates: t.Sequence[Template]):
     template_lookup = {
         template.name: template
         for template in templates
@@ -16,7 +16,7 @@ def validate_templates(templates: Sequence[Template]):
         _check_for_invalid_component_calls(template, template_lookup)
 
 
-def _check_for_missing_layout(template: Template, lookup: dict[str, Template]):
+def _check_for_missing_layout(template: Template, lookup: t.Dict[str, Template]):
     if template.layout is None:
         return
 
@@ -35,11 +35,11 @@ def _check_for_missing_layout(template: Template, lookup: dict[str, Template]):
         )
 
 
-def _check_for_missing_blocks(template: Template, lookup: dict[str, Template]):
+def _check_for_missing_blocks(template: Template, lookup: t.Dict[str, Template]):
     if template.layout is None:
         return
 
-    layout = cast(LayoutTemplate, lookup[template.layout])
+    layout = t.cast(LayoutTemplate, lookup[template.layout])
     for slot in layout.slots:
         slot_used = slot.name in template.blocks
         slot_required = slot.default is None
@@ -51,11 +51,11 @@ def _check_for_missing_blocks(template: Template, lookup: dict[str, Template]):
             )
 
 
-def _check_for_non_existant_blocks(template: Template, lookup: dict[str, Template]):
+def _check_for_non_existant_blocks(template: Template, lookup: t.Dict[str, Template]):
     if template.layout is None:
         return
 
-    layout = cast(LayoutTemplate, lookup[template.layout])
+    layout = t.cast(LayoutTemplate, lookup[template.layout])
     slot_names = [slot.name for slot in layout.slots]
     for block in template.blocks:
         if block not in slot_names:
@@ -66,7 +66,7 @@ def _check_for_non_existant_blocks(template: Template, lookup: dict[str, Templat
             )
 
 
-def _check_for_invalid_component_calls(template: Template, lookup: dict[str, Template]):
+def _check_for_invalid_component_calls(template: Template, lookup: t.Dict[str, Template]):
     for call in template.components_calls:
         if call.component_name not in lookup:
             raise InvalidTemplate.create(

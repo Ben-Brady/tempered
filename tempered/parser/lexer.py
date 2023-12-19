@@ -1,6 +1,6 @@
 from . import python_utils, tokens
 from .text_scanner import TextScanner
-from typing_extensions import Sequence
+import typing_extensions as t
 import string
 from pathlib import Path
 
@@ -17,9 +17,9 @@ IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
 WHITESPACE = string.whitespace
 
 
-def to_token_stream(html: str, filepath: Path|None = None) -> Sequence[tokens.Token]:
+def to_token_stream(html: str, filepath: t.Union[Path, None] = None) -> t.Sequence[tokens.Token]:
     scanner = TextScanner(html, filepath)
-    _tokens: list[tokens.Token] = []
+    _tokens: t.List[tokens.Token] = []
     while scanner.has_text:
         token = take_token(scanner)
         _tokens.append(token)
@@ -44,47 +44,46 @@ def take_statement_token(scanner: TextScanner) -> tokens.Token:
     statement = python_utils.take_ident(scanner)
     take_whitespace(scanner)
 
-    match statement:
-        case "if":
-            return take_if_token(scanner)
-        case "elif":
-            return take_elif_token(scanner)
-        case "else":
-            scanner.expect(STATEMENT_END)
-            return tokens.ElseToken()
-        case "endif":
-            scanner.expect(STATEMENT_END)
-            return tokens.IfEndToken()
-        case "for":
-            return take_forstart_token(scanner)
-        case "endfor":
-            scanner.expect(STATEMENT_END)
-            return tokens.ForEndToken()
-        case "set":
-            return take_set_token(scanner)
-        case "html":
-            return take_html_token(scanner)
-        case "param":
-            return take_param_token(scanner)
-        case "styles":
-            scanner.expect(STATEMENT_END)
-            return tokens.StylesToken()
-        case "include":
-            return take_include_token(scanner)
-        case "layout":
-            return take_layout_token(scanner)
-        case "slot":
-            return take_slot_token(scanner)
-        case "endslot":
-            scanner.expect(STATEMENT_END)
-            return tokens.SlotEndToken()
-        case "block":
-            return take_block_token(scanner)
-        case "endblock":
-            scanner.expect(STATEMENT_END)
-            return tokens.BlockEndToken()
-        case _:
-            raise scanner.error(f'Unknown Statement "{statement}"')
+    if statement == "if":
+        return take_if_token(scanner)
+    elif statement == "elif":
+        return take_elif_token(scanner)
+    elif statement == "else":
+        scanner.expect(STATEMENT_END)
+        return tokens.ElseToken()
+    elif statement == "endif":
+        scanner.expect(STATEMENT_END)
+        return tokens.IfEndToken()
+    elif statement == "for":
+        return take_forstart_token(scanner)
+    elif statement == "endfor":
+        scanner.expect(STATEMENT_END)
+        return tokens.ForEndToken()
+    elif statement == "set":
+        return take_set_token(scanner)
+    elif statement == "html":
+        return take_html_token(scanner)
+    elif statement == "param":
+        return take_param_token(scanner)
+    elif statement == "styles":
+        scanner.expect(STATEMENT_END)
+        return tokens.StylesToken()
+    elif statement == "include":
+        return take_include_token(scanner)
+    elif statement == "layout":
+        return take_layout_token(scanner)
+    elif statement == "slot":
+        return take_slot_token(scanner)
+    elif statement == "endslot":
+        scanner.expect(STATEMENT_END)
+        return tokens.SlotEndToken()
+    elif statement == "block":
+        return take_block_token(scanner)
+    elif statement == "endblock":
+        scanner.expect(STATEMENT_END)
+        return tokens.BlockEndToken()
+    else:
+        raise scanner.error(f'Unknown Statement "{statement}"')
 
 
 

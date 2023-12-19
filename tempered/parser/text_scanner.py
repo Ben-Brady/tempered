@@ -1,5 +1,5 @@
 from ..errors import ParserException
-from typing_extensions import TYPE_CHECKING
+import typing_extensions as t
 from array import array
 import sys
 from pathlib import Path
@@ -8,13 +8,13 @@ from pathlib import Path
 class TextScanner:
     original: str
     position: int = 0
-    file: Path | None
+    file: t.Union[Path, None]
 
-    if TYPE_CHECKING:
+    if t.TYPE_CHECKING:
         text: array[str]
-        _checkpoint: tuple[array[str], int] | None = None
+        _checkpoint: t.Union[t.Tuple[array[str], int], None] = None
 
-    def __init__(self, html: str, file: Path | None = None):
+    def __init__(self, html: str, file: t.Union[Path, None] = None):
         self.file = file
         self.original = html
         if sys.version_info >= (3, 13):
@@ -76,7 +76,7 @@ class TextScanner:
         self.position += length
         return popped_text
 
-    def take_optional(self, *text: str) -> str | None:
+    def take_optional(self, *text: str) -> t.Union[str, None]:
         for match in text:
             if not self.startswith(match):
                 continue
@@ -93,7 +93,7 @@ class TextScanner:
 
         return value
 
-    def take_until(self, matches: str | list[str]) -> str:
+    def take_until(self, matches: t.Union[str, t.List[str]]) -> str:
         if isinstance(matches, str):
             matches = [matches]
 

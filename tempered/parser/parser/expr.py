@@ -6,39 +6,29 @@ import keyword
 
 def parse_parameter(parameter: str) -> TemplateParameter:
     expr = parse_stmt(parameter)
-    match expr:
-        case ast.AnnAssign(
-            target=ast.Name(id=name),
-            annotation=annotation,
-            value=default
+
+    if isinstance(expr, ast.AnnAssign) and isinstance(expr.target, ast.Name):
+        # name: type | name: type = default
+        return TemplateParameter(
+            name=expr.target.id,
+            type=expr.annotation,
+            default=expr.value,
+        )
+    elif (
+        isinstance(expr, ast.Assign)
+        and isinstance(expr.targets, list)
+        and isinstance(expr.targets[0], ast.Name)
         ):
-            return TemplateParameter(
-                name=name,
-                type=annotation,
-                default=default
-            )
-        case ast.AnnAssign(
-            target=ast.Name(id=name),
-            annotation=annotation,
-        ):
-            return TemplateParameter(
-                name=name,
-                type=annotation,
-            )
-        case ast.Assign(
-            targets=[ast.Name(id=name)],
-            value=default
-        ):
-            return TemplateParameter(
-                name=name,
-                default=default
-            )
-        case ast.Expr(
-            value=ast.Name(id=name)
-        ):
-            return TemplateParameter(name=name)
-        case _:
-            raise ValueError(f"Invalid Parameter: {parameter}")
+        # name = default
+        return TemplateParameter(
+            name=expr.targets[0].id,
+            default=expr.value,
+        )
+    elif isinstance(expr, ast.Expr) and isinstance(expr.value, ast.Name):
+        # name
+        return TemplateParameter(name=expr.value.id)
+    else:
+        raise ValueError(f"Invalid Parameter: {parameter}")
 
 
 def parse_expr(expression: str) -> ast.expr:

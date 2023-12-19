@@ -1,6 +1,6 @@
 import tempered
 from typing_extensions import Callable, LiteralString
-import pytest
+import typing_extensions as t
 
 
 def build_template(template: LiteralString) -> Callable:
@@ -11,7 +11,7 @@ def build_template(template: LiteralString) -> Callable:
 
 
 def build_templates(
-    template: LiteralString, *other_templates: tuple[str, LiteralString]
+    template: LiteralString, *other_templates: t.Tuple[str, LiteralString]
 ) -> Callable:
     components = tempered.Tempered()
     components.add_template_from_string("foo", template)

@@ -1,13 +1,13 @@
 from ..tokens import Token
-from typing_extensions import Sequence, TypeVar
+import typing_extensions as t
 
 
 
 class TokenScanner:
-    stream: Sequence[Token]
-    _checkpoint: Sequence[Token]|None = None
+    stream: t.Sequence[Token]
+    _checkpoint: t.Union[t.Sequence[Token], None] = None
 
-    def __init__(self, stream: Sequence[Token]):
+    def __init__(self, stream: t.Sequence[Token]):
         self.stream = stream
 
 
@@ -33,7 +33,7 @@ class TokenScanner:
         self.stream = self.stream[1:]
         return popped
 
-    def is_next(self, *token: type[Token]):
+    def is_next(self, *token: t.Type[Token]):
         if len(self.stream) == 0:
             return False
         elif isinstance(self.stream[0], token):
@@ -41,7 +41,7 @@ class TokenScanner:
         else:
             return False
 
-    def accept(self, token: type[Token]) -> bool:
+    def accept(self, token: t.Type[Token]) -> bool:
         if self.is_next(token):
             self.pop()
             return True
@@ -49,15 +49,15 @@ class TokenScanner:
             return False
 
 
-    T = TypeVar("T", bound=Token)
-    def expect(self, token: type[T]) -> T:
+    T = t.TypeVar("T", bound=Token)
+    def expect(self, token: t.Type[T]) -> T:
         if not self.is_next(token):
             raise ValueError(f"Expected {token} but got {self.stream[0]!r}")
         else:
             return self.pop() # type: ignore
 
-    T = TypeVar("T", bound=Token)
-    def take_while(self, token: type[T]) -> Sequence[T]:
+    T = t.TypeVar("T", bound=Token)
+    def take_while(self, token: t.Type[T]) -> t.Sequence[T]:
         tokens = []
         while self.is_next(token):
             tokens.append(self.pop())

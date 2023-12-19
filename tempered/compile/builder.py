@@ -1,32 +1,19 @@
 from .. import ast_utils
 from ..parser import template_ast
 from ..parser.template_ast import (
-    Template,
-    LayoutTemplate,
-    TemplateTag,
-    LiteralTag,
-    ExprTag,
-    HtmlTag,
-    ComponentTag,
-    StyleTag,
-    SlotTag,
-    IfTag,
-    ForTag,
-    AssignmentTag,
+    Template, LayoutTemplate, TemplateTag,
+    LiteralTag, ExprTag, HtmlTag,
+    ComponentTag, StyleTag, SlotTag,
+    IfTag, ForTag, BlockTag, AssignmentTag,
 )
 from .utils import (
-    create_escape_call,
-    slot_variable_name,
-    slot_parameter,
-    WITH_STYLES_PARAMETER,
-    COMPONENT_CSS_VARIABLE,
-    KWARGS_VARIABLE,
+    create_escape_call, slot_variable_name, slot_parameter,
+    WITH_STYLES_PARAMETER, COMPONENT_CSS_VARIABLE, KWARGS_VARIABLE,
 )
 from .accumulators import StringVariable, ExprBuffer
-from copy import copy
 import ast
 import sys
-from typing_extensions import Sequence, assert_never, Generator
+import typing_extensions as t
 from dataclasses import dataclass, field
 
 
@@ -34,9 +21,9 @@ from dataclasses import dataclass, field
 class CodeBuilder:
     variable: StringVariable
     template: Template
-    layout: LayoutTemplate | None
-    css: str | None
-    body: list[ast.stmt] = field(default_factory=list)
+    layout: t.Union[LayoutTemplate, None]
+    css: t.Union[str, None]
+    body: t.List[ast.stmt] = field(default_factory=list)
     buffer: ExprBuffer = field(default_factory=ExprBuffer)
 
     def add_expr(self, value: ast.expr):
@@ -55,34 +42,32 @@ class CodeBuilder:
         self.body.extend(self.variable.ensure_assigned())
 
     def construct_tag(self, tag: TemplateTag):
-        match tag:
-            case LiteralTag():
-                self.add_expr(ast_utils.Constant(tag.body))
-            case ExprTag():
-                self.add_expr(create_escape_call(tag.value))
-            case HtmlTag():
-                self.add_expr(tag.value)
-            case ComponentTag():
-                self.construct_component_tag(tag)
-            case template_ast.BlockTag():
-                self.construct_block_tag(tag)
-            case IfTag():
-                self.construct_if(tag)
-            case ForTag():
-                self.construct_for(tag)
-            case AssignmentTag():
-                self.construct_assignment(tag)
-            case StyleTag() if self.layout is None:
-                self.construct_style(tag)
-            case SlotTag():
-                self.construct_slot_tag(tag)
-            case StyleTag():  #  if self.layout
-                # Type narrow doesn't work properly
-                pass
-            case e:
-                assert_never(e)
+        if isinstance(tag, LiteralTag):
+            self.add_expr(ast_utils.Constant(tag.body))
+        elif isinstance(tag, ExprTag):
+            self.add_expr(create_escape_call(value=tag.value))
+        elif isinstance(tag, HtmlTag):
+            self.add_expr(tag.value)
+        elif isinstance(tag, ComponentTag):
+            self.construct_component_tag(tag)
+        elif isinstance(tag, BlockTag):
+            self.construct_block_tag(tag)
+        elif isinstance(tag, IfTag):
+            self.construct_if(tag)
+        elif isinstance(tag, ForTag):
+            self.construct_for(tag)
+        elif isinstance(tag, AssignmentTag):
+            self.construct_assignment(tag)
+        elif isinstance(tag, StyleTag) and self.layout is None:
+            self.construct_style(tag)
+        elif isinstance(tag, StyleTag):
+            pass
+        elif isinstance(tag, SlotTag):
+            self.construct_slot_tag(tag)
+        else:
+            t.assert_never(tag)
 
-    def create_block(self, tags: Sequence[TemplateTag]) -> Sequence[ast.stmt]:
+    def create_block(self, tags: t.Sequence[TemplateTag]) -> t.Sequence[ast.stmt]:
         if not self.buffer.empty():
             raise RuntimeError(
                 "Internal Error, must flush buffer before creating block"
@@ -104,9 +89,9 @@ class CodeBuilder:
 
     def create_variable(
         self,
-        name: str | ast.Name,
-        tags: Sequence[TemplateTag],
-    ) -> list[ast.stmt]:
+        name: t.Union[str, ast.Name],
+        tags: t.Sequence[TemplateTag],
+    ) -> t.List[ast.stmt]:
         ctx_assign = self.create_subcontext(name)
         for tag in tags:
             ctx_assign.construct_tag(tag)
@@ -169,7 +154,7 @@ class CodeBuilder:
 
         if_body = self.create_block(block.if_block)
 
-        elif_blocks: list[tuple[ast.expr, Sequence[ast.stmt]]] = []
+        elif_blocks: t.List[t.Tuple[ast.expr, t.Sequence[ast.stmt]]] = []
         for condition, elif_block in block.elif_blocks:
             elif_body = self.create_block(elif_block)
             elif_blocks.append((condition, elif_body))
@@ -242,7 +227,7 @@ class CodeBuilder:
         self.body.append(if_stmt)
         self.buffer.add(slot_param)
 
-    def create_subcontext(self, name: str | ast.Name | None = None):
+    def create_subcontext(self, name: t.Union[str, ast.Name, None] = None):
         if name is None:
             variable = self.variable
         else:

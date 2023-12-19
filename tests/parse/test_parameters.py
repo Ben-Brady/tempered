@@ -1,14 +1,20 @@
-from tempered.parser import parse_template, TemplateParameter, template_ast
+from tempered import ast_utils
+from tempered.parser import parse_template, template_ast
 import ast
-from typing import Any
+import typing_extensions as t
 import pytest
 
-class Unset(): pass
+
+class Unset:
+    pass
+
+
 def _assert_single_parameter(
-    template_str, *,
+    template_str,
+    *,
     name: str,
-    type: str|None = None,
-    default: Any | Unset = Unset()
+    type: t.Union[str, None] = None,
+    default: t.Union[t.Any, Unset] = Unset(),
 ):
     template = parse_template("_", template_str)
     parameters = template.parameters
@@ -18,7 +24,7 @@ def _assert_single_parameter(
     assert param.name == name
     if type:
         assert param.type
-        assert ast.unparse(param.type) == type
+        assert ast_utils.unparse(param.type) == type
 
     if isinstance(default, Unset):
         assert param.default == None
@@ -28,21 +34,14 @@ def _assert_single_parameter(
 
 
 def test_parse_removes_parameters():
-    template = parse_template("abc",
-        "{%param a%}"
-        "{%param b%}"
-        "a"
-    )
+    template = parse_template("abc", "{%param a%}" "{%param b%}" "a")
     block = template.body[0]
     assert isinstance(block, template_ast.LiteralTag)
     assert "a" in block.body
 
 
 def test_parse_parameter_single():
-    _assert_single_parameter(
-        "{%param a %}",
-        name="a"
-    )
+    _assert_single_parameter("{%param a %}", name="a")
 
 
 def test_parse_parameters_with_builtin_annotation():
@@ -54,11 +53,7 @@ def test_parse_parameters_with_builtin_annotation():
 
 
 def test_parse_parameters_with_custom_annotation():
-    _assert_single_parameter(
-        "{%param a: Post %}",
-        name="a",
-        type="Post"
-    )
+    _assert_single_parameter("{%param a: Post %}", name="a", type="Post")
 
 
 def test_parse_parameters_with_default():
@@ -77,6 +72,7 @@ def test_parse_parameters_with_none_default():
         default=None,
     )
 
+
 def test_parse_parameters_with_annotation_and_default():
     _assert_single_parameter(
         "{%param a: int = 1%}",
@@ -88,9 +84,9 @@ def test_parse_parameters_with_annotation_and_default():
 
 def test_parse_parameters_with_complex_annotation():
     _assert_single_parameter(
-        "{%param a: list[str]%}",
+        "{%param a: t.List[str]%}",
         name="a",
-        type="list[str]",
+        type="t.List[str]",
     )
 
 

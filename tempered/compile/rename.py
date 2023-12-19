@@ -2,10 +2,10 @@ from .utils import KWARGS_VARIABLE, WITH_STYLES_PARAMETER
 import ast
 import builtins
 from functools import lru_cache
-from typing import cast
+import typing_extensions as t
 
 
-def convert_unknown_variables_to_kwargs(body: list[ast.stmt], known_names: list[str]):
+def convert_unknown_variables_to_kwargs(body: t.List[ast.stmt], known_names: t.List[str]):
     transformer = NameTransformer(known_names)
     for node in body:
         transformer.visit(node)
@@ -17,7 +17,7 @@ class NameTransformer(ast.NodeTransformer):
         WITH_STYLES_PARAMETER,
     )
 
-    def __init__(self, known_names: list[str]):
+    def __init__(self, known_names: t.List[str]):
         self.known_names = known_names
 
     def visit_Assign(self, node: ast.Assign):
@@ -52,7 +52,7 @@ class NameTransformer(ast.NodeTransformer):
         return self._comprehension(node)
 
     def _comprehension(
-        self, node: ast.ListComp | ast.SetComp | ast.DictComp | ast.GeneratorExp
+        self, node: t.Union[ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp]
     ):
         loop_vars = []
         for generator in node.generators:
@@ -67,7 +67,7 @@ class NameTransformer(ast.NodeTransformer):
             node.elt = self.visit(node.elt)
 
         node.generators = [
-            cast(ast.comprehension, self.generic_visit(generator))
+            t.cast(ast.comprehension, self.generic_visit(generator))
             for generator in node.generators
         ]
 
@@ -92,7 +92,7 @@ class NameTransformer(ast.NodeTransformer):
         )
 
 
-def extract_loop_variables(target: ast.expr) -> list[str]:
+def extract_loop_variables(target: ast.expr) -> t.List[str]:
     if isinstance(target, ast.Name):
         # `for a in x:`
         return [target.id]

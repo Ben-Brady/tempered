@@ -16,12 +16,12 @@ from .rename import convert_unknown_variables_to_kwargs
 from .builder import CodeBuilder
 from .accumulators import StringVariable
 import ast
-from typing import Sequence
+import typing_extensions as t
 
 
 def create_template_function(
     template: Template,
-    layout: LayoutTemplate | None,
+    layout: t.Union[LayoutTemplate, None],
     css: str,
 ) -> ast.FunctionDef:
     arguements = [*template.parameters]
@@ -88,7 +88,7 @@ def create_template_function(
     return func
 
 
-def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
+def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
     args = []
     defaults = []
     for arguement in arguments:
@@ -116,8 +116,8 @@ def construct_arguments(arguments: list[TemplateParameter]) -> ast.arguments:
     )
 
 
-def construct_body(ctx: CodeBuilder) -> Sequence[ast.AST]:
-    statements: list[ast.AST] = []
+def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
+    statements: t.List[ast.AST] = []
     statements.extend(create_style_contant(ctx))
 
     for tag in ctx.template.body:
@@ -144,7 +144,7 @@ def construct_body(ctx: CodeBuilder) -> Sequence[ast.AST]:
     return statements
 
 
-def create_style_contant(ctx: CodeBuilder) -> list[ast.stmt]:
+def create_style_contant(ctx: CodeBuilder) -> t.List[ast.stmt]:
     if ctx.template.is_layout:
         if ctx.css is None:
             value = ast_utils.Name(LAYOUT_CSS_PARAMETER)

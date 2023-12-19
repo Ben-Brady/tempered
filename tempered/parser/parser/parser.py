@@ -2,7 +2,7 @@ from .. import template_ast, tokens
 from ..lexer import *
 from .token_scanner import TokenScanner
 from .expr import parse_expr, parse_stmt, parse_ident, parse_parameter
-from typing_extensions import assert_never
+import typing_extensions as t
 import ast
 from dataclasses import dataclass, field
 
@@ -10,20 +10,20 @@ from dataclasses import dataclass, field
 @dataclass
 class ParseContext:
     is_layout: bool = False
-    parameters: list[template_ast.TemplateParameter] = field(default_factory=list)
-    layout: str|None = None
+    parameters: t.List[template_ast.TemplateParameter] = field(default_factory=list)
+    layout: t.Union[str, None] = None
 
     has_default_slot: bool = False
-    slots: list[template_ast.SlotTag] = field(default_factory=list)
+    slots: t.List[template_ast.SlotTag] = field(default_factory=list)
 
-    components_calls: list[template_ast.ComponentTag] = field(default_factory=list)
-    style_includes: set[str] = field(default_factory=set)
+    components_calls: t.List[template_ast.ComponentTag] = field(default_factory=list)
+    style_includes: t.Set[str] = field(default_factory=set)
     body: template_ast.TemplateBlock = field(default_factory=list)
     styles_set: bool = False
-    blocks: set[str] = field(default_factory=set)
+    blocks: t.Set[str] = field(default_factory=set)
 
 
-def parse_token_stream(tokens: Sequence[tokens.Token], has_css: bool) -> ParseContext:
+def parse_token_stream(tokens: t.Sequence[tokens.Token], has_css: bool) -> ParseContext:
     scanner = TokenScanner(tokens)
     ctx = ParseContext()
     ctx.body = take_tags_until(ctx, scanner)
@@ -39,8 +39,8 @@ def parse_token_stream(tokens: Sequence[tokens.Token], has_css: bool) -> ParseCo
 def take_tags_until(
     ctx: ParseContext,
     scanner: TokenScanner,
-    stop_tags: list[type[tokens.Token]] = [],
-) -> list[template_ast.TemplateTag]:
+    stop_tags: t.List[t.Type[tokens.Token]] = [],
+) -> t.List[template_ast.TemplateTag]:
     tags = []
     while scanner.has_tokens:
         if scanner.is_next(*stop_tags):
@@ -53,52 +53,51 @@ def take_tags_until(
     return tags
 
 
-def next_tag(ctx: ParseContext, scanner: TokenScanner) -> template_ast.TemplateTag | None:
-    token = scanner.pop()
-    match token:
-        case tokens.LiteralToken() as tag:
-            return tag.into_tag()
-        case tokens.StylesIncludeToken() as tag:
-            ctx.style_includes.add(tag.template)
-            return None
-        case tokens.EscapedExprToken(expr_str):
-            return template_ast.ExprTag(parse_expr(expr_str))
-        case tokens.HtmlExprToken(expr_str):
-            return template_ast.HtmlTag(parse_expr(expr_str))
-        case tokens.ComponentToken() as token:
-            return next_component(ctx, token)
-        case tokens.StylesToken():
-            return parse_styles(ctx)
-        case tokens.LayoutToken(layout):
-            parse_layout(ctx, layout)
-            return None
-        case tokens.ParameterToken() as token:
-            parse_param(ctx, token)
-            return None
-        case tokens.SetToken() as token:
-            return next_set(token)
+def next_tag(ctx: ParseContext, scanner: TokenScanner) -> t.Union[template_ast.TemplateTag, None]:
+    tag = scanner.pop()
+    if isinstance(tag, tokens.LiteralToken):
+        return tag.into_tag()
+    elif isinstance(tag, tokens.StylesIncludeToken):
+        ctx.style_includes.add(tag.template)
+        return None
+    elif isinstance(tag, tokens.EscapedExprToken):
+        return template_ast.ExprTag(parse_expr(tag.expr))
+    elif isinstance(tag, tokens.HtmlExprToken):
+        return template_ast.HtmlTag(parse_expr(tag.expr))
+    elif isinstance(tag, tokens.ComponentToken):
+        return next_component(ctx, tag)
+    elif isinstance(tag, tokens.StylesToken):
+        return parse_styles(ctx)
+    elif isinstance(tag, tokens.LayoutToken):
+        parse_layout(ctx, tag.layout)
+        return None
+    elif isinstance(tag, tokens.ParameterToken):
+        parse_param(ctx, tag)
+        return None
+    elif isinstance(tag, tokens.SetToken):
+        return next_set(tag)
 
-        case tokens.SlotToken() as token:
-            return next_slot(ctx, scanner, token)
-        case tokens.SlotEndToken():
-            raise ValueError("Slot not opened")
+    elif isinstance(tag, tokens.SlotToken):
+        return next_slot(ctx, scanner, tag)
+    elif isinstance(tag, tokens.SlotEndToken):
+        raise ValueError("Slot not opened")
 
-        case tokens.BlockToken(name) as token:
-            return next_block(ctx, scanner, token)
-        case tokens.BlockEndToken():
-            raise ValueError("Block not opened")
+    elif isinstance(tag, tokens.BlockToken):
+        return next_block(ctx, scanner, tag)
+    elif isinstance(tag, tokens.BlockEndToken):
+        raise ValueError("Block not opened")
 
-        case tokens.IfStartToken() as token:
-            return next_if(ctx, scanner, token)
-        case tokens.ElIfToken() | tokens.ElseToken() | tokens.IfEndToken():
-            raise ValueError("If statement not openned")
+    elif isinstance(tag, tokens.IfStartToken):
+        return next_if(ctx, scanner, tag)
+    elif isinstance(tag, (tokens.ElIfToken, tokens.ElseToken, tokens.IfEndToken)):
+        raise ValueError("If statement not openned")
 
-        case tokens.ForStartToken() as token:
-            return next_for(ctx, scanner, token)
-        case tokens.ForEndToken():
-            raise ValueError("For loop not opened")
-        case e:
-            assert_never(e)
+    elif isinstance(tag, tokens.ForStartToken):
+        return next_for(ctx, scanner, tag)
+    elif isinstance(tag, tokens.ForEndToken):
+        raise ValueError("For loop not opened")
+    else:
+        t.assert_never(tag)
 
 
 def next_slot(
@@ -162,23 +161,21 @@ def parse_param(ctx: ParseContext, token: tokens.ParameterToken) -> None:
 
 def next_component(ctx: ParseContext, token: tokens.ComponentToken) -> template_ast.ComponentTag:
     call = parse_expr(token.call)
-    match call:
-        case ast.Call(
-            func=ast.Name(id=component_name),
-            keywords=keywords,
-        ):
-            call = template_ast.ComponentTag(
-                component_name=component_name,
-                keywords={
-                    keyword.arg: keyword.value
-                    for keyword in keywords
-                    if keyword.arg is not None
-                },
-            )
-            ctx.components_calls.append(call)
-            return call
-        case _:
-            raise ValueError("Invalid Component Call")
+    if (
+        not isinstance(call, ast.Call) or
+        not isinstance(call.func, ast.Name)):
+        raise ValueError("Invalid Component Call")
+
+    call = template_ast.ComponentTag(
+        component_name=call.func.id,
+        keywords={
+            keyword.arg: keyword.value
+            for keyword in call.keywords
+            if keyword.arg is not None
+        },
+    )
+    ctx.components_calls.append(call)
+    return call
 
 
 def next_set(token: tokens.SetToken) -> template_ast.AssignmentTag:
@@ -210,7 +207,7 @@ def next_if(
 ) -> template_ast.IfTag:
     condition = parse_expr(token.condition)
 
-    if_block: list[template_ast.TemplateTag] = take_tags_until(
+    if_block: t.List[template_ast.TemplateTag] = take_tags_until(
         ctx=ctx,
         scanner=scanner,
         stop_tags=[
@@ -220,11 +217,11 @@ def next_if(
         ]
     )
 
-    elif_blocks: list[tuple[ast.expr, template_ast.TemplateBlock]] = []
+    elif_blocks: t.List[t.Tuple[ast.expr, template_ast.TemplateBlock]] = []
     while scanner.is_next(tokens.ElIfToken):
         elif_token = scanner.expect(tokens.ElIfToken)
         elif_condition = parse_expr(elif_token.condition)
-        block: list[template_ast.TemplateTag] = take_tags_until(
+        block: t.List[template_ast.TemplateTag] = take_tags_until(
             ctx=ctx,
             scanner=scanner,
             stop_tags=[
@@ -235,7 +232,7 @@ def next_if(
         )
         elif_blocks.append((elif_condition, block))
 
-    else_block: list[template_ast.TemplateTag] | None = None
+    else_block: t.Union[t.List[template_ast.TemplateTag], None] = None
     if scanner.accept(tokens.ElseToken):
         else_block = take_tags_until(
             ctx=ctx,

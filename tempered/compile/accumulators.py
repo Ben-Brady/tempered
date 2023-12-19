@@ -1,10 +1,10 @@
 from .. import ast_utils
 import ast
-from typing_extensions import Self
+import typing_extensions as t
 
 
 class ExprBuffer:
-    _stack: list[ast.expr]
+    _stack: t.List[ast.expr]
 
     def __init__(self):
         self._stack = []
@@ -15,7 +15,7 @@ class ExprBuffer:
     def empty(self) -> bool:
         return len(self._stack) == 0
 
-    def flush(self) -> ast.expr | None:
+    def flush(self) -> t.Union[ast.expr, None]:
         if len(self._stack) == 0:
             return None
 
@@ -34,7 +34,7 @@ class StringVariable:
     variable: ast.Name
     assigned: bool = False
 
-    def __init__(self, name: str | ast.Name):
+    def __init__(self, name: t.Union[str, ast.Name]):
         if isinstance(name, str):
             name = ast_utils.Name(name)
         self.variable = name
@@ -46,7 +46,7 @@ class StringVariable:
             self.assigned = True
             return ast_utils.Assign(target=self.variable, value=value)
 
-    def ensure_assigned(self) -> list[ast.stmt]:
+    def ensure_assigned(self) -> t.List[ast.stmt]:
         if self.assigned:
             return []
 

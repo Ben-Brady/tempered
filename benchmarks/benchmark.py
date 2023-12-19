@@ -1,7 +1,5 @@
 from real_world import user
-from typing import Callable
 import timeit
-from django
 
 def assert_imports():
     try:
@@ -9,11 +7,13 @@ def assert_imports():
     except:
         print("Django not installed, run `pip install django`")
         exit()
+
     try:
         import jinja2 as _
     except:
         print("Jinja2 not installed, run `pip install jinja2`")
         exit()
+
     try:
         import tempered as _
     except:
@@ -89,7 +89,7 @@ benchmark(
 )
 benchmark(
     name="Static Pages",
-    context={"profile": user},
+    context={},
     count=250_000,
     entry_point="page",
     folder="./static",

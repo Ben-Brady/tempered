@@ -1,10 +1,10 @@
 from . import template_ast
-from typing import TypeAlias, Protocol, runtime_checkable
+import typing_extensions as t
 from dataclasses import dataclass
 
 
-@runtime_checkable
-class EasyParseToken(Protocol):
+@t.runtime_checkable
+class EasyParseToken(t.Protocol):
     def into_tag(self) -> template_ast.TemplateTag:
         ...
 
@@ -35,7 +35,7 @@ class LayoutToken:
 
 @dataclass
 class SlotToken:
-    name: str|None
+    name: t.Union[str, None]
     is_required: bool
 
 
@@ -107,11 +107,9 @@ class SetToken:
     assignment: str
 
 
-Token: TypeAlias = (
-    LiteralToken |
-    ParameterToken | StylesToken | StylesIncludeToken | SetToken |
-    ComponentToken | HtmlExprToken | EscapedExprToken |
-    IfStartToken | ElIfToken | ElseToken | IfEndToken |
-    ForStartToken | ForEndToken |
-    LayoutToken | SlotToken | SlotEndToken |BlockToken | BlockEndToken
-)
+Token: t.TypeAlias = t.Union[
+    LiteralToken, ParameterToken, StylesToken,  StylesIncludeToken,
+    SetToken, ComponentToken, HtmlExprToken,  EscapedExprToken,
+    ForStartToken, ForEndToken, IfStartToken, ElIfToken, ElseToken,
+    IfEndToken, LayoutToken, SlotToken,  SlotEndToken, BlockToken, BlockEndToken
+]

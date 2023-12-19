@@ -1,15 +1,14 @@
 from ... import errors
-from typing_extensions import Literal
+import typing_extensions as t
 import warnings
 import textwrap
-
 try:
     import sass
 except ImportError:
     sass = None
 
 
-def transform_sass(css: str, lang: Literal["sass", "scss"]) -> str:
+def transform_sass(css: str, lang: t.Literal["sass", "scss"]) -> str:
     if sass is None:
         warnings.warn(
             message="sass support not installed, run `pip install tempered[sass]`",
