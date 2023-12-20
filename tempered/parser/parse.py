@@ -1,4 +1,4 @@
-from ..preprocess import htmlify
+from ..preprocess import htmlify, minify_css, minify_html
 from .. import errors, preprocess
 from . import lexer, template_ast
 from .parser import parse_token_stream
@@ -38,8 +38,9 @@ def _parse_template(
     html, token_lookup = htmlify.convert_tokens_to_valid_html(tokens)
 
     # Process HTML
-    html, css = preprocess.extract_css(html, prefix=name)
-    html = htmlify.minify_html(html)
+    html, css = preprocess.create_scoped_css(html, prefix=name)
+    css = minify_css(css)
+    html = minify_html(html)
 
     # Reconvert the HTML back into tokens
     tokens = htmlify.tokenised_html_to_tokens(html, token_lookup)

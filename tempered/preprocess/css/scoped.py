@@ -46,16 +46,19 @@ def add_scope_to_rule(rule: QualifiedRule, scope: str):
 
 
 counter = 0
-
-
-def generate_scope_id(prefix: str) -> str:
+def generate_scope_id(prefix: str|None = None) -> str:
     global counter
     counter += 1
     id = str(counter).encode()
+    hash = hex(crc32(id))[2:]
 
-    prefix = prefix.replace("-", "_").lower()
-    hash = hex(crc32(id))[2:6]
-    return f"{prefix}-{hash}"
+    if prefix is None:
+        return hash
+    else:
+        prefix = prefix \
+            .replace("-", "_") \
+            .lower()
+        return f"{prefix}-{hash[:6]}"
 
 
 def apply_scope_to_soup(soup: bs4.BeautifulSoup, scope_id: str):

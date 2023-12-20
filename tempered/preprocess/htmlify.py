@@ -2,18 +2,6 @@ from ..parser import tokens
 from ..parser.text_scanner import TextScanner
 import typing_extensions as t
 import random
-from minify_html import minify
-
-
-def minify_html(html: str) -> str:
-    return minify(
-        html,
-        minify_js=True,
-        do_not_minify_doctype=True,
-        ensure_spec_compliant_unquoted_attribute_values=True,
-        keep_spaces_between_attributes=True,
-    )
-
 
 TOKEN_LENGTH = 16
 TOKEN_REGEX = rf"\ TEMPERED_[A-Z0-9]{{{TOKEN_LENGTH}}}"
