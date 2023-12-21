@@ -26,10 +26,10 @@ jobs:
     - name: Run Benchmark
       run: |
         cd benchmarks
-        python benchmark.py > output.txt
+        python benchmark.py > output-${{ matrix.python-version }}.txt
     - uses: actions/upload-artifact@v4
       id: artifact-upload-step
       with:
         name: benchmark
-        path: benchmarks/output.txt
+        path: benchmarks/output-${{ matrix.python-version }}.txt
 
