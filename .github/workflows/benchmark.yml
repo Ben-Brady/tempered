@@ -23,7 +23,12 @@ jobs:
       run: |
         python -m pip install .[sass]
         python -m pip install django jinja2
+    - uses: actions/upload-artifact@v4
     - name: Run Benchmark
       run: |
         cd benchmarks
-        python benchmark.py
+        python benchmark.py > output.txt
+      with:
+        name: Output
+        path: output.txt
+
