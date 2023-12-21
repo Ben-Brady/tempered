@@ -2,6 +2,7 @@ import tinycss2
 from tinycss2.ast import QualifiedRule, IdentToken, LiteralToken, HashToken
 from zlib import crc32
 import bs4
+import typing_extensions as t
 
 # QualifiedRule = #a .b {}
 
@@ -46,7 +47,7 @@ def add_scope_to_rule(rule: QualifiedRule, scope: str):
 
 
 counter = 0
-def generate_scope_id(prefix: str|None = None) -> str:
+def generate_scope_id(prefix: t.Union[str, None] = None) -> str:
     global counter
     counter += 1
     id = str(counter).encode()
