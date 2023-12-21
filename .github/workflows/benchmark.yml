@@ -15,7 +15,6 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/upload-artifact@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -28,6 +27,7 @@ jobs:
       run: |
         cd benchmarks
         python benchmark.py > output.txt
+    - uses: actions/upload-artifact@v4
       with:
         name: Output
         path: output.txt
