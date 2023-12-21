@@ -33,13 +33,13 @@ def take_string(scanner: TextScanner) -> str:
     terminator = scanner.take(*STRING_TERMINATORS)
     is_multiline = terminator in MULTILINE_TERMINATORS
 
-    str_text = _take_string(
+    body = _take_string(
         scanner,
         terminator=terminator,
         is_multiline=is_multiline,
         is_bytestring=is_bytestring,
     )
-    return prefix + terminator + str_text + terminator
+    return prefix + terminator + body + terminator
 
 
 def _take_string(
@@ -71,53 +71,3 @@ def _take_string(
 
 
     raise scanner.error("String was not closed")
-
-
-def take_number(scanner: TextScanner) -> str:
-    DEC_DIGITS = "_" + "0123456789"
-    BIN_DIGITS = "_" + "01"
-    OCT_DIGITS = "_" + "01234567"
-    HEX_DIGITS = "_" + "0123456789" + "abcdef" + "ABCDEF"
-
-    if not scanner.startswith("0"):
-        return scanner.take_while(DEC_DIGITS)
-
-    scanner.expect("0")
-    if scanner.accept("b") or scanner.accept("B"):
-        return "0b" + scanner.take_while(*BIN_DIGITS)
-    elif scanner.accept("o") or scanner.accept("O"):
-        return "0o" + scanner.take_while(*OCT_DIGITS)
-    elif scanner.accept("x") or scanner.accept("X"):
-        return "0x" + scanner.take_while(*HEX_DIGITS)
-    else:
-        return scanner.take_while(*"0_")
-
-def take_value(scanner: TextScanner) -> str:
-    stack = []
-    text = ""
-
-    while len(stack) != 0:
-        if scanner.accept("None"):
-            text += "None"
-        elif scanner.accept("True"):
-            text += "True"
-        elif scanner.accept("False"):
-            text += "False"
-        elif scanner.startswith("'", '"'):
-            return take_string(scanner)
-        elif scanner.startswith(*string.digits):
-            return take_number(scanner)
-        elif scanner.startswith(*IDENT_START):
-            return take_ident(scanner)
-        elif scanner.startswith("{", "[", "("):
-            char = scanner.pop()
-            stack.append(char)
-            text += char
-        elif scanner.startswith("}", "]", ")"):
-            stack.pop()
-            text += scanner.pop()
-
-        if not scanner.has_text:
-            break
-
-    return text
