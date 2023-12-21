@@ -11,7 +11,6 @@ class Unset:
 
 def _assert_single_parameter(
     template_str,
-    *,
     name: str,
     type: t.Union[str, None] = None,
     default: t.Union[t.Any, Unset] = Unset(),
