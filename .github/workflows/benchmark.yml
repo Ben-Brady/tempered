@@ -28,7 +28,8 @@ jobs:
         cd benchmarks
         python benchmark.py > output.txt
     - uses: actions/upload-artifact@v4
+      id: artifact-upload-step
       with:
-        name: Output
-        path: output.txt
+        name: benchmark
+        path: benchmarks/output.txt
 
