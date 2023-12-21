@@ -4,6 +4,15 @@ import sys
 SAFE_CONVERSIONS = (int, float)
 
 if sys.version_info <= (3, 9):
+    from markupsafe import escape_silent
+
+    def escape(value: Any) -> str:
+        if type(value) in SAFE_CONVERSIONS:
+            return str(value)
+        else:
+            return str(escape_silent(value))
+
+else:
     def escape(value: Any) -> str:
         if type(value) in SAFE_CONVERSIONS:
             return str(value)
@@ -16,12 +25,3 @@ if sys.version_info <= (3, 9):
             .replace("'", "&#39;")
             .replace('"', "&#34;")
         )
-
-else:
-    from markupsafe import escape_silent
-
-    def escape(value: Any) -> str:
-        if type(value) in SAFE_CONVERSIONS:
-            return str(value)
-
-        return str(escape_silent(value))
