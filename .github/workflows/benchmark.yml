@@ -15,6 +15,7 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/upload-artifact@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -24,7 +25,6 @@ jobs:
         python -m pip install .[sass]
         python -m pip install django jinja2
     - name: Run Benchmark
-      uses: actions/upload-artifact@v4
       run: |
         cd benchmarks
         python benchmark.py > output.txt
