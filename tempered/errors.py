@@ -1,5 +1,8 @@
+from __future__ import annotations
 from pathlib import Path
 import typing_extensions as t
+from dataclasses import dataclass
+from functools import cached_property
 
 
 class BuildError(Exception):
@@ -8,7 +11,6 @@ class BuildError(Exception):
 
 class ParsingWarning(Warning):
     pass
-
 
 class InvalidTemplate(BuildError):
     @classmethod
@@ -24,57 +26,105 @@ class InvalidTemplate(BuildError):
             return cls(f"{msg} in {name}")
 
 
-
-
 class ParserException(BuildError):
+    error_info: ErrorInfo|None = None
+
     @classmethod
-    def create(cls, msg: str, file: t.Union[Path, None], source: str, position: int) -> t.Self:
-        msg = create_parse_error_message(msg, file, source, position)
-        return cls(msg)
+    def create(
+        cls,
+        msg: str,
+        source: str,
+        file: t.Union[Path, None],
+    ) -> t.Self:
+        line_no, offset = calculate_line_and_offset(source, position)
+        err_info = ErrorInfo(
+            msg=msg,
+            file=file,
+            source=source,
+            line_no=line_no,
+            offset=offset,
+        )
+        return cls(create_error_message(err_info))
+
+    @classmethod
+    def create_from_parser(
+        cls,
+        msg: str,
+        source: str,
+        position: int,
+        file: t.Union[Path, None],
+    ) -> t.Self:
+        line_no, offset = calculate_line_and_offset(source, position)
+        err_info = ErrorInfo(
+            msg=msg,
+            file=file,
+            source=source,
+            line_no=line_no,
+            offset=offset,
+        )
+        msg = "\n".join(
+            (
+                create_error_message(err_info),
+                err_info.prev_line or "",
+                err_info.err_line,
+                f"{' ' * err_info.offset}^",
+                err_info.next_line or "",
+            )
+        )
+
+        err = cls(msg)
+        err.error_info = err_info
+        return err
 
 
-def create_parse_error_message(
-    msg: str, file: t.Union[Path, None], source: str, position: int
-) -> str:
-    MAX_LINE_LENGTH = 80
-    line_index = source[:position].count("\n")
-
-    lines = source.split("\n")
-
-    err_line = lines[line_index]
-
-    try:
-        prev_line = lines[line_index - 1]
-        if len(prev_line) > MAX_LINE_LENGTH:
-            prev_line = prev_line[:MAX_LINE_LENGTH] + "..."
-    except IndexError:
-        prev_line = ""
-
-    try:
-        next_line = lines[line_index + 1]
-        if len(next_line) > MAX_LINE_LENGTH:
-            next_line = next_line[:MAX_LINE_LENGTH] + "..."
-    except IndexError:
-        next_line = ""
-
-    line_no = line_index + 1
-    line_start = source.rfind("\n", 0, position) + 1
-    offset = position - line_start
-
-    if offset > MAX_LINE_LENGTH:
-        cutoff = offset - MAX_LINE_LENGTH
-        err_line = "..." + err_line[cutoff:]
-        offset = MAX_LINE_LENGTH
-
-    if file:
-        msg = (
-            f"{msg} in {file.name} on line {line_no}, offset {offset} \n"
-            f"{file.absolute()}:{line_no}:{offset}"
+def create_error_message(file: ErrorInfo) -> str:
+    if info.file:
+        return (
+            f"{info.msg} in {file.name} on line {info.line_no}, offset {info.offset} \n"
+            f"{info.file.absolute()}:{info.line_no}:{info.offset}"
         )
     else:
-        msg = f"{msg} on line {line_no}, offset {offset}"
+        return f"{info.msg} on line {info.line_no}, offset {info.offset}"
 
-    return (
-        msg + "\n" + prev_line + "\n" + err_line + "\n" + f"{offset * ' '}^"
-        "\n" + next_line
-    )
+
+@dataclass
+class ErrorInfo:
+    file: t.Optional[Path]
+    msg: str
+    source: str
+    line_no: int
+    offset: int
+
+    @cached_property
+    def lines(self) -> list[str]:
+        return self.source.split("\n")
+
+    @cached_property
+    def err_line(self) -> str:
+        line_index = self.line_no - 1
+        return self.lines[line_index]
+
+    @cached_property
+    def prev_line(self) -> t.Union[str, None]:
+        line_index = self.line_no - 1
+        try:
+            return self.lines[line_index - 1]
+        except KeyError:
+            return None
+
+    @cached_property
+    def next_line(self) -> t.Union[str, None]:
+        line_index = self.line_no - 1
+        try:
+            return self.lines[line_index + 1]
+        except KeyError:
+            return None
+
+
+def calculate_line_and_offset(source: str, position: int) -> t.Tuple[int, int]:
+    line_index = source[:position].count("\n")
+    line_no = line_index + 1
+
+    line_start = source.rfind("\n", 0, position) + 1  # + 1 for removed newline
+    offset = position - line_start
+    return line_no, offset

@@ -9,20 +9,20 @@ import typing_extensions as t
 def parse_template(
     name: str,
     html: str,
-    filepath: t.Union[Path, None] = None,
+    file: t.Union[Path, None] = None,
 ) -> template_ast.Template:
     try:
         return _parse_template(
             name=name,
             html=html,
-            filepath=filepath,
+            file=file,
         )
     except errors.ParserException as e:
         raise e
     except Exception as e:
         msg = f"Failed to parse template {name}"
-        if filepath:
-            msg += f" in {filepath}"
+        if file:
+            msg += f" in {file}"
 
         raise errors.ParserException(msg) from e
 
@@ -30,11 +30,11 @@ def parse_template(
 def _parse_template(
     name: str,
     html: str,
-    filepath: t.Union[Path, None],
+    file: t.Union[Path, None],
 ) -> template_ast.Template:
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
-    tokens = lexer.to_token_stream(html, filepath=filepath)
+    tokens = lexer.to_token_stream(html, file=file)
     html, token_lookup = htmlify.convert_tokens_to_valid_html(tokens)
 
     # Process HTML
@@ -51,7 +51,7 @@ def _parse_template(
     if ctx.is_layout:
         return template_ast.LayoutTemplate(
             name=name,
-            file=filepath,
+            file=file,
             parameters=ctx.parameters,
             body=ctx.body,
             css=css,
@@ -65,7 +65,7 @@ def _parse_template(
     else:
         return template_ast.Template(
             name=name,
-            file=filepath,
+            file=file,
             parameters=ctx.parameters,
             body=ctx.body,
             css=css,

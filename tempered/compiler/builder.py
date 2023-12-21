@@ -26,6 +26,15 @@ class CodeBuilder:
     body: t.List[ast.stmt] = field(default_factory=list)
     buffer: ExprBuffer = field(default_factory=ExprBuffer)
 
+    @property
+    def uses_layout(self):
+        return self.layout is not None
+
+    @property
+    def is_layout(self):
+        return self.template.is_layout
+
+
     def add_expr(self, value: ast.expr):
         self.buffer.add(value)
 
@@ -58,10 +67,11 @@ class CodeBuilder:
             self.construct_for(tag)
         elif isinstance(tag, AssignmentTag):
             self.construct_assignment(tag)
-        elif isinstance(tag, StyleTag) and self.layout is None:
-            self.construct_style(tag)
-        elif isinstance(tag, StyleTag):
+        elif isinstance(tag, StyleTag) and self.uses_layout:
+            # Templates that use layouts won't have their styles placed their
             pass
+        elif isinstance(tag, StyleTag):
+            self.construct_style(tag)
         elif isinstance(tag, SlotTag):
             self.construct_slot_tag(tag)
         else:
@@ -73,13 +83,13 @@ class CodeBuilder:
                 "Internal Error, must flush buffer before creating block"
             )
 
-        ctx_block = self.create_subcontext(self.variable.variable.id + "_block")
+        ctx_block = self.create_subcontext(self.variable.name.id + "_block")
         for tag in tags:
             ctx_block.construct_tag(tag)
 
         if ctx_block.variable.assigned:
             ctx_block.flush_expressions()
-            expr = ctx_block.variable.variable
+            expr = ctx_block.variable.name
         else:
             expr = ctx_block.buffer.flush() or ast_utils.EmptyStr
 
@@ -122,32 +132,39 @@ class CodeBuilder:
         )
 
     def construct_style(self, tag: StyleTag):
-        if self.css is None and not self.template.is_layout:
+        if self.css is None and not self.is_layout:
             return
 
         self.flush_expressions()
         self.ensure_assigned()
 
-        condition = ast_utils.And(
-            ast_utils.Name(WITH_STYLES_PARAMETER),
-            ast_utils.Name(COMPONENT_CSS_VARIABLE),
-        )
-        if_body = [
-            ast_utils.AddAssign(
-                target=self.variable.variable,
+        if not self.is_layout:
+            self.body.append(ast_utils.If(
+                condition=ast_utils.Name(WITH_STYLES_PARAMETER),
+                if_body=ast_utils.AddAssign(
+                    target=self.variable.name,
+                    value=ast_utils.Constant(f"<style>{self.css}</style>"),
+                ),
+            ))
+        else:
+            condition = ast_utils.And(
+                ast_utils.Name(WITH_STYLES_PARAMETER),
+                ast_utils.Name(COMPONENT_CSS_VARIABLE),
+            )
+            if_body = ast_utils.AddAssign(
+                target=self.variable.name,
                 value=ast_utils.FormatString(
                     ast_utils.Constant("<style>"),
                     ast_utils.Name(COMPONENT_CSS_VARIABLE),
                     ast_utils.Constant("</style>"),
                 ),
             )
-        ]
-        self.body.append(
-            ast_utils.If(
-                condition=condition,
-                if_body=if_body,
-            ),
-        )
+            self.body.append(
+                ast_utils.If(
+                    condition=condition,
+                    if_body=[if_body],
+                ),
+            )
 
     def construct_if(self, block: IfTag):
         self.enter_block()
@@ -176,7 +193,7 @@ class CodeBuilder:
     def construct_for(self, tag: ForTag):
         self.enter_block()
 
-        ctx_for = self.create_subcontext(self.variable.variable.id + "_block")
+        ctx_for = self.create_subcontext(self.variable.name.id + "_block")
         for tag_ in tag.loop_block:
             ctx_for.construct_tag(tag_)
 

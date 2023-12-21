@@ -27,7 +27,7 @@ class Tempered:
         template_obj = parser.parse_template(
             name,
             template,
-            filepath=file,
+            file=file,
         )
         self._templates.append(template_obj)
         self.template_files.append(file)

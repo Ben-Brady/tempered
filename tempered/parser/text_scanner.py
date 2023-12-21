@@ -117,4 +117,4 @@ class TextScanner:
         return text
 
     def error(self, msg: str) -> Exception:
-        return ParserException.create(msg, self.file, self.original, self.position)
+        return ParserException.create_from_parser(msg, self.file, self.original, self.position)

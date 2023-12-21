@@ -118,14 +118,15 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
 
 def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
     statements: t.List[ast.AST] = []
-    statements.extend(create_style_contant(ctx))
+    if ctx.is_layout or ctx.uses_layout:
+        statements.extend(create_style_contant(ctx))
 
     for tag in ctx.template.body:
         ctx.construct_tag(tag)
 
     if ctx.variable.assigned:
         ctx.flush_expressions()
-        output_value = ctx.variable.variable
+        output_value = ctx.variable.name
     else:
         output_value = ctx.buffer.flush() or ast_utils.EmptyStr
 

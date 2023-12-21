@@ -17,8 +17,8 @@ IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
 WHITESPACE = string.whitespace
 
 
-def to_token_stream(html: str, filepath: t.Union[Path, None] = None) -> t.Sequence[tokens.Token]:
-    scanner = TextScanner(html, filepath)
+def to_token_stream(html: str, file: t.Union[Path, None] = None) -> t.Sequence[tokens.Token]:
+    scanner = TextScanner(html, file)
     _tokens: t.List[tokens.Token] = []
     while scanner.has_text:
         token = take_token(scanner)
