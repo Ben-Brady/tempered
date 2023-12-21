@@ -19,19 +19,6 @@ class Tempered:
             self.add_template_folder(template_folder)
 
 
-    def add_template_folder(self, folder: t.Union[Path, str]):
-        folder = Path(folder)
-        for file in folder.glob("**/*.*"):
-            name = file.stem
-            template = file.read_text()
-            template_obj = parser.parse_template(
-                name,
-                template,
-                filepath=file,
-            )
-            self.template_files.append(file)
-            self._templates.append(template_obj)
-
 
     def add_template(self, file: t.Union[Path, str]):
         file = Path(file)
@@ -44,6 +31,11 @@ class Tempered:
         )
         self._templates.append(template_obj)
         self.template_files.append(file)
+
+
+    def add_template_folder(self, folder: t.Union[Path, str]):
+        for file in Path(folder).glob("**/*.*"):
+            self.add_template(file)
 
 
     def add_template_from_string(self, name: str, template: str):
@@ -64,3 +56,4 @@ class Tempered:
 
     def build_static(self):
         return build.build_static(self._templates)
+

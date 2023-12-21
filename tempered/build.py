@@ -1,5 +1,5 @@
 from . import parser, ast_utils
-from .compile.module import compile_module
+from .compiler.module import compile_module
 import ast
 import sys
 import importlib
