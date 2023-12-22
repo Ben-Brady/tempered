@@ -135,11 +135,14 @@ If you want to use sass, you can declare it on a style tag with `lang="scss"` or
 Use `{%param %}` for parameters
 
 ```html
-{% param d %}            <!-- Parameter -->
-{% param c: list %}      <!-- Typed Parameter-->
-{% param b = 2 %}        <!-- Default Value Parameter-->
-{% param a: str = "A" %} <!-- Typed Default Value Parameter-->
+{% param a %}            <!-- Parameter -->
+{% param b: list %}      <!-- Typed Parameter-->
+{% param c = 2 %}        <!-- Default Value Parameter-->
+{% param d: str = "A" %} <!-- Typed Default Value Parameter-->
+{% param e: t.Union[str, None] = None %} <!-- Advanced Typing-->
 ```
+
+> Note: typing_extensions is imported as t and can be used in parameters
 
 ### Style Placement
 

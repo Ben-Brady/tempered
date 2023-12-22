@@ -12,8 +12,8 @@ UTILS_IMPORT = ast.ImportFrom(
     ],
 )
 
-TYPING_MODULE = "__typing"
-TYPING_IMPORT = ast.Import(names=[ast.alias(name="typing", asname=TYPING_MODULE)])
+TYPING_MODULE = "t"
+TYPING_IMPORT = ast.Import(names=[ast.alias(name="typing_extensions", asname=TYPING_MODULE)])
 
 
 ANNOTATIONS_IMPORT = ast.ImportFrom(
@@ -29,7 +29,7 @@ WITH_STYLES_PARAMETER = "with_styles"
 LAYOUT_CSS_PARAMETER = "__component_css"
 COMPONENT_CSS_VARIABLE = "__css"
 OUTPUT_VARIABLE = "__html"
-KWARGS_VARIABLE = "kwargs"
+KWARGS_VARIABLE = "context"
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
