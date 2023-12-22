@@ -30,6 +30,3 @@ build-backend = "flit_core.buildapi"
 
 [tool.flit.sdist]
 exclude = ["tests/", "benchmarks/", "examples/", ".github/"]
-
-[tool.flit.bdist_wheel]
-exclude = ["tests/", "benchmarks/", "examples/", ".github/"]
