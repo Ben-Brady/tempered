@@ -1,96 +1,67 @@
-from real_world import user
+from utils import setup_django, setup_jinja2, setup_tempered
+from data import user
 import timeit
-
-def assert_imports():
-    try:
-        import django as _
-    except:
-        print("Django not installed, run `pip install django`")
-        exit()
-
-    try:
-        import jinja2 as _
-    except:
-        print("Jinja2 not installed, run `pip install jinja2`")
-        exit()
-
-    try:
-        import tempered as _
-    except:
-        print("Tempered not installed, run `pip install tempered`")
-        exit()
+import os
+from pathlib import Path
+import matplotlib.pyplot as plt
 
 
-def benchmark(
-    *,
+def benchmark_render(
     name: str,
     count: int,
-    context: dict,
     entry_point: str,
     folder: str,
+    context: dict = {},
 ):
-    # Setup jinja2
-    from jinja2 import Environment, FileSystemLoader
+    render_tempered = setup_tempered(f"{folder}/tempered", entry_point, context)
+    render_jinja2 = setup_jinja2(f"{folder}/jinja", f"{entry_point}.html", context)
+    render_django = setup_django(f"{folder}/django", f"{entry_point}.html", context)
 
-    env = Environment(loader=FileSystemLoader(f"{folder}/jinja"))
-    jinja_template = env.get_template(f"{entry_point}.html")
-    render_jinja2 = lambda: jinja_template.render(**context)
-
-    # Setup django
-    from django.template.backends.django import DjangoTemplates
-    import django
-    import os
-
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "_")
-    django.setup()
-    DJANGO_SETTINGS = {
-        "NAME": "bench",
-        "DIRS": [f"{folder}/django"],
-        "APP_DIRS": False,
-        "OPTIONS": {},
-    }
-    django_templates = DjangoTemplates(DJANGO_SETTINGS)
-    django_template = django_templates.get_template(f"{entry_point}.html")
-    assert django_template
-    render_django = lambda: django_template.render(context)
-
-    # Setup Tempered
-    from tempered import Tempered
-
-    tempered_module = Tempered(f"{folder}/tempered").build_static()
-    tempered_template = getattr(tempered_module, entry_point)
-    render_tempered = lambda: tempered_template(**context)
+    runs: dict[str, float] = {}
 
     def bench(name, func):
         time = timeit.timeit(func, number=count)
         per_second = int(1 / (time / count))
         print(f" {name:>10}: {time:>5.2f}s {per_second:,}/s")
+        runs[name] = per_second
 
     print(f"{name.title()} ({count:,}x)")
     bench("Tempered", render_tempered)
     bench("Jinja2", render_jinja2)
     bench("Django", render_django)
 
+    OUTPUT_DIR = Path("./output")
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    plt.style.use("Solarize_Light2")
+    plt.figure(figsize=(5, 5))
+    plt.bar(
+        x=list(runs.keys()),
+        height=list(runs.values()),
+    )
+    plt.title(f"{name.title()} ({count:,}x)")
+    plt.ylabel("Renders Per Second")
+    filename = name.replace(" ", "-").lower() + ".png"
+    plt.savefig(OUTPUT_DIR / filename)
 
-assert_imports()
-benchmark(
+
+os.chdir(Path(__file__).parent)
+benchmark_render(
     name="Full Page Application",
     context={"user": user},
-    count=10_000,
+    count=50_000,
     entry_point="page",
     folder="./real_world",
 )
-benchmark(
+benchmark_render(
     name="Partials",
     context={"profile": user},
-    count=250_000,
+    count=1_000_000,
     entry_point="page",
     folder="./partials",
 )
-benchmark(
+benchmark_render(
     name="Static Pages",
-    context={},
-    count=250_000,
+    count=1_000_000,
     entry_point="page",
     folder="./static",
 )
