@@ -27,3 +27,9 @@ test = [
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.flit.sdist]
+exclude = ["tests/", "benchmarks/", "examples/", ".github/"]
+
+[tool.flit.bdist_wheel]
+exclude = ["tests/", "benchmarks/", "examples/", ".github/"]
