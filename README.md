@@ -2,14 +2,12 @@
 
 Convert html templates into native python components
 
-
 ```python
 pip install tempered
 ```
 
-| [PyPi](https://pypi.org/project/tempered) | [Github](https://github.com/Ben-Brady/tempered) | [Documentation](https://github.com/Ben-Brady/tempered/blob/main/Documentation.md) |
+| [Documentation](https://github.com/Ben-Brady/tempered/blob/main/Documentation.md) | [PyPi](https://pypi.org/project/tempered) | [Github](https://github.com/Ben-Brady/tempered)|
 | - | - | - |
-
 
 ## Features
 
@@ -21,14 +19,10 @@ pip install tempered
   - Each template is it's own components and can call other components
 - **Layouts**
   - Templates can inherit layouts, based on jinja2's implementation
-- **Codegen**
-  - The native python out has the choice between being built in memeory or to a static file
 - **Type Checked**
   - The compiled components can be checked by static analysers such as mypy
 - **Intelisense**
   - Components have intelisense support
-- **HTMX Support**
-  - Designed to used with HTMX
 
 ## Example
 
@@ -60,14 +54,18 @@ print(components.Image(
 ))
 ```
 
-Output:
 ```html
-<img alt="Example Post" src="/example.png" class=image-83dc><style>img.image-83dc{width:100px;height:100px}</style>
+<img alt="Example Post" src=/example.png class=image-83dc><style>img.image-83dc{width:100px;height:100px}</style>
 ```
 
 ## Compiled
 
-[![Benchmark(1)](https://github.com/Ben-Brady/tempered/assets/64110708/456540e2-cdeb-4ebb-a6f5-c2f82b33f499)](https://github.com/Ben-Brady/tempered/tree/main/benchmarks)
+<img
+  src="https://github.com/Ben-Brady/tempered/assets/64110708/456540e2-cdeb-4ebb-a6f5-c2f82b33f499"
+  alt="Benchmarks"
+  width="240" height="270"
+  align="center"
+>
 
 Tempered is runtime compiled and loaded, this provides increased performance as well as intelisense and type checking.
 
