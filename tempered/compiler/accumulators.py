@@ -30,7 +30,7 @@ class ExprBuffer:
         return expr
 
 
-class StringVariable:
+class Variable:
     name: ast.Name
     assigned: bool = False
 

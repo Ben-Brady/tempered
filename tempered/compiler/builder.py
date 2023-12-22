@@ -10,7 +10,7 @@ from .utils import (
     create_escape_call, slot_variable_name, slot_parameter,
     WITH_STYLES_PARAMETER, COMPONENT_CSS_VARIABLE, KWARGS_VARIABLE,
 )
-from .accumulators import StringVariable, ExprBuffer
+from .accumulators import Variable, ExprBuffer
 import ast
 import sys
 import typing_extensions as t
@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class CodeBuilder:
-    variable: StringVariable
+    variable: Variable
     template: Template
     layout: t.Union[LayoutTemplate, None]
     css: t.Union[str, None]
@@ -248,7 +248,7 @@ class CodeBuilder:
         if name is None:
             variable = self.variable
         else:
-            variable = StringVariable(name)
+            variable = Variable(name)
 
         return CodeBuilder(
             variable=variable, template=self.template, layout=self.layout, css=self.css

@@ -14,7 +14,7 @@ from .utils import (
 )
 from .rename import convert_unknown_variables_to_kwargs
 from .builder import CodeBuilder
-from .accumulators import StringVariable
+from .accumulators import Variable
 import ast
 import typing_extensions as t
 
@@ -70,7 +70,7 @@ def create_template_function(
 
     ctx = CodeBuilder(
         template=template,
-        variable=StringVariable(OUTPUT_VARIABLE),
+        variable=Variable(OUTPUT_VARIABLE),
         layout=layout,
         css=css if len(css) > 0 else None,
     )

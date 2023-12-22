@@ -45,7 +45,7 @@ def slot_variable_name(slot_name: t.Union[str, None]) -> str:
     if slot_name is None:
         return OUTPUT_VARIABLE
     else:
-        return f"__slot_{slot_name}_content"
+        return f"__{slot_name}_slot"
 
 
 def slot_parameter(slot_name: t.Union[str, None]) -> str:
