@@ -2,8 +2,16 @@ name: benchmark
 
 on:
   push:
+    paths:
+      - tempered/**
+      - benchmark/**
+      - pyproject.toml
     branches: [ "main" ]
   pull_request:
+    paths:
+      - tempered/**
+      - benchmark/**
+      - pyproject.toml
     branches: [ "main" ]
 
 jobs:

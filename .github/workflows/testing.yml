@@ -6,8 +6,16 @@ name: testing
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - tempered/**
+      - tests/**
+      - pyproject.toml
   pull_request:
     branches: [ "main" ]
+    paths:
+      - tempered/**
+      - tests/**
+      - pyproject.toml
 
 jobs:
   build:
