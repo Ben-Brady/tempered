@@ -3,7 +3,7 @@ from typing_extensions import Callable, LiteralString
 import typing_extensions as t
 
 
-def build_template(template: LiteralString) -> Callable:
+def build_template(template: LiteralString) -> Callable[..., str]:
     components = tempered.Tempered()
     components.add_template_from_string("foo", template)
     module = components.build_static()
