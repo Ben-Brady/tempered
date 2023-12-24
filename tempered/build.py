@@ -42,7 +42,7 @@ def build_to(
     with open(module.__file__, "w") as f:
         f.write(source)
 
-    importlib.reload(module)
+    return importlib.reload(module)
 
 
 def build_static(
@@ -56,11 +56,11 @@ def build_static(
         BUILD_FILE.touch()
         components = _load_static_file()
 
-    build_to(components, templates)
-    return components
+    return build_to(components, templates)
 
 
 def _load_static_file():
+    importlib.invalidate_caches()
     from tempered.generated import _components
 
     importlib.reload(_components)

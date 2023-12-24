@@ -8,14 +8,15 @@ from ..parser.template_ast import (
 )
 from .utils import (
     create_escape_call, slot_variable_name, slot_parameter,
-    WITH_STYLES_PARAMETER, COMPONENT_CSS_VARIABLE, KWARGS_VARIABLE,
+    WITH_STYLES_PARAMETER, CSS_VARIABLE, KWARGS_VARIABLE,
 )
-from .accumulators import Variable, ExprBuffer
+from .accumulators import Variable
 import ast
 import sys
 import typing_extensions as t
 from dataclasses import dataclass, field
 
+USE_EXPR_BUFFER = True
 
 @dataclass
 class CodeBuilder:
@@ -24,7 +25,6 @@ class CodeBuilder:
     layout: t.Union[LayoutTemplate, None]
     css: t.Union[str, None]
     body: t.List[ast.stmt] = field(default_factory=list)
-    buffer: ExprBuffer = field(default_factory=ExprBuffer)
 
     @property
     def uses_layout(self):
@@ -34,18 +34,8 @@ class CodeBuilder:
     def is_layout(self):
         return self.template.is_layout
 
-
-    def add_expr(self, value: ast.expr):
-        self.buffer.add(value)
-
-    def enter_block(self):
-        self.ensure_assigned()
-        self.flush_expressions()
-
-    def flush_expressions(self):
-        expr = self.buffer.flush()
-        if expr:
-            self.body.append(self.variable.create_add(expr))
+    def add_expr(self, expr: ast.expr):
+        self.body.append(self.variable.create_add(expr))
 
     def ensure_assigned(self):
         self.body.extend(self.variable.ensure_assigned())
@@ -78,22 +68,9 @@ class CodeBuilder:
             t.assert_never(tag)
 
     def create_block(self, tags: t.Sequence[TemplateTag]) -> t.Sequence[ast.stmt]:
-        if not self.buffer.empty():
-            raise RuntimeError(
-                "Internal Error, must flush buffer before creating block"
-            )
-
-        ctx_block = self.create_subcontext(self.variable.name.id + "_block")
+        ctx_block = self.create_subcontext()
         for tag in tags:
             ctx_block.construct_tag(tag)
-
-        if ctx_block.variable.assigned:
-            ctx_block.flush_expressions()
-            expr = ctx_block.variable.name
-        else:
-            expr = ctx_block.buffer.flush() or ast_utils.EmptyStr
-
-        ctx_block.body.append(self.variable.create_add(expr))
 
         return ctx_block.body
 
@@ -105,8 +82,6 @@ class CodeBuilder:
         ctx_assign = self.create_subcontext(name)
         for tag in tags:
             ctx_assign.construct_tag(tag)
-
-        ctx_assign.flush_expressions()
         ctx_assign.ensure_assigned()
         return ctx_assign.body
 
@@ -123,7 +98,6 @@ class CodeBuilder:
         self.add_expr(func_call)
 
     def construct_assignment(self, tag: AssignmentTag):
-        self.flush_expressions()
         self.body.append(
             ast_utils.Assign(
                 target=tag.target,
@@ -131,43 +105,9 @@ class CodeBuilder:
             )
         )
 
-    def construct_style(self, tag: StyleTag):
-        if self.css is None and not self.is_layout:
-            return
-
-        self.flush_expressions()
-        self.ensure_assigned()
-
-        if not self.is_layout:
-            self.body.append(ast_utils.If(
-                condition=ast_utils.Name(WITH_STYLES_PARAMETER),
-                if_body=ast_utils.AddAssign(
-                    target=self.variable.name,
-                    value=ast_utils.Constant(f"<style>{self.css}</style>"),
-                ),
-            ))
-        else:
-            condition = ast_utils.And(
-                ast_utils.Name(WITH_STYLES_PARAMETER),
-                ast_utils.Name(COMPONENT_CSS_VARIABLE),
-            )
-            if_body = ast_utils.AddAssign(
-                target=self.variable.name,
-                value=ast_utils.FormatString(
-                    ast_utils.Constant("<style>"),
-                    ast_utils.Name(COMPONENT_CSS_VARIABLE),
-                    ast_utils.Constant("</style>"),
-                ),
-            )
-            self.body.append(
-                ast_utils.If(
-                    condition=condition,
-                    if_body=[if_body],
-                ),
-            )
 
     def construct_if(self, block: IfTag):
-        self.enter_block()
+        self.ensure_assigned()
 
         if_body = self.create_block(block.if_block)
 
@@ -191,25 +131,10 @@ class CodeBuilder:
         )
 
     def construct_for(self, tag: ForTag):
-        self.enter_block()
+        self.ensure_assigned()
 
-        ctx_for = self.create_subcontext(self.variable.name.id + "_block")
-        for tag_ in tag.loop_block:
-            ctx_for.construct_tag(tag_)
-
-        has_expr = not ctx_for.buffer.empty()
-        is_single_expr = has_expr and len(ctx_for.body) == 0
-        if is_single_expr and sys.version_info >= (3, 12):  # python3.12 comprehensions are faster
-            loop_expr = ctx_for.buffer.flush()
-            if loop_expr:
-                generator = ast_utils.GeneratorExp(
-                    expr=loop_expr,
-                    loop_var=tag.loop_variable,
-                    iterable=tag.iterable,
-                )
-                self.add_expr(ast_utils.ArrayJoin(generator))
-        elif len(ctx_for.body) >= 1 or has_expr:
-            for_body = self.create_block(tag.loop_block)
+        for_body = self.create_block(tag.loop_block)
+        if len(for_body) >= 1:
             self.body.append(
                 ast.For(
                     target=tag.loop_variable,
@@ -242,7 +167,7 @@ class CodeBuilder:
             ),
         )
         self.body.append(if_stmt)
-        self.buffer.add(slot_param)
+        self.add_expr(slot_param)
 
     def create_subcontext(self, name: t.Union[str, ast.Name, None] = None):
         if name is None:
@@ -253,3 +178,36 @@ class CodeBuilder:
         return CodeBuilder(
             variable=variable, template=self.template, layout=self.layout, css=self.css
         )
+
+    def construct_style(self, tag: StyleTag):
+        if self.css is None and not self.is_layout:
+            return
+
+        self.ensure_assigned()
+        if not self.is_layout:
+            self.body.append(ast_utils.If(
+                condition=ast_utils.Name(WITH_STYLES_PARAMETER),
+                if_body=ast_utils.AddAssign(
+                    target=self.variable.name,
+                    value=ast_utils.Constant(f"<style>{self.css}</style>"),
+                ),
+            ))
+        else:
+            condition = ast_utils.And(
+                ast_utils.Name(WITH_STYLES_PARAMETER),
+                ast_utils.Name(CSS_VARIABLE),
+            )
+            if_body = ast_utils.AddAssign(
+                target=self.variable.name,
+                value=ast_utils.FormatString(
+                    ast_utils.Constant("<style>"),
+                    ast_utils.Name(CSS_VARIABLE),
+                    ast_utils.Constant("</style>"),
+                ),
+            )
+            self.body.append(
+                ast_utils.If(
+                    condition=condition,
+                    if_body=[if_body],
+                ),
+            )

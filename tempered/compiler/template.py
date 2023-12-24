@@ -9,10 +9,10 @@ from .utils import (
     LAYOUT_CSS_PARAMETER,
     OUTPUT_VARIABLE,
     KWARGS_VARIABLE,
-    COMPONENT_CSS_VARIABLE,
+    CSS_VARIABLE,
     TYPING_MODULE,
 )
-from .rename import convert_unknown_variables_to_kwargs
+from .resolve import create_resolve_for_unknown_variables
 from .builder import CodeBuilder
 from .accumulators import Variable
 import ast
@@ -83,7 +83,7 @@ def create_template_function(
 
     parameter_names = [param.name for param in ctx.template.parameters]
     component_names = [comp.component_name for comp in ctx.template.components_calls]
-    convert_unknown_variables_to_kwargs(func.body, [*parameter_names, *component_names])
+    create_resolve_for_unknown_variables(func.body, [*parameter_names, *component_names])
     ast.fix_missing_locations(func)
     return func
 
@@ -124,11 +124,8 @@ def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
     for tag in ctx.template.body:
         ctx.construct_tag(tag)
 
-    if ctx.variable.assigned:
-        ctx.flush_expressions()
-        output_value = ctx.variable.name
-    else:
-        output_value = ctx.buffer.flush() or ast_utils.EmptyStr
+    ctx.ensure_assigned()
+    output_value = ctx.variable.name
 
     statements.extend(ctx.body)
 
@@ -136,7 +133,7 @@ def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
         output_value = create_layout_call(
             layout_name=ctx.layout.name,
             default_slot=output_value,
-            css=ast_utils.Name(COMPONENT_CSS_VARIABLE),
+            css=ast_utils.Name(CSS_VARIABLE),
             has_default_slot=ctx.layout.has_default_slot,
             blocks=ctx.template.blocks,
         )
@@ -146,17 +143,9 @@ def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
 
 
 def create_style_contant(ctx: CodeBuilder) -> t.List[ast.stmt]:
-    if ctx.template.is_layout:
-        if ctx.css is None:
-            value = ast_utils.Name(LAYOUT_CSS_PARAMETER)
-        else:
-            value = ast_utils.Add(
-                ast_utils.Name(LAYOUT_CSS_PARAMETER),
-                ast_utils.Constant(ctx.css),
-            )
-    elif ctx.css is not None or ctx.layout:
+    if ctx.css is not None or ctx.layout:
         value = ast_utils.Constant(ctx.css or "")
     else:
         return []
 
-    return [ast_utils.Assign(target=COMPONENT_CSS_VARIABLE, value=value)]
+    return [ast_utils.Assign(target=CSS_VARIABLE, value=value)]

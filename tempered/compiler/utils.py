@@ -3,38 +3,43 @@ from .. import ast_utils
 import typing_extensions as t
 
 
-ESCAPE_FUNC = "__escape"
-UTILS_IMPORT = ast.ImportFrom(
-    module="tempered._internals",
-    level=0,
-    names=[
-        ast.alias(name="escape", asname=ESCAPE_FUNC),
-    ],
-)
-
 TYPING_MODULE = "t"
-TYPING_IMPORT = ast.Import(names=[ast.alias(name="typing_extensions", asname=TYPING_MODULE)])
+ESCAPE_FUNC = "__escape"
+RESOLVE_FUNC = "__resolve"
 
-
-ANNOTATIONS_IMPORT = ast.ImportFrom(
-    module="__future__",
-    names=[ast.alias(name="annotations", asname="_")],
-    level=0,
-)
-
-IMPORTS = [ANNOTATIONS_IMPORT, TYPING_IMPORT, UTILS_IMPORT]
-
-
+CSS_VARIABLE = "__css"
+LAYOUT_CSS_PARAMETER = "__css"
 WITH_STYLES_PARAMETER = "with_styles"
-LAYOUT_CSS_PARAMETER = "__component_css"
-COMPONENT_CSS_VARIABLE = "__css"
 OUTPUT_VARIABLE = "__html"
 KWARGS_VARIABLE = "context"
 
+FILE_HEADER = ast.parse(
+    f"""
+from __future__ import annotations as _
+from tempered._internals import escape as {ESCAPE_FUNC}
+import typing_extensions as {TYPING_MODULE}
+
+__globals = {{}}
+
+def reigster_global(name: str, value: t.Any):
+    __globals[name] = value
+
+def {RESOLVE_FUNC}(name: str, context: dict[str, t.Any]) -> t.Any:
+    if name in context:
+        return context[name]
+    elif name in __globals:
+        return __globals[name]
+    else:
+        raise RuntimeError(f"The variable {{name}} could not be resolved")
+"""
+).body
+
 
 def create_escape_call(value: ast.expr) -> ast.expr:
-    ESCAPE_FUNC_NAME = ast.Name(id="__escape")
-    return ast_utils.Call(ESCAPE_FUNC_NAME, [value])
+    return ast_utils.Call(
+        func=ast.Name(id="__escape"),
+        arguments=[value]
+    )
 
 
 def component_func_name(template_name: str) -> str:
@@ -57,6 +62,16 @@ def slot_parameter(slot_name: t.Union[str, None]) -> str:
 
 def layout_func_name(template_name: str) -> str:
     return f"__{template_name}_layout"
+
+
+def create_resolve_call(name: str):
+    return ast_utils.Call(
+        func=ast_utils.Name(RESOLVE_FUNC),
+        arguments=[
+            ast_utils.Constant(name),
+            ast_utils.Name(KWARGS_VARIABLE),
+        ],
+    )
 
 
 def create_layout_call(

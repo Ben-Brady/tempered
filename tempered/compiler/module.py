@@ -1,6 +1,6 @@
 from .. import ast_utils, validate
 from ..parser import Template, LayoutTemplate
-from .utils import IMPORTS
+from .utils import FILE_HEADER
 from . import preprocess
 from .template import create_template_function
 import ast
@@ -35,6 +35,6 @@ def compile_module(
         functions.append(func)
 
     return ast_utils.Module([
-        *IMPORTS,
+        *FILE_HEADER,
         *functions,
     ])

@@ -59,3 +59,36 @@ def test_for_loop_with_set():
     html = component()
     for i in range(5):
         assert str(i * i) in html
+
+
+def test_nested_for_loop():
+    component = build_template(
+        """
+        {% for x in range(2) %}
+            {% for y in range(2) %}
+                ({{x}},{{y}})
+            {% endfor %}
+        {% endfor %}
+    """
+    )
+    html = component()
+
+    for x in range(2):
+        for y in range(2):
+            assert f"({x},{y})" in html
+
+
+def test_nested_for_loop_with_same_name():
+    component = build_template(
+        """
+        {% for x in range(5) %}
+            {% for x in range(5) %}
+                {{x}}
+            {% endfor %}
+        {% endfor %}
+    """
+    )
+    html = component()
+
+    for x in range(5):
+        assert html.count(str(x)) == 5

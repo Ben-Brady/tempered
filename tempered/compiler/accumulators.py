@@ -3,33 +3,6 @@ import ast
 import typing_extensions as t
 
 
-class ExprBuffer:
-    _stack: t.List[ast.expr]
-
-    def __init__(self):
-        self._stack = []
-
-    def add(self, value: ast.expr):
-        self._stack.append(value)
-
-    def empty(self) -> bool:
-        return len(self._stack) == 0
-
-    def flush(self) -> t.Union[ast.expr, None]:
-        if len(self._stack) == 0:
-            return None
-
-        if len(self._stack) == 1:
-            expr = self._stack[0]
-        elif len(self._stack) < 100:
-            expr = ast_utils.FormatString(*self._stack)
-        else:
-            expr = ast_utils.ArrayJoin(ast_utils.List(self._stack))
-
-        self._stack.clear()
-        return expr
-
-
 class Variable:
     name: ast.Name
     assigned: bool = False

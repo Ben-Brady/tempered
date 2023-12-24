@@ -1,11 +1,14 @@
-from .utils import KWARGS_VARIABLE, WITH_STYLES_PARAMETER
+from .. import ast_utils
+from .utils import KWARGS_VARIABLE, WITH_STYLES_PARAMETER, create_resolve_call
 import ast
 import builtins
 from functools import lru_cache
 import typing_extensions as t
 
 
-def convert_unknown_variables_to_kwargs(body: t.List[ast.stmt], known_names: t.List[str]):
+def create_resolve_for_unknown_variables(
+    body: t.List[ast.stmt], known_names: t.List[str]
+):
     transformer = NameTransformer(known_names)
     for node in body:
         transformer.visit(node)
@@ -16,6 +19,7 @@ class NameTransformer(ast.NodeTransformer):
         KWARGS_VARIABLE,
         WITH_STYLES_PARAMETER,
     )
+    known_names: list[str]
 
     def __init__(self, known_names: t.List[str]):
         self.known_names = known_names
@@ -28,15 +32,13 @@ class NameTransformer(ast.NodeTransformer):
         return self.generic_visit(node)
 
     def visit_Name(self, node: ast.Name):
-        return self.transform(node)
+        return self.resolve(node)
 
     def visit_For(self, node: ast.For):
         loop_vars = extract_loop_variables(node.target)
         self.known_names.extend(loop_vars)
         output_node = self.generic_visit(node)
-        for _ in range(len(loop_vars)):
-            self.known_names.pop()
-
+        self.known_names = self.known_names[:-len(loop_vars)]
         return output_node
 
     def visit_ListComp(self, node: ast.ListComp):
@@ -76,20 +78,16 @@ class NameTransformer(ast.NodeTransformer):
 
         return node
 
-    def transform(self, node: ast.Name) -> ast.expr:
+    def resolve(self, name: ast.Name) -> ast.expr:
         if (
-            node.id.startswith("__")
-            or node.id in self.RESERVED_NAMES
-            or node.id in self.known_names
-            or is_builtin(node.id)
+            name.id.startswith("__")
+            or name.id in self.RESERVED_NAMES
+            or name.id in self.known_names
+            or is_builtin(name.id)
         ):
-            return node
+            return name
 
-        return ast.Subscript(
-            value=ast.Name(KWARGS_VARIABLE, ctx=ast.Load()),
-            slice=ast.Constant(value=node.id),
-            ctx=getattr(node, "ctx", ast.Load()),
-        )
+        return create_resolve_call(name.id)
 
 
 def extract_loop_variables(target: ast.expr) -> t.List[str]:

@@ -1,5 +1,6 @@
 from utils import build_template
 import bs4
+import sys
 import pytest
 
 
@@ -37,7 +38,15 @@ def test_expr_block_escapes_param():
 
 
 def test_multiple_expr_chained():
-    component = build_template("""
+    component = build_template(
+        """
         1{{"a"}}2{{"b"}}3{{"c"}}
-    """)
+    """
+    )
     assert "1a2b3c" in component()
+
+
+def test_many_expr_chained():
+    depth = sys.getrecursionlimit() + 10
+    component = build_template("{{ 'a' }}" * depth)
+    assert "a" in component()
