@@ -14,7 +14,7 @@ dependencies = [
     "markupsafe; python_version <= '3.9'",
     "astor; python_version <= '3.8'",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.7"
 
 [project.optional-dependencies]
 sass = ["libsass"]
