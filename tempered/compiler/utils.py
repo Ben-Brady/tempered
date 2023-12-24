@@ -3,28 +3,24 @@ from .. import ast_utils
 import typing_extensions as t
 
 
-TYPING_MODULE = "t"
-ESCAPE_FUNC = "__escape"
-RESOLVE_FUNC = "__resolve"
-
 CSS_VARIABLE = "__css"
-LAYOUT_CSS_PARAMETER = "__css"
 WITH_STYLES_PARAMETER = "with_styles"
 OUTPUT_VARIABLE = "__html"
 KWARGS_VARIABLE = "context"
 
+
 FILE_HEADER = ast.parse(
     f"""
 from __future__ import annotations as _
-from tempered._internals import escape as {ESCAPE_FUNC}
-import typing_extensions as {TYPING_MODULE}
+from tempered._internals import escape as __escape
+import typing_extensions as t
 
 __globals = {{}}
 
 def reigster_global(name: str, value: t.Any):
     __globals[name] = value
 
-def {RESOLVE_FUNC}(name: str, context: dict[str, t.Any]) -> t.Any:
+def __resolve(name: str, context: dict[str, t.Any]) -> t.Any:
     if name in context:
         return context[name]
     elif name in __globals:
@@ -36,10 +32,7 @@ def {RESOLVE_FUNC}(name: str, context: dict[str, t.Any]) -> t.Any:
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
-    return ast_utils.Call(
-        func=ast.Name(id="__escape"),
-        arguments=[value]
-    )
+    return ast_utils.Call(func=ast_utils.Name("__escape"), arguments=[value])
 
 
 def component_func_name(template_name: str) -> str:
@@ -66,7 +59,7 @@ def layout_func_name(template_name: str) -> str:
 
 def create_resolve_call(name: str):
     return ast_utils.Call(
-        func=ast_utils.Name(RESOLVE_FUNC),
+        func=ast_utils.Name("__resolve"),
         arguments=[
             ast_utils.Constant(name),
             ast_utils.Name(KWARGS_VARIABLE),
@@ -82,7 +75,7 @@ def create_layout_call(
     blocks: t.Set[str],
 ) -> ast.expr:
     kw_args: t.Dict[str, ast.expr] = {}
-    kw_args[LAYOUT_CSS_PARAMETER] = css
+    kw_args[CSS_VARIABLE] = css
     kw_args[WITH_STYLES_PARAMETER] = ast_utils.Name(WITH_STYLES_PARAMETER)
 
     if has_default_slot:

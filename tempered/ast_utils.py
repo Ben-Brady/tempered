@@ -32,7 +32,9 @@ def Constant(value: LiteralType) -> ast.expr:
         return Set(value)
     elif isinstance(value, dict):
         return Dict(value)
-    elif isinstance(value, (NoneType, EllipsisType, str, bytes, bool, int, float, complex)):
+    elif isinstance(
+        value, (NoneType, EllipsisType, str, bytes, bool, int, float, complex)
+    ):
         return ast.Constant(value=value)
     else:
         raise ValueError(f"Cannot convert {value} to an ast constant")
@@ -63,7 +65,9 @@ def Dict(value: dict) -> ast.Dict:
     )
 
 
-def _IterableConstant(iterable: Iterable[t.Union[LiteralType, ast.expr]]) -> t.List[ast.expr]:
+def _IterableConstant(
+    iterable: Iterable[t.Union[LiteralType, ast.expr]]
+) -> t.List[ast.expr]:
     values = []
     for item in iterable:
         if not isinstance(item, ast.AST):
@@ -80,10 +84,11 @@ def Call(
     kwargs: t.Union[ast.Name, None] = None,
 ) -> ast.Call:
     call_keywords = [
-        ast.keyword(arg=name, value=value) for name, value in keywords.items()
+        ast.keyword(arg=name, value=value)
+        for name, value in keywords.items()
     ]
     if kwargs is not None:
-        call_keywords.append(ast.keyword(value=kwargs))
+        call_keywords.append(ast.keyword(value=kwargs, arg=None))
 
     return ast.Call(
         func=func,
@@ -111,6 +116,36 @@ def Module(body: Sequence[ast.AST]) -> ast.Module:
     return module
 
 
+def Arguments(
+    args: t.List[ast.arg] = [],
+    defaults: t.List[ast.expr] = [],
+    kw_defaults: t.List[t.Union[ast.expr, None]] = [],
+    posonlyargs: t.List[ast.arg] = [],
+    kwonlyargs: t.List[ast.arg] = [],
+    vararg: t.Optional[ast.arg] = None,
+    kwarg: t.Optional[ast.arg] = None,
+) -> ast.arguments:
+    if sys.version_info >= (3, 9):
+        return ast.arguments(
+            args=args,
+            defaults=defaults,
+            kw_defaults=kw_defaults,
+            posonlyargs=posonlyargs,
+            kwonlyargs=kwonlyargs,
+            vararg=vararg,
+            kwarg=kwarg,
+        )
+    else:
+        return ast.arguments(
+            args=args + posonlyargs,
+            defaults=defaults,
+            kw_defaults=kw_defaults,
+            kwonlyargs=kwonlyargs,
+            vararg=vararg,
+            kwarg=kwarg,
+        )
+
+
 def Function(
     name: str,
     args: ast.arguments,
@@ -128,7 +163,9 @@ def Function(
     )
 
 
-def AddAssign(target: t.Union[str, ast.Name], value: t.Union[LiteralType, ast.expr]) -> ast.AugAssign:
+def AddAssign(
+    target: t.Union[str, ast.Name], value: t.Union[LiteralType, ast.expr]
+) -> ast.AugAssign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -142,7 +179,9 @@ def AddAssign(target: t.Union[str, ast.Name], value: t.Union[LiteralType, ast.ex
     )
 
 
-def Assign(target: t.Union[str, ast.expr], value: t.Union[LiteralType, ast.AST]) -> ast.Assign:
+def Assign(
+    target: t.Union[str, ast.expr], value: t.Union[LiteralType, ast.AST]
+) -> ast.Assign:
     if isinstance(target, str):
         target = Name(target)
 
@@ -269,12 +308,14 @@ def FormatString(*expressions: ast.expr) -> ast.expr:
         if isinstance(expr, ast.Constant) and isinstance(expr.value, str):
             values.append(expr)
         else:
-            values.append(ast.FormattedValue(value=expr, conversion=-1))
+            values.append(ast.FormattedValue(value=expr, conversion=-1, format_spec=None))
 
     return ast.JoinedStr(values=values)
 
 
 IfBody: t.TypeAlias = t.Union[t.Sequence[ast.stmt], ast.stmt]
+
+
 def If(
     condition: ast.expr,
     if_body: IfBody,
@@ -322,15 +363,29 @@ def If(
     return if_statement
 
 
+def create(code: str) -> ast.expr:
+    module = ast.parse(code)
+    if len(module.body) != 1:
+        raise RuntimeError("Generated code was not an expression")
+
+    expr = module.body[0]
+    if not isinstance(expr, ast.Expr):
+        raise RuntimeError("Generated code was not an expression")
+
+    return expr.value
+
+
 def print_ast(module: t.Union[t.List[ast.AST], ast.Module]):
     if isinstance(module, list):
         module = Module(module)
 
     print(unparse(module))
 
+
 def unparse(node: ast.AST):
     if sys.version_info >= (3, 9):
         return ast.unparse(node)
     else:
         import astor
-        return astor.to_source(node)
+
+        return astor.to_source(node).strip()

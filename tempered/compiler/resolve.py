@@ -19,7 +19,7 @@ class NameTransformer(ast.NodeTransformer):
         KWARGS_VARIABLE,
         WITH_STYLES_PARAMETER,
     )
-    known_names: list[str]
+    known_names: t.List[str]
 
     def __init__(self, known_names: t.List[str]):
         self.known_names = known_names

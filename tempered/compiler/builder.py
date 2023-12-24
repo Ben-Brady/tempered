@@ -88,8 +88,8 @@ class CodeBuilder:
     def construct_component_tag(self, tag: ComponentTag):
         func = ast_utils.Name(tag.component_name)
         keywords = tag.keywords.copy()
-        keywords[WITH_STYLES_PARAMETER] = ast_utils.Constant(False)
 
+        keywords[WITH_STYLES_PARAMETER] = ast_utils.Constant(False)
         func_call = ast_utils.Call(
             func=func,
             keywords=keywords,

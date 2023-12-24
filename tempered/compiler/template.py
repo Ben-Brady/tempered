@@ -6,11 +6,9 @@ from .utils import (
     layout_func_name,
     create_layout_call,
     WITH_STYLES_PARAMETER,
-    LAYOUT_CSS_PARAMETER,
     OUTPUT_VARIABLE,
     KWARGS_VARIABLE,
     CSS_VARIABLE,
-    TYPING_MODULE,
 )
 from .resolve import create_resolve_for_unknown_variables
 from .builder import CodeBuilder
@@ -39,7 +37,7 @@ def create_template_function(
         function_name = layout_func_name(template.name)
         arguements.append(
             TemplateParameter(
-                name=LAYOUT_CSS_PARAMETER,
+                name=CSS_VARIABLE,
                 type=ast_utils.Str,
             )
         )
@@ -100,19 +98,13 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
         )
         defaults.append(arguement.default)
 
-    return ast.arguments(
+    return ast_utils.Arguments(
         kwonlyargs=args,
         kw_defaults=defaults,
         kwarg=ast.arg(
             arg=KWARGS_VARIABLE,
-            annotation=ast_utils.Attribute(
-                value=ast_utils.Name(TYPING_MODULE),
-                attr="Any",
-            ),
+            annotation=ast_utils.create("t.Any"),
         ),
-        args=[],
-        defaults=[],
-        posonlyargs=[],
     )
 
 

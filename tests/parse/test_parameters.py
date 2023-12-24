@@ -3,6 +3,7 @@ from tempered.parser import parse_template, template_ast
 import ast
 import typing_extensions as t
 import pytest
+import sys
 
 
 class Unset:
@@ -63,13 +64,25 @@ def test_parse_parameters_with_default():
     )
 
 
-def test_parse_parameters_with_none_default():
-    _assert_single_parameter(
-        "{%param a: str|None = None %}",
-        name="a",
-        type="str | None",
-        default=None,
-    )
+if sys.version_info >= (3, 9):
+
+    def test_parse_parameters_with_none_default():
+        _assert_single_parameter(
+            "{%param a: str | None = None %}",
+            name="a",
+            type="str | None",
+            default=None,
+        )
+
+else:
+
+    def test_parse_parameters_with_none_default():
+        _assert_single_parameter(
+            "{%param a: t.Union[str, None] = None %}",
+            name="a",
+            type="t.Union[str, None]",
+            default=None,
+        )
 
 
 def test_parse_parameters_with_annotation_and_default():
@@ -98,14 +111,14 @@ def test_parse_parameters_with_end_statement_default():
     )
 
 
-@pytest.mark.skip
 def test_parse_parameters_with_multiline_string_default():
-    _assert_single_parameter(
-        """{%param a =
-        '''
-        a
-        '''
-        """,
-        name="a",
-        default="%}",
-    )
+    with pytest.raises(Exception):
+        _assert_single_parameter(
+            """{%param a =
+            '''
+            a
+            ''' %}
+            """,
+            name="a",
+            default="%}",
+        )
