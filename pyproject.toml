@@ -9,7 +9,6 @@ dependencies = [
     "bs4",
     "minify-html",
     "tinycss2",
-    "cachetools",
     "rcssmin",
     "typing_extensions",
     "markupsafe; python_version <= '3.9'",
