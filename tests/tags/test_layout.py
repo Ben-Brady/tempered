@@ -89,5 +89,32 @@ def test_layout_respects_with_styles():
             """,
         ),
     )
+    html = func(with_styles=True)
     assert CSS_KEY in func(with_styles=True)
     assert CSS_KEY not in func(with_styles=False)
+
+
+def test_layout_styles_are_combined():
+    CSS_LAYOUT = "TEMPERED_LAYOUT"
+    CSS_COMP = "TEMPERED_COMP"
+    component = f"""
+        {{% layout "layout" %}}
+        <style>
+            a {{content: '{CSS_COMP}'; }}
+        </style>
+    """
+    layout = f"""
+        {{% styles %}}
+        {{% slot %}}
+        <style>
+            a {{ content: '{CSS_LAYOUT}'; }}
+        </style>
+    """
+
+    func = utils.build_templates(
+        component,
+        ("layout", layout),
+    )
+    styled_html = func(with_styles=True)
+    assert CSS_LAYOUT in styled_html, "Doesn't contain layout css"
+    assert CSS_COMP in styled_html, "Doesn't contain component css"
