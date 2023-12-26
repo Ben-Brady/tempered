@@ -3,27 +3,27 @@ from typing_extensions import Any, Iterable, Sequence
 import typing_extensions as t
 import sys
 
-
 NoneType = type(None)
 EllipsisType = type(...)
 
 LiteralType: t.TypeAlias = t.Union[
-    list,
-    set,
-    tuple,
-    dict,
-    NoneType,
     EllipsisType,
+    None,
     str,
     bytes,
     bool,
     int,
     float,
     complex,
+    list,
+    set,
+    tuple,
+    dict,
 ]
 
 
 def Constant(value: LiteralType) -> ast.expr:
+    CONSTANT_TYPES = (NoneType, EllipsisType, str, bytes, bool, int, float, complex)
     if isinstance(value, list):
         return List(value)
     elif isinstance(value, set):
@@ -32,9 +32,7 @@ def Constant(value: LiteralType) -> ast.expr:
         return Set(value)
     elif isinstance(value, dict):
         return Dict(value)
-    elif isinstance(
-        value, (NoneType, EllipsisType, str, bytes, bool, int, float, complex)
-    ):
+    elif isinstance(value, CONSTANT_TYPES):
         return ast.Constant(value=value)
     else:
         raise ValueError(f"Cannot convert {value} to an ast constant")
@@ -84,8 +82,7 @@ def Call(
     kwargs: t.Union[ast.Name, None] = None,
 ) -> ast.Call:
     call_keywords = [
-        ast.keyword(arg=name, value=value)
-        for name, value in keywords.items()
+        ast.keyword(arg=name, value=value) for name, value in keywords.items()
     ]
     if kwargs is not None:
         call_keywords.append(ast.keyword(value=kwargs, arg=None))
@@ -308,7 +305,9 @@ def FormatString(*expressions: ast.expr) -> ast.expr:
         if isinstance(expr, ast.Constant) and isinstance(expr.value, str):
             values.append(expr)
         else:
-            values.append(ast.FormattedValue(value=expr, conversion=-1, format_spec=None))
+            values.append(
+                ast.FormattedValue(value=expr, conversion=-1, format_spec=None)
+            )
 
     return ast.JoinedStr(values=values)
 
