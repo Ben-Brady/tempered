@@ -116,5 +116,43 @@ def test_layout_styles_are_combined():
         ("layout", layout),
     )
     styled_html = func(with_styles=True)
-    assert CSS_LAYOUT in styled_html, "Doesn't contain layout css"
-    assert CSS_COMP in styled_html, "Doesn't contain component css"
+    styled_html = func(with_styles=True)
+    assert CSS_LAYOUT in styled_html, "Layout css not found"
+    assert CSS_COMP in styled_html, "Component css not found"
+
+
+def test_nested_layout_styles_are_combined():
+    CSS_LAYOUT_1 = "TEMPERED_LAYOUT"
+    CSS_LAYOUT_2 = "TEMPERED_LAYOUT"
+    CSS_COMP = "TEMPERED_COMP"
+    layout_1 = f"""
+        {{% styles %}}
+        {{% slot %}}
+        <style>
+            a {{ content: '{CSS_LAYOUT_1}'; }}
+        </style>
+    """
+    layout_2 = f"""
+        {{% layout "layout_1" %}}
+        {{% styles %}}
+        {{% slot %}}
+        <style>
+            a {{ content: '{CSS_LAYOUT_2}'; }}
+        </style>
+    """
+    component = f"""
+        {{% layout "layout_2" %}}
+        <style>
+            a {{content: '{CSS_COMP}'; }}
+        </style>
+    """
+
+    func = utils.build_templates(
+        component,
+        ("layout_1", layout_1),
+        ("layout_2", layout_2),
+    )
+    styled_html = func(with_styles=True)
+    assert CSS_LAYOUT_1 in styled_html, "Layout 1 css not found"
+    assert CSS_LAYOUT_2 in styled_html, "Layout 2 css not found"
+    assert CSS_COMP in styled_html, "Component's css not found"
