@@ -22,9 +22,10 @@ USE_EXPR_BUFFER = True
 class CodeBuilder:
     variable: Variable
     template: Template
-    layout: t.Union[LayoutTemplate, None]
-    css: t.Union[str, None]
+    layout: t.Optional[LayoutTemplate]
+    css: t.Optional[str]
     body: t.List[ast.stmt] = field(default_factory=list)
+    css_variable: t.Optional[Variable] = None
 
     @property
     def uses_layout(self):
@@ -38,7 +39,8 @@ class CodeBuilder:
         self.body.append(self.variable.create_add(expr))
 
     def ensure_assigned(self):
-        self.body.extend(self.variable.ensure_assigned())
+        if not self.variable.assigned:
+            self.body.extend(self.variable.assign())
 
     def construct_tag(self, tag: TemplateTag):
         if isinstance(tag, LiteralTag):

@@ -19,9 +19,6 @@ class Variable:
             self.assigned = True
             return ast_utils.Assign(target=self.name, value=value)
 
-    def ensure_assigned(self) -> t.List[ast.stmt]:
-        if self.assigned:
-            return []
-
+    def assign(self, value: ast.expr = ast_utils.EmptyStr) -> t.List[ast.stmt]:
         self.assigned = True
-        return [ast_utils.Assign(target=self.name, value=ast_utils.EmptyStr)]
+        return [ast_utils.Assign(target=self.name, value=value)]

@@ -136,13 +136,12 @@ def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
 
 def create_style_contant(ctx: CodeBuilder) -> t.List[ast.stmt]:
     if ctx.is_layout:
-        value = ast_utils.Add(
-            ast_utils.Name(CSS_VARIABLE),
-            ast_utils.Constant(ctx.css or ""),
-        )
-    elif ctx.css is not None or ctx.uses_layout:
-        value = ast_utils.Constant(ctx.css or "")
-    else:
         return []
 
-    return [ast_utils.Assign(target=CSS_VARIABLE, value=value)]
+    if ctx.css is None and not ctx.uses_layout:
+        return []
+
+    value = ast_utils.Constant(ctx.css or "")
+
+    ctx.css_variable = Variable(CSS_VARIABLE)
+    return ctx.css_variable.assign(value)
