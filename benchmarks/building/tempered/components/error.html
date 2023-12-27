@@ -1,0 +1,39 @@
+{% param error: str %}
+
+<div
+    id="login-error"
+    class="error"
+    remove-me="6s"
+    >
+    {{ error }}
+</div>
+
+<style>
+    .error {
+        align-self: stretch;
+        text-align: center;
+        color: var(--error);
+        animation:
+            forwards ease-out error-flash 200ms,
+            forwards linear fade-out 6s;
+    }
+
+    @keyframes error-flash {
+        0% {
+            filter: saturate(1.3);
+            scale: .9;
+        }
+        100% {
+            filter: saturate(1);
+            scale: 1;
+        }
+    }
+
+    @keyframes fade-out {
+        0%, 90% { opacity: 1;}
+        100% {
+            display: none;
+            opacity: 0;
+        }
+    }
+</style>

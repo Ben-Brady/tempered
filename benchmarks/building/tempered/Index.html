@@ -1,0 +1,22 @@
+{% layout "layout" %}
+{% param videos: list %}
+
+{% block title%}Home{% endblock %}
+
+<div id="scroll">
+    {<VideoScroll(videos=videos)>}
+</div>
+
+<style>
+    #scroll {
+        width: 100%;
+        height: fit-content;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+
+        display: flex;
+        justify-content: center;
+        flex-flow: row wrap;
+        gap: 2rem;
+    }
+</style>

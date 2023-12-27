@@ -1,0 +1,6 @@
+{% layout "layout" %}
+{% param upload_id: int|None = None %}
+
+{% block title %}Upload{% endblock %}
+
+{<UploadPage(upload_id=upload_id)>}

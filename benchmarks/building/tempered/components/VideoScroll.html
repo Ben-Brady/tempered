@@ -1,0 +1,14 @@
+{%param videos %}
+{%param page: int = 0 %}
+
+{% for video in videos %}
+    {<Thumbnail(video=video)>}
+{% endfor %}
+<div
+    hx-get="/videos/scroll/{{page + 1}}"
+    hx-trigger="intersect once"
+    hx-swap="outerHTML"
+    hx-target="this"
+>
+    {<LoadingIcon(fade=True)>}
+</div>
