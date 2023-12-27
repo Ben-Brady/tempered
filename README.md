@@ -6,7 +6,7 @@ Convert html templates into native python components
 pip install tempered
 ```
 
-| [Documentation](https://github.com/Ben-Brady/tempered/blob/main/Documentation.md) | [PyPi](https://pypi.org/project/tempered) | [Github](https://github.com/Ben-Brady/tempered)|
+| [Documentation](https://github.com/Ben-Brady/tempered/blob/main/docs/index.md) | [PyPi](https://pypi.org/project/tempered) | [Github](https://github.com/Ben-Brady/tempered)|
 | - | - | - |
 
 ## Features
@@ -62,14 +62,14 @@ print(components.Image(
 
 Tempered is runtime compiled and loaded, this provides increased performance as well as intelisense and type checking.
 
-<picture>
-  <img align="center" alt="Static Page Benchmark" src="https://github.com/Ben-Brady/tempered/assets/64110708/a9c3242c-872d-4969-878d-fb39547ca67a">
+<picture align="center">
+  <img align="center" alt="Full Page Benchmark" src="https://github.com/Ben-Brady/tempered/assets/64110708/684ff121-a2c9-41df-94dd-f5c0aa136d3e">
 </picture>
 <picture align="center">
   <img align="center" alt="Partials Benchmark" src="https://github.com/Ben-Brady/tempered/assets/64110708/6bbc6c1d-107b-47b3-9b59-fb9c78e6352f">
 </picture>
-<picture align="center">
-  <img align="center" alt="Full Page Benchmark" src="https://github.com/Ben-Brady/tempered/assets/64110708/684ff121-a2c9-41df-94dd-f5c0aa136d3e">
+<picture>
+  <img align="center" alt="Static Page Benchmark" src="https://github.com/Ben-Brady/tempered/assets/64110708/a9c3242c-872d-4969-878d-fb39547ca67a">
 </picture>
 
 [View Benchmarks Here](https://github.com/Ben-Brady/tempered/tree/main/benchmarks)

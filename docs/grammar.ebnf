@@ -1,0 +1,102 @@
+<template> ::= (<tag> | <html>)*
+
+<statements> ::= <if_statement> | <for_statement>
+<for_statement> ::= <for_tag> <html> <endfor_tag>
+
+<tag> ::= (
+    <if_tag> | <elif_tag> | <else_tag> | <endif_tag> |
+    <for_tag> | <endfor_tag> | <set_tag> | <param_tag> |
+    <include_tag> | <layout_tag> | <styles_tag> |
+    <slot_tag> | <endslot_tag> | <block_tag> | <endblock_tag> |
+    <html_tag> | <expr_tag> | <component_tag>
+)
+
+<control_escape>            ::= "\{" | "\}"
+<expr_start>                ::= "{{"
+<expr_end>                  ::= "}}"
+<statement_start>           ::= "{%"
+<statement_end>             ::= "%}"
+<component_start>           ::= "{<"
+<component_end>             ::= ">}"
+<component_end_alternative> ::= "/>}"
+
+<for_keyword> ::= "for"
+<endfor_keyword> ::= "endfor"
+<set_keyword> ::= "set"
+<param_keyword> ::= "param"
+<include_keyword> ::= "include"
+<layout_keyword> ::= "layout"
+<slot_keyword> ::= "slot"
+<endslot_keyword> ::= "endslot"
+<block_keyword> ::= "block"
+<endblock_keyword> ::= "endblock"
+
+<if_statement> ::= <if_tag> <html> (<elif_tag> <html>)* (<else_tag> <html>)? <endif_tag>
+<if_tag> ::= (
+    <statement_start> <whitespace> "if" <whitespace> <python_expr> <statement_end>
+)
+<elif_tag> ::= (
+    <statement_start> <whitespace> "elif" <whitespace> <python_expr> <statement_end>
+)
+<else_tag> ::= (
+    <statement_start> <whitespace> "else" <whitespace> <statement_end>
+)
+<endif_tag> ::= (
+    <statement_start> <whitespace> "endif" <whitespace> <statement_end>
+)
+
+<for_tag> ::= (
+    <statement_start> <whitespace> "for" <python> <statement_end>
+)
+<endfor_tag> ::= (
+    <statement_start> <whitespace> "endfor" <whitespace> <statement_end>
+)
+<set_tag> ::= (
+    <statement_start> <whitespace> "set" <python> <statement_end>
+)
+<param_tag> ::= (
+    <statement_start> <whitespace> "param" <python> <statement_end>
+)
+<include_tag> ::= (
+    <statement_start> <whitespace> "include" <whitespace> <string> <whitespace> <statement_end>
+)
+<layout_tag> ::= (
+    <statement_start> <whitespace> "layout" <whitespace> <string> <whitespace> <statement_end>
+)
+<styles_tag> ::= (
+    <statement_start> <whitespace> "styles" <whitespace> <statement_end>
+)
+<slot_tag> ::= (
+    <statement_start> <whitespace> <slot_keyword> <whitespace> <ident>? <whitespace> "required"? <whitespace> <statement_end>
+)
+<endslot_tag> ::= (
+    <statement_start> <whitespace> "endslot" <whitespace> <statement_end>
+)
+<block_tag> ::= (
+    <statement_start> <whitespace> "block" <whitespace> <ident> <whitespace> <statement_end>
+)
+<endblock_tag> ::= (
+    <statement_start> <whitespace> "endblock" <whitespace> <statement_end>
+)
+<html_tag> ::= (
+    <statement_start> <whitespace> "html" <whitespace> <python> <statement_end>
+)
+<expr_tag> ::= (
+    <expr_start> <python> <expr_end>
+)
+<component_tag> ::= (
+    <component_start> <whitespace> <python> (<component_end> | <component_end_alternative>)
+)
+<html> ::= (<unicode> | <control_escape>)*
+
+
+<python> ::= <unicode>+
+<python_expr> ::= <unicode>+
+
+<string> ::= "\"" <unicode>* "\""
+
+<whitespace> ::=  " " | "\t" | "\n" | "\r"
+
+<ident> ::= <ident_start> <ident_letters>*
+<ident_start> ::= [a-z] | [A-Z] | "_"
+<ident_letters> ::= [a-z] | [A-Z] | [0-9] | "_"
