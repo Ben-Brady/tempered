@@ -10,6 +10,11 @@ TYPES_FILE = Path(__file__).parent.joinpath("enviroment.pyi")
 T_OVERLOAD = ast_utils.create_expr("t.overload")
 
 
+def clear_types() -> None:
+    if TYPES_FILE.exists():
+        TYPES_FILE.unlink()
+
+
 def build_types(templates: t.List[parser.Template]) -> None:
     BASE = """
 import typing_extensions as t
@@ -80,8 +85,7 @@ class Template:
     class_def = ast_utils.create_stmt(template_base, ast.ClassDef)
     class_def.name = class_name
     template_params = [
-        ast_utils.Arg(param.name, param.type)
-        for param in template.parameters
+        ast_utils.Arg(param.name, param.type) for param in template.parameters
     ]
     param_defaults = [param.default for param in template.parameters]
     render_func = t.cast(ast.FunctionDef, class_def.body[0])

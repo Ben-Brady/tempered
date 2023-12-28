@@ -22,10 +22,7 @@ def _calculate_required_components(
     components_used: t.Set[str] = set()
     components_used.add(template.name)
 
-    required_names = [
-        call.component_name
-        for call in list(template.components_calls)
-    ]
+    required_names = [call.component_name for call in list(template.components_calls)]
     if template.layout:
         required_names.append(template.layout)
 

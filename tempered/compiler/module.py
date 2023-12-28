@@ -12,16 +12,12 @@ def compile_module(
 ) -> ast.Module:
     validate.validate_templates(templates)
 
-    lookup = {
-        template.name: template
-        for template in templates
-    }
+    lookup = {template.name: template for template in templates}
     layout_lookup = {
         template.name: template
         for template in templates
         if isinstance(template, LayoutTemplate)
     }
-
 
     functions = []
     for template in templates:
@@ -34,7 +30,8 @@ def compile_module(
         func = create_template_function(template, layout, css)
         functions.append(func)
 
-    return ast_utils.Module([
+    body = [
         *FILE_HEADER,
         *functions,
-    ])
+    ]
+    return ast_utils.Module(body)

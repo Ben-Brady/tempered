@@ -10,6 +10,8 @@ warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 html: t.TypeAlias = str
 css: t.TypeAlias = str
+
+
 def create_scoped_css(body: str, prefix: str = "tempered") -> t.Tuple[html, css]:
     soup = bs4.BeautifulSoup(body, "html.parser")
     css = ""
@@ -38,11 +40,8 @@ def create_scoped_css(body: str, prefix: str = "tempered") -> t.Tuple[html, css]
 
 
 def transform_css(
-        css: str,
-        scope: str,
-        is_global: bool,
-        lang: t.Union[str, None]
-        ) -> str:
+    css: str, scope: str, is_global: bool, lang: t.Union[str, None]
+) -> str:
     if lang == "scss" or lang == "sass":
         css = sass.transform_sass(css, lang)
 

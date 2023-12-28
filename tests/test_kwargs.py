@@ -76,5 +76,4 @@ def test_kwargs_loop_variable():
     items = ["a", "b", "c"]
     html = func(items=items)
     for item in items:
-
         assert item in html

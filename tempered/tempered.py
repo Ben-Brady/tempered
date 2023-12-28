@@ -1,7 +1,6 @@
-from . import parser, build
+from . import parser, build, types
 from .enviroment import Template, Enviroment
 from .compiler.utils import component_func_name
-from .types import build_types
 from pathlib import Path
 from types import ModuleType
 import typing_extensions as t
@@ -26,6 +25,7 @@ class Tempered:
 
     def __init__(self, template_folder: t.Union[str, Path, None] = None):
         self._templates = []
+        self._globals = {}
         if template_folder:
             self.add_template_folder(template_folder)
 
@@ -65,19 +65,21 @@ class Tempered:
         return [template.parse() for template in self._templates]
 
     def build_to(self, module: ModuleType) -> None:
-        build.build_to(module, self._parse_templates())
+        build.build_to(module, self._parse_templates(), self._globals)
 
     def build_memory(self) -> ModuleType:
-        return build.build_memory(self._parse_templates())
+        return build.build_memory(self._parse_templates(), self._globals)
 
     def build_static(self):
-        return build.build_static(self._parse_templates())
+        return build.build_static(self._parse_templates(), self._globals)
 
     def build_enviroment(self, generate_types: bool = True) -> Enviroment:
         template_objs = self._parse_templates()
-        m = build.build_memory(template_objs)
+        m = build.build_memory(template_objs, self._globals)
         if generate_types:
-            build_types(template_objs)
+            types.build_types(template_objs)
+        else:
+            types.clear_types()
 
         templates: t.Dict[str, Template] = {}
         for template in template_objs:
@@ -85,6 +87,6 @@ class Tempered:
                 continue
 
             func = getattr(m, component_func_name(template.name))
-            templates[template.name] = Template(func) # type: ignore
+            templates[template.name] = Template(func)  # type: ignore
 
         return Enviroment(templates=templates, globals={})

@@ -2,18 +2,15 @@ from ..tokens import Token
 import typing_extensions as t
 
 
-
 class TokenScanner:
     stream: t.Sequence[Token]
 
     def __init__(self, stream: t.Sequence[Token]):
         self.stream = stream
 
-
     @property
     def has_tokens(self) -> bool:
         return len(self.stream) != 0
-
 
     def pop(self) -> Token:
         popped = self.stream[0]
@@ -35,19 +32,19 @@ class TokenScanner:
         else:
             return False
 
-
     T = t.TypeVar("T", bound=Token)
+
     def expect(self, token: t.Type[T]) -> T:
         if not self.is_next(token):
             raise ValueError(f"Expected {token} but got {self.stream[0]!r}")
         else:
-            return self.pop() # type: ignore
+            return self.pop()  # type: ignore
 
     T = t.TypeVar("T", bound=Token)
+
     def take_while(self, token: t.Type[T]) -> t.Sequence[T]:
         tokens = []
         while self.is_next(token):
             tokens.append(self.pop())
 
         return tokens
-

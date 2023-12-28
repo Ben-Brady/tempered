@@ -38,7 +38,7 @@ class NameTransformer(ast.NodeTransformer):
         loop_vars = extract_loop_variables(node.target)
         self.known_names.extend(loop_vars)
         output_node = self.generic_visit(node)
-        self.known_names = self.known_names[:-len(loop_vars)]
+        self.known_names = self.known_names[: -len(loop_vars)]
         return output_node
 
     def visit_ListComp(self, node: ast.ListComp):

@@ -1,6 +1,7 @@
 import typing_extensions as t
 from dataclasses import dataclass
 
+
 @dataclass
 class Template:
     func: t.Callable[..., str]

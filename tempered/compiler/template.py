@@ -81,7 +81,9 @@ def create_template_function(
 
     parameter_names = [param.name for param in ctx.template.parameters]
     component_names = [comp.component_name for comp in ctx.template.components_calls]
-    create_resolve_for_unknown_variables(func.body, [*parameter_names, *component_names])
+    create_resolve_for_unknown_variables(
+        func.body, [*parameter_names, *component_names]
+    )
     ast.fix_missing_locations(func)
     return func
 

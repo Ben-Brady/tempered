@@ -79,13 +79,16 @@ class ParameterToken:
 class IfStartToken:
     condition: str
 
+
 @dataclass
 class ElIfToken:
     condition: str
 
+
 @dataclass
 class ElseToken:
     pass
+
 
 @dataclass
 class IfEndToken:
@@ -96,6 +99,7 @@ class IfEndToken:
 class ForStartToken:
     variable: str
     iterable: str
+
 
 @dataclass
 class ForEndToken:
@@ -108,8 +112,23 @@ class SetToken:
 
 
 Token: t.TypeAlias = t.Union[
-    LiteralToken, ParameterToken, StylesToken,  StylesIncludeToken,
-    SetToken, ComponentToken, HtmlExprToken,  EscapedExprToken,
-    ForStartToken, ForEndToken, IfStartToken, ElIfToken, ElseToken,
-    IfEndToken, LayoutToken, SlotToken,  SlotEndToken, BlockToken, BlockEndToken
+    LiteralToken,
+    ParameterToken,
+    StylesToken,
+    StylesIncludeToken,
+    SetToken,
+    ComponentToken,
+    HtmlExprToken,
+    EscapedExprToken,
+    ForStartToken,
+    ForEndToken,
+    IfStartToken,
+    ElIfToken,
+    ElseToken,
+    IfEndToken,
+    LayoutToken,
+    SlotToken,
+    SlotEndToken,
+    BlockToken,
+    BlockEndToken,
 ]

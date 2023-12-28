@@ -10,9 +10,7 @@ def build_template(template: str) -> Callable:
     return getattr(module, "foo")
 
 
-def build_templates(
-    template: str, *other_templates: t.Tuple[str, str]
-) -> Callable:
+def build_templates(template: str, *other_templates: t.Tuple[str, str]) -> Callable:
     components = tempered.Tempered()
     components.add_template_from_string("foo", template)
     for name, body in other_templates:

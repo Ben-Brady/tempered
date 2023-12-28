@@ -375,9 +375,7 @@ def If(
     return if_statement
 
 
-
-
-T = t.TypeVar("T", bound=ast.stmt   )
+T = t.TypeVar("T", bound=ast.stmt)
 
 
 def create_stmt(code: str, type: t.Type[T]) -> T:
@@ -391,9 +389,11 @@ def create_stmt(code: str, type: t.Type[T]) -> T:
 
     return t.cast(T, expr)
 
+
 def create_expr(code: str) -> ast.expr:
     expr = create_stmt(code, ast.Expr)
     return expr.value
+
 
 def print_ast(module: t.Union[t.List[ast.AST], ast.Module]):
     if isinstance(module, list):

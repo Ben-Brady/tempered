@@ -17,7 +17,9 @@ IDENT_LETTERS = list(string.ascii_letters + string.digits + "_")
 WHITESPACE = string.whitespace
 
 
-def to_token_stream(html: str, file: t.Union[Path, None] = None) -> t.Sequence[tokens.Token]:
+def to_token_stream(
+    html: str, file: t.Union[Path, None] = None
+) -> t.Sequence[tokens.Token]:
     scanner = TextScanner(html, file)
     _tokens: t.List[tokens.Token] = []
     while scanner.has_text:
@@ -86,7 +88,6 @@ def take_statement_token(scanner: TextScanner) -> tokens.Token:
         raise scanner.error(f'Unknown Statement "{statement}"')
 
 
-
 def take_include_token(scanner: TextScanner) -> tokens.Token:
     template = python_utils.take_ident(scanner)
     take_whitespace(scanner)
@@ -131,8 +132,7 @@ def take_expr_token(scanner: TextScanner) -> tokens.EscapedExprToken:
 def take_component_token(scanner: TextScanner) -> tokens.ComponentToken:
     scanner.expect(COMPONENT_START)
     take_whitespace(scanner)
-    call = scanner.take_until(
-        [COMPONENT_END, COMPONENT_END_ALTERNATIVE]).rstrip()
+    call = scanner.take_until([COMPONENT_END, COMPONENT_END_ALTERNATIVE]).rstrip()
     take_whitespace(scanner)
     scanner.accept("/")  # For />}
     scanner.expect(COMPONENT_END)
@@ -145,7 +145,6 @@ def take_html_token(scanner: TextScanner) -> tokens.HtmlExprToken:
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
     return tokens.HtmlExprToken(expr)
-
 
 
 def take_layout_token(scanner: TextScanner) -> tokens.LayoutToken:
@@ -181,10 +180,7 @@ def take_block_token(scanner: TextScanner) -> tokens.BlockToken:
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return tokens.BlockToken(
-        name=name,
-        is_required=is_required
-    )
+    return tokens.BlockToken(name=name, is_required=is_required)
 
 
 def take_set_token(scanner: TextScanner) -> tokens.SetToken:

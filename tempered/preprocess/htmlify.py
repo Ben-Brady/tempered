@@ -5,6 +5,8 @@ import random
 
 TOKEN_LENGTH = 16
 TOKEN_REGEX = rf"\ TEMPERED_[A-Z0-9]{{{TOKEN_LENGTH}}}"
+
+
 def generate_token_id() -> str:
     def randbytes(length: int):
         return bytes(random.randint(0, 255) for _ in range(length))

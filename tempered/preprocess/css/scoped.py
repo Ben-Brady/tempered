@@ -47,6 +47,8 @@ def add_scope_to_rule(rule: QualifiedRule, scope: str):
 
 
 counter = 0
+
+
 def generate_scope_id(prefix: t.Union[str, None] = None) -> str:
     global counter
     counter += 1
@@ -56,9 +58,7 @@ def generate_scope_id(prefix: t.Union[str, None] = None) -> str:
     if prefix is None:
         return hash
     else:
-        prefix = prefix \
-            .replace("-", "_") \
-            .lower()
+        prefix = prefix.replace("-", "_").lower()
         return f"{prefix}-{hash[:6]}"
 
 

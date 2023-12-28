@@ -18,7 +18,7 @@ def parse_parameter(parameter: str) -> TemplateParameter:
         isinstance(expr, ast.Assign)
         and isinstance(expr.targets, list)
         and isinstance(expr.targets[0], ast.Name)
-        ):
+    ):
         # name = default
         return TemplateParameter(
             name=expr.targets[0].id,

@@ -17,18 +17,23 @@ def _build_python(
     return ast_utils.unparse(module_ast)
 
 
-def build_memory(templates: t.List[parser.Template]) -> ModuleType:
+def build_memory(
+    templates: t.List[parser.Template],
+    globals: t.Dict[str, t.Any],
+) -> ModuleType:
     source = _build_python(templates)
     spec = spec_from_loader(name="tempered.components", loader=None)
     assert spec is not None
     module = module_from_spec(spec)
     exec(source, module.__dict__)
+    _register_globals(module, globals)
     return module
 
 
 def build_to(
     module: ModuleType,
     templates: t.List[parser.Template],
+    globals: t.Dict[str, t.Any],
 ):
     source = _build_python(templates)
     if not hasattr(module, "__file__") or module.__file__ is None:
@@ -37,11 +42,14 @@ def build_to(
     with open(module.__file__, "w") as f:
         f.write(source)
 
-    return importlib.reload(module)
+    module = importlib.reload(module)
+    _register_globals(module, globals)
+    return module
 
 
 def build_static(
     templates: t.List[parser.Template],
+    globals: t.Dict[str, t.Any],
 ):
     try:
         components = _load_static_file()
@@ -53,7 +61,11 @@ def build_static(
         BUILD_FILE.touch()
         components = _load_static_file()
 
-    return build_to(components, templates)
+    return build_to(
+        components,
+        templates,
+        globals,
+    )
 
 
 def _load_static_file():
@@ -62,3 +74,11 @@ def _load_static_file():
 
     importlib.reload(_components)
     return _components
+
+
+def _register_globals(
+    module: ModuleType,
+    globals: t.Dict[str, t.Any],
+):
+    for name, value in globals.items():
+        module.reigster_global(name, value)

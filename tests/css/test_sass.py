@@ -33,4 +33,3 @@ def test_sass_styles_are_transpiled_with_indent():
     soup = bs4.BeautifulSoup(html, "html.parser")
     style = soup.find("style")
     assert style and style.text == "a b{color:red}"
-

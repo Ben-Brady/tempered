@@ -4,12 +4,8 @@ import typing_extensions as t
 
 
 def validate_templates(templates: t.Sequence[Template]):
-    template_lookup = {
-        template.name: template
-        for template in templates
-    }
+    template_lookup = {template.name: template for template in templates}
     for template in templates:
-
         _check_for_missing_layout(template, template_lookup)
         _check_for_missing_blocks(template, template_lookup)
         _check_for_non_existant_blocks(template, template_lookup)
@@ -66,7 +62,9 @@ def _check_for_non_existant_blocks(template: Template, lookup: t.Dict[str, Templ
             )
 
 
-def _check_for_invalid_component_calls(template: Template, lookup: t.Dict[str, Template]):
+def _check_for_invalid_component_calls(
+    template: Template, lookup: t.Dict[str, Template]
+):
     for call in template.components_calls:
         if call.component_name not in lookup:
             raise InvalidTemplate.create(
@@ -77,9 +75,7 @@ def _check_for_invalid_component_calls(template: Template, lookup: t.Dict[str, T
 
         component = lookup[call.component_name]
         required_parameters = [
-            param.name
-            for param in component.parameters
-            if param.default is None
+            param.name for param in component.parameters if param.default is None
         ]
         for param in required_parameters:
             if param not in call.keywords:
@@ -88,4 +84,3 @@ def _check_for_invalid_component_calls(template: Template, lookup: t.Dict[str, T
                     file=template.file,
                     name=template.name,
                 )
-

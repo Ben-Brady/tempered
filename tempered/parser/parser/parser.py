@@ -53,7 +53,9 @@ def take_tags_until(
     return tags
 
 
-def next_tag(ctx: ParseContext, scanner: TokenScanner) -> t.Union[template_ast.TemplateTag, None]:
+def next_tag(
+    ctx: ParseContext, scanner: TokenScanner
+) -> t.Union[template_ast.TemplateTag, None]:
     tag = scanner.pop()
     if isinstance(tag, tokens.LiteralToken):
         return tag.into_tag()
@@ -101,10 +103,8 @@ def next_tag(ctx: ParseContext, scanner: TokenScanner) -> t.Union[template_ast.T
 
 
 def next_slot(
-    ctx: ParseContext,
-    scanner: TokenScanner,
-    token: tokens.SlotToken
-    ) -> template_ast.SlotTag:
+    ctx: ParseContext, scanner: TokenScanner, token: tokens.SlotToken
+) -> template_ast.SlotTag:
     ctx.is_layout = True
 
     if token.name is None:
@@ -114,14 +114,11 @@ def next_slot(
         ctx.has_default_slot = True
         return template_ast.SlotTag(name=None, default=None)
 
-
     if token.is_required:
         default_body = None
     else:
         default_body = take_tags_until(
-            ctx=ctx,
-            scanner=scanner,
-            stop_tags=[tokens.SlotEndToken]
+            ctx=ctx, scanner=scanner, stop_tags=[tokens.SlotEndToken]
         )
         scanner.expect(tokens.SlotEndToken)
 
@@ -159,11 +156,11 @@ def parse_param(ctx: ParseContext, token: tokens.ParameterToken) -> None:
     return None
 
 
-def next_component(ctx: ParseContext, token: tokens.ComponentToken) -> template_ast.ComponentTag:
+def next_component(
+    ctx: ParseContext, token: tokens.ComponentToken
+) -> template_ast.ComponentTag:
     call = parse_expr(token.call)
-    if (
-        not isinstance(call, ast.Call) or
-        not isinstance(call.func, ast.Name)):
+    if not isinstance(call, ast.Call) or not isinstance(call.func, ast.Name):
         raise ValueError("Invalid Component Call")
 
     call = template_ast.ComponentTag(
@@ -214,7 +211,7 @@ def next_if(
             tokens.ElIfToken,
             tokens.ElseToken,
             tokens.IfEndToken,
-        ]
+        ],
     )
 
     elif_blocks: t.List[t.Tuple[ast.expr, template_ast.TemplateBlock]] = []
@@ -224,11 +221,7 @@ def next_if(
         block: t.List[template_ast.TemplateTag] = take_tags_until(
             ctx=ctx,
             scanner=scanner,
-            stop_tags=[
-                tokens.ElIfToken,
-                tokens.ElseToken,
-                tokens.IfEndToken
-            ],
+            stop_tags=[tokens.ElIfToken, tokens.ElseToken, tokens.IfEndToken],
         )
         elif_blocks.append((elif_condition, block))
 

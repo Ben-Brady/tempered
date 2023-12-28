@@ -1,14 +1,27 @@
 from .. import ast_utils
 from ..parser import template_ast
 from ..parser.template_ast import (
-    Template, LayoutTemplate, TemplateTag,
-    LiteralTag, ExprTag, HtmlTag,
-    ComponentTag, StyleTag, SlotTag,
-    IfTag, ForTag, BlockTag, AssignmentTag,
+    Template,
+    LayoutTemplate,
+    TemplateTag,
+    LiteralTag,
+    ExprTag,
+    HtmlTag,
+    ComponentTag,
+    StyleTag,
+    SlotTag,
+    IfTag,
+    ForTag,
+    BlockTag,
+    AssignmentTag,
 )
 from .utils import (
-    create_escape_call, slot_variable_name, slot_parameter,
-    WITH_STYLES_PARAMETER, CSS_VARIABLE, KWARGS_VARIABLE,
+    create_escape_call,
+    slot_variable_name,
+    slot_parameter,
+    WITH_STYLES_PARAMETER,
+    CSS_VARIABLE,
+    KWARGS_VARIABLE,
 )
 from .accumulators import Variable
 import ast
@@ -106,7 +119,6 @@ class CodeBuilder:
             )
         )
 
-
     def construct_if(self, block: IfTag):
         self.ensure_assigned()
 
@@ -186,13 +198,15 @@ class CodeBuilder:
 
         self.ensure_assigned()
         if not self.is_layout:
-            self.body.append(ast_utils.If(
-                condition=ast_utils.Name(WITH_STYLES_PARAMETER),
-                if_body=ast_utils.AddAssign(
-                    target=self.variable.name,
-                    value=ast_utils.Constant(f"<style>{self.css}</style>"),
-                ),
-            ))
+            self.body.append(
+                ast_utils.If(
+                    condition=ast_utils.Name(WITH_STYLES_PARAMETER),
+                    if_body=ast_utils.AddAssign(
+                        target=self.variable.name,
+                        value=ast_utils.Constant(f"<style>{self.css}</style>"),
+                    ),
+                )
+            )
         else:
             condition = ast_utils.And(
                 ast_utils.Name(WITH_STYLES_PARAMETER),

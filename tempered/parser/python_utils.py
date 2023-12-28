@@ -4,6 +4,8 @@ import string
 
 IDENT_START = string.ascii_letters + "_"
 IDENT_CONTINUE = IDENT_START
+
+
 def take_ident(scanner: TextScanner) -> str:
     ident = scanner.take(*IDENT_START)
     ident += scanner.take_while(*IDENT_CONTINUE)
@@ -12,9 +14,22 @@ def take_ident(scanner: TextScanner) -> str:
 
 def take_string(scanner: TextScanner) -> str:
     STRING_PREFIXES = (
-        "r", "u", "R", "U", "f", "F",
-        "fr", "Fr", "fR", "FR", "rf", "rF", "Rf", "RF"
+        "r",
+        "u",
+        "R",
+        "U",
+        "f",
+        "F",
+        "fr",
+        "Fr",
+        "fR",
+        "FR",
+        "rf",
+        "rF",
+        "Rf",
+        "RF",
     )
+
     BYTE_PREFIXES = "b", "B", "br", "Br", "bR", "BR", "rb", "rB", "Rb", "RB"
     SINGLELINE_TERMINATORS = ("'", '"')
     MULTILINE_TERMINATORS = ("'''", '"""')
@@ -44,7 +59,7 @@ def _take_string(
     terminator: str,
     is_multiline: bool,
     is_bytestring: bool,
-    ):
+):
     STRING_ESCAPE = "\\"
 
     text = ""
@@ -65,6 +80,5 @@ def _take_string(
             scanner.error("Non-ascii character in bytestring")
 
         text += char
-
 
     raise scanner.error("String was not closed")
