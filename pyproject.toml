@@ -6,10 +6,10 @@ license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
-    "bs4",
-    "minify-html",
-    "tinycss2",
-    "rcssmin",
+    "beautifulsoup4~=4.12.2",
+    "minify-html~=0.15.0",
+    "tinycss2~=1.2.1",
+    "rcssmin!=1.1.2",
     "typing_extensions",
     "markupsafe; python_version <= '3.9'",
     "astor; python_version <= '3.8'",
@@ -23,6 +23,9 @@ test = [
     "pytest-asyncio",
     "mypy",
 ]
+dev = [
+    "black",
+]
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]
@@ -30,3 +33,6 @@ build-backend = "flit_core.buildapi"
 
 [tool.flit.sdist]
 exclude = ["tests/", "benchmarks/", "examples/", ".github/"]
+
+[tool.black]
+target-version = ["py37", "py38", "py39", "py310", "py311"]
