@@ -1,4 +1,4 @@
-from utils import build_template
+from . import build_template
 import time
 import pytest
 

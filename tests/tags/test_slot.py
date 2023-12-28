@@ -1,4 +1,4 @@
-from utils import build_templates
+from . import build_templates
 import pytest
 import bs4
 import tempered

@@ -1,16 +1,16 @@
 import tempered
-import utils
+from . import build_template, build_templates
 import pytest
 
 
 def test_checks_detect_missing_layout():
     with pytest.raises(tempered.errors.InvalidTemplate):
-        utils.build_template('{% layout "dont_exist" %}')
+        build_template('{% layout "dont_exist" %}')
 
 
 def test_checks_detect_invalid_layout():
     with pytest.raises(tempered.errors.InvalidTemplate):
-        utils.build_templates(
+        build_templates(
             '{% layout "non_layout" %}',
             ("non_layout", "This isn't a layout"),
         )
@@ -18,7 +18,7 @@ def test_checks_detect_invalid_layout():
 
 def test_checks_detect_missing_components():
     with pytest.raises(tempered.errors.InvalidTemplate):
-        utils.build_template(
+        build_template(
             """
             {<Invalid()>}
         """
@@ -27,7 +27,7 @@ def test_checks_detect_missing_components():
 
 def test_checks_detect_missing_components_parameters():
     with pytest.raises(tempered.errors.InvalidTemplate):
-        utils.build_templates(
+        build_templates(
             "{<invalid()>}",
             ("invalid", "{% param a %}"),
         )
@@ -35,7 +35,7 @@ def test_checks_detect_missing_components_parameters():
 
 def test_checks_detect_invalid_blocks():
     with pytest.raises(tempered.errors.InvalidTemplate):
-        utils.build_templates(
+        build_templates(
             """
             {% layout "layout" %}
             {% block nonexist %}
@@ -48,7 +48,7 @@ def test_checks_detect_invalid_blocks():
 
 def test_checks_detect_missing_blocks():
     with pytest.raises(tempered.errors.InvalidTemplate):
-        utils.build_templates(
+        build_templates(
             """
             {% layout "layout" %}
             {% block nonexist %}

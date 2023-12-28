@@ -1,11 +1,11 @@
-import utils
+from . import build_template, build_templates
 from tempered import Tempered
 import bs4
 import pytest
 
 
 def test_layout_extend_with_default_slot():
-    func = utils.build_templates(
+    func = build_templates(
         """
         {% layout "a" %}
         Test
@@ -22,7 +22,7 @@ def test_layout_extend_with_default_slot():
 def test_layout_migrates_css():
     CSS_KEY = "TEMPERED_CSS"
 
-    func = utils.build_templates(
+    func = build_templates(
         f"""
         {{% layout "a" %}}
         Test
@@ -40,7 +40,7 @@ def test_layout_migrates_css():
 
 
 def test_layout_extend_with_named_slots():
-    func = utils.build_templates(
+    func = build_templates(
         """
         {% layout "layout" %}
         {% block title %}Test{% endblock %}
@@ -53,7 +53,7 @@ def test_layout_extend_with_named_slots():
 
 
 def test_layout_extend_with_many_named_slots():
-    func = utils.build_templates(
+    func = build_templates(
         """
         {% layout "layout" %}
         {% block a %}A{% endblock %}
@@ -74,7 +74,7 @@ def test_layout_extend_with_many_named_slots():
 
 def test_layout_respects_with_styles():
     CSS_KEY = "TEMPERED"
-    func = utils.build_templates(
+    func = build_templates(
         """
         {% layout "layout" %}
         """,
@@ -111,7 +111,7 @@ def test_layout_styles_are_combined():
         </style>
     """
 
-    func = utils.build_templates(
+    func = build_templates(
         component,
         ("layout", layout),
     )
@@ -147,7 +147,7 @@ def test_nested_layout_styles_are_combined():
         </style>
     """
 
-    func = utils.build_templates(
+    func = build_templates(
         component,
         ("layout_1", layout_1),
         ("layout_2", layout_2),

@@ -1,4 +1,4 @@
-from utils import build_template, build_templates
+from . import build_template, build_templates
 import pytest
 import tinycss2
 import tempered

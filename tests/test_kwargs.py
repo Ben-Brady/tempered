@@ -1,4 +1,4 @@
-from utils import build_template, build_templates
+from . import build_template, build_templates
 import bs4
 import pytest
 
