@@ -1,5 +1,5 @@
 from rcssmin import cssmin
-from minify_html import minify
+from minify_html import minify  # type: ignore
 
 
 def minify_html(html: str) -> str:
