@@ -1,6 +1,5 @@
 from . import parser, ast_utils
 from .compiler.module import compile_module
-import ast
 import sys
 import importlib
 from importlib.util import spec_from_loader, module_from_spec
@@ -14,15 +13,11 @@ BUILD_FILE = Path(__file__).parent.joinpath("generated/_components.py")
 def _build_python(
     templates: t.List[parser.Template],
 ) -> str:
-    module_ast = compile_module(
-        templates=templates,
-    )
+    module_ast = compile_module(templates=templates)
     return ast_utils.unparse(module_ast)
 
 
-def build_memory(
-    templates: t.List[parser.Template],
-) -> ModuleType:
+def build_memory(templates: t.List[parser.Template]) -> ModuleType:
     source = _build_python(templates)
     spec = spec_from_loader(name="tempered.components", loader=None)
     assert spec is not None

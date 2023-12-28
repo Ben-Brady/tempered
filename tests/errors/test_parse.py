@@ -1,9 +1,13 @@
-from tempered import Tempered
+import tempered
+from tempered.parser import parse_template
 import pytest
 
-INVALID_BLOCK_TEMPLATE = "tests/errors/templates/invalid_block.html"
 
-
-@pytest.mark.skip
 def test_invalid_end_block():
-    Tempered().add_template(INVALID_BLOCK_TEMPLATE)
+    with pytest.raises(tempered.errors.ParserException):
+        parse_template("foo", "{% block test %}{%endblock test%}")
+
+
+def test_invalid_tag():
+    with pytest.raises(tempered.errors.ParserException):
+        parse_template("foo", "{% fake %}")

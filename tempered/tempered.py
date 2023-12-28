@@ -1,10 +1,11 @@
 from . import parser, build
+from .enviroment import Template, Enviroment
+from .compiler.utils import component_func_name
+from .types import build_types
 from pathlib import Path
 from types import ModuleType
 import typing_extensions as t
 from dataclasses import dataclass
-import multiprocessing as mp
-
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 
@@ -18,10 +19,10 @@ class TemplateInfo:
     def parse(self) -> parser.Template:
         return parser.parse_template(self.name, self.body, self.file)
 
+
 class Tempered:
     _templates: t.List[TemplateInfo]
     _globals: t.Dict[str, t.Any]
-
 
     def __init__(self, template_folder: t.Union[str, Path, None] = None):
         self._templates = []
@@ -36,7 +37,7 @@ class Tempered:
 
     def add_global(self, name: str, value: t.Any):
         self._globals[name] = value
-    
+
     def add_template_folder(self, folder: t.Union[Path, str]):
         for file in Path(folder).glob("**/*.*"):
             self.add_template(file)
@@ -71,3 +72,19 @@ class Tempered:
 
     def build_static(self):
         return build.build_static(self._parse_templates())
+
+    def build_enviroment(self, generate_types: bool = True) -> Enviroment:
+        template_objs = self._parse_templates()
+        m = build.build_memory(template_objs)
+        if generate_types:
+            build_types(template_objs)
+
+        templates: t.Dict[str, Template] = {}
+        for template in template_objs:
+            if template.is_layout:
+                continue
+
+            func = getattr(m, component_func_name(template.name))
+            templates[template.name] = Template(func) # type: ignore
+
+        return Enviroment(templates=templates, globals={})

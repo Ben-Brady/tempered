@@ -65,7 +65,6 @@ def test_parse_parameters_with_default():
 
 
 if sys.version_info >= (3, 9):
-
     def test_parse_parameters_with_none_default():
         _assert_single_parameter(
             "{%param a: str | None = None %}",
@@ -73,9 +72,7 @@ if sys.version_info >= (3, 9):
             type="str | None",
             default=None,
         )
-
 else:
-
     def test_parse_parameters_with_none_default():
         _assert_single_parameter(
             "{%param a: t.Union[str, None] = None %}",

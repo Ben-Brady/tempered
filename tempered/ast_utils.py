@@ -39,6 +39,7 @@ def Constant(value: LiteralType) -> ast.expr:
 
 
 EmptyStr = Constant("")
+Ellipsis = Constant(...)
 None_ = Constant(None)
 True_ = Constant(True)
 False_ = Constant(False)
@@ -113,34 +114,28 @@ def Module(body: Sequence[ast.AST]) -> ast.Module:
     return module
 
 
+def Arg(name: str, annotation: t.Optional[ast.expr] = None) -> ast.arg:
+    return ast.arg(name, annotation)
+
+
 def Arguments(
     args: t.List[ast.arg] = [],
     defaults: t.List[ast.expr] = [],
-    kw_defaults: t.List[t.Union[ast.expr, None]] = [],
+    kw_defaults: t.List[t.Optional[ast.expr]] = [],
     posonlyargs: t.List[ast.arg] = [],
     kwonlyargs: t.List[ast.arg] = [],
     vararg: t.Optional[ast.arg] = None,
     kwarg: t.Optional[ast.arg] = None,
 ) -> ast.arguments:
-    if sys.version_info >= (3, 9):
-        return ast.arguments(
-            args=args,
-            defaults=defaults,
-            kw_defaults=kw_defaults,
-            posonlyargs=posonlyargs,
-            kwonlyargs=kwonlyargs,
-            vararg=vararg,
-            kwarg=kwarg,
-        )
-    else:
-        return ast.arguments(
-            args=args + posonlyargs,
-            defaults=defaults,
-            kw_defaults=kw_defaults,
-            kwonlyargs=kwonlyargs,
-            vararg=vararg,
-            kwarg=kwarg,
-        )
+    return ast.arguments(
+        args=args,
+        defaults=defaults,
+        kw_defaults=kw_defaults,
+        posonlyargs=posonlyargs,
+        kwonlyargs=kwonlyargs,
+        vararg=vararg,
+        kwarg=kwarg,
+    )
 
 
 def Function(
@@ -156,6 +151,21 @@ def Function(
         body=body,
         returns=returns,
         decorator_list=decorators,
+        type_params=[],
+    )
+
+
+def ClassDef(
+    name: str,
+    bases: t.List[ast.expr] = [],
+    body: t.List[ast.stmt] = [],
+) -> ast.ClassDef:
+    return ast.ClassDef(
+        name=name,
+        bases=bases,
+        keywords=[],
+        body=body,
+        decorator_list=[],
         type_params=[],
     )
 
@@ -189,6 +199,14 @@ def Assign(
         targets=[target],
         value=value,
         type_comment=None,
+    )
+
+
+def Index(value: ast.expr, index: ast.expr) -> ast.Subscript:
+    return ast.Subscript(
+        value=value,
+        slice=index,
+        ctx=ast.Load(),
     )
 
 
@@ -362,23 +380,35 @@ def If(
     return if_statement
 
 
-def create(code: str) -> ast.expr:
+
+
+T = t.TypeVar("T", bound=ast.stmt   )
+
+
+def create_stmt(code: str, type: t.Type[T]) -> T:
     module = ast.parse(code)
     if len(module.body) != 1:
-        raise RuntimeError("Generated code was not an expression")
+        raise RuntimeError("Generated code a single stmt")
 
     expr = module.body[0]
-    if not isinstance(expr, ast.Expr):
-        raise RuntimeError("Generated code was not an expression")
+    if not isinstance(expr, type):
+        raise RuntimeError(f"Generated code was not {type}")
 
+    return t.cast(T, expr)
+
+def create_expr(code: str) -> ast.expr:
+    expr = create_stmt(code, ast.Expr)
     return expr.value
-
 
 def print_ast(module: t.Union[t.List[ast.AST], ast.Module]):
     if isinstance(module, list):
         module = Module(module)
 
     print(unparse(module))
+
+
+def parse(code: str) -> t.List[ast.stmt]:
+    return ast.parse(code).body
 
 
 def unparse(node: ast.AST):

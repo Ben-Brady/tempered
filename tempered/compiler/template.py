@@ -101,10 +101,7 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
     return ast_utils.Arguments(
         kwonlyargs=args,
         kw_defaults=defaults,
-        kwarg=ast.arg(
-            arg=KWARGS_VARIABLE,
-            annotation=ast_utils.create("t.Any"),
-        ),
+        kwarg=ast_utils.Arg(KWARGS_VARIABLE, ast_utils.create_expr("t.Any")),
     )
 
 
