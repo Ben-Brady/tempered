@@ -3,8 +3,11 @@ from typing import Sequence
 import typing_extensions as t
 
 
-def calculate_required_css(template: Template, lookup: t.Dict[str, Template]) -> str:
-    components_used = _calculate_required_components(template, lookup)
+def calculate_required_css(
+    template: Template,
+    lookup: t.Dict[str, Template],
+) -> str:
+    components_used = calculate_dependencies(template, lookup)
     component_cache.clear()
     css_fragments = [lookup[comp].css for comp in components_used]
     return " ".join(css_fragments)
@@ -13,8 +16,9 @@ def calculate_required_css(template: Template, lookup: t.Dict[str, Template]) ->
 component_cache: t.Dict[str, t.Set[str]] = {}
 
 
-def _calculate_required_components(
-    template: Template, lookup: t.Dict[str, Template]
+def calculate_dependencies(
+    template: Template,
+    lookup: t.Dict[str, Template],
 ) -> Sequence[str]:
     if template.name in component_cache:
         return list(component_cache[template.name])
@@ -28,7 +32,7 @@ def _calculate_required_components(
 
     for name in list(required_names):
         child = lookup[name]
-        child_children = _calculate_required_components(child, lookup)
+        child_children = calculate_dependencies(child, lookup)
         components_used.update(child_children)
 
     component_cache[template.name] = components_used

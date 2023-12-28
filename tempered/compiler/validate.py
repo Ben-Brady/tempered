@@ -1,5 +1,6 @@
-from .errors import InvalidTemplate
-from .parser.template_ast import Template, LayoutTemplate
+from ..errors import InvalidTemplate
+from ..parser.template_ast import Template, LayoutTemplate
+from .preprocess import calculate_dependencies
 import typing_extensions as t
 
 
