@@ -27,7 +27,7 @@ def create_template_function(
         TemplateParameter(
             name=WITH_STYLES_PARAMETER,
             type=ast_utils.Name("bool"),
-            default=ast_utils.True_,
+            default=ast_utils.Constant(True),
         )
     )
 

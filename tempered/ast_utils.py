@@ -4,10 +4,8 @@ import typing_extensions as t
 import sys
 
 NoneType = type(None)
-EllipsisType = type(...)
 
 LiteralType: t.TypeAlias = t.Union[
-    EllipsisType,
     None,
     str,
     bytes,
@@ -23,7 +21,7 @@ LiteralType: t.TypeAlias = t.Union[
 
 
 def Constant(value: LiteralType) -> ast.expr:
-    CONSTANT_TYPES = (NoneType, EllipsisType, str, bytes, bool, int, float, complex)
+    CONSTANT_TYPES = (NoneType, str, bytes, bool, int, float, complex)
     if isinstance(value, list):
         return List(value)
     elif isinstance(value, set):
@@ -39,10 +37,7 @@ def Constant(value: LiteralType) -> ast.expr:
 
 
 EmptyStr = Constant("")
-Ellipsis = Constant(...)
 None_ = Constant(None)
-True_ = Constant(True)
-False_ = Constant(False)
 
 
 def List(value: Iterable[t.Union[LiteralType, ast.expr]]) -> ast.List:

@@ -2,9 +2,6 @@ from .text_scanner import TextScanner
 import string
 
 
-WHITESPACE = string.whitespace
-
-
 IDENT_START = string.ascii_letters + "_"
 IDENT_CONTINUE = IDENT_START
 def take_ident(scanner: TextScanner) -> str:

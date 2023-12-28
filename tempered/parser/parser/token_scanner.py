@@ -5,7 +5,6 @@ import typing_extensions as t
 
 class TokenScanner:
     stream: t.Sequence[Token]
-    _checkpoint: t.Union[t.Sequence[Token], None] = None
 
     def __init__(self, stream: t.Sequence[Token]):
         self.stream = stream
@@ -14,18 +13,6 @@ class TokenScanner:
     @property
     def has_tokens(self) -> bool:
         return len(self.stream) != 0
-
-
-    def checkpoint(self):
-        self._checkpoint = self.stream
-
-
-    def restore(self):
-        if self._checkpoint is None:
-            raise RuntimeError("No checkpoint to restore from")
-
-        self.stream = self._checkpoint
-        self._checkpoint = None
 
 
     def pop(self) -> Token:

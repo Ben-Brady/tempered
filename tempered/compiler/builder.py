@@ -16,7 +16,6 @@ import sys
 import typing_extensions as t
 from dataclasses import dataclass, field
 
-USE_EXPR_BUFFER = True
 
 @dataclass
 class CodeBuilder:

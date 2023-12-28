@@ -12,7 +12,6 @@ class TextScanner:
 
     if t.TYPE_CHECKING:
         text: array[str]
-        _checkpoint: t.Union[t.Tuple[array[str], int], None] = None
 
     def __init__(self, html: str, file: t.Union[Path, None] = None):
         self.file = file
@@ -25,16 +24,6 @@ class TextScanner:
     @property
     def has_text(self) -> bool:
         return len(self.text) != 0
-
-    def checkpoint(self):
-        self._checkpoint = self.text[:], self.position
-
-    def backtrack(self):
-        if self._checkpoint is None:
-            raise RuntimeError("No checkpoint to backtrack to")
-
-        self.text, self.position = self._checkpoint
-        self._checkpoint = None
 
     def pop(
         self,
