@@ -1,1 +1,1 @@
-python -m black tempered/ tests/
+python3 -m black tempered/ tests/
