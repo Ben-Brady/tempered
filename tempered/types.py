@@ -102,7 +102,7 @@ class Template:
 
 def create_enviroment(overloads: t.List[ast.FunctionDef]) -> ast.ClassDef:
     enviroment_base = """
-class Enviroment:
+class Environment:
     def __init__(self, templates: t.Dict[str, Template], globals: t.Dict[str, t.Any]):
         ...
 

@@ -10,7 +10,7 @@ class Template:
         return self.func(**context)
 
 
-class Enviroment:
+class Environment:
     _templates: t.Dict[str, Template] = {}
     _globals: t.Dict[str, Template] = {}
 

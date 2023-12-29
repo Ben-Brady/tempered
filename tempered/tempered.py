@@ -1,5 +1,5 @@
 from . import parser, build, types
-from .enviroment import Template, Enviroment
+from .enviroment import Template, Environment
 from .compiler.utils import component_func_name
 from pathlib import Path
 from types import ModuleType
@@ -73,7 +73,7 @@ class Tempered:
     def build_static(self):
         return build.build_static(self._parse_templates(), self._globals)
 
-    def build_enviroment(self, generate_types: bool = True) -> Enviroment:
+    def build_enviroment(self, generate_types: bool = True) -> Environment:
         template_objs = self._parse_templates()
         m = build.build_memory(template_objs, self._globals)
         if generate_types:
@@ -89,4 +89,4 @@ class Tempered:
             func = getattr(m, component_func_name(template.name))
             templates[template.name] = Template(func)  # type: ignore
 
-        return Enviroment(templates=templates, globals={})
+        return Environment(templates=templates, globals={})
