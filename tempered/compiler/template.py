@@ -11,8 +11,9 @@ from .utils import (
     CSS_VARIABLE,
 )
 from .resolve import create_resolve_for_unknown_variables
-from .builder import CodeBuilder
+from .builder import BuildContext
 from .accumulators import Variable
+from .rules import default_rules
 import ast
 import typing_extensions as t
 
@@ -66,11 +67,12 @@ def create_template_function(
                 )
             )
 
-    ctx = CodeBuilder(
+    ctx = BuildContext(
         template=template,
-        variable=Variable(OUTPUT_VARIABLE),
+        output_variable=Variable(OUTPUT_VARIABLE),
         layout=layout,
         css=css if len(css) > 0 else None,
+        rules=default_rules,
     )
     func = ast_utils.Function(
         name=function_name,
@@ -107,7 +109,7 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
     )
 
 
-def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
+def construct_body(ctx: BuildContext) -> t.Sequence[ast.AST]:
     statements: t.List[ast.AST] = []
     if ctx.is_layout or ctx.uses_layout:
         statements.extend(create_style_contant(ctx))
@@ -115,8 +117,8 @@ def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
     for tag in ctx.template.body:
         ctx.construct_tag(tag)
 
-    ctx.ensure_assigned()
-    output_value = ctx.variable.name
+    ctx.ensure_output_assigned()
+    output_value = ctx.output_variable.name
 
     statements.extend(ctx.body)
 
@@ -133,7 +135,7 @@ def construct_body(ctx: CodeBuilder) -> t.Sequence[ast.AST]:
     return statements
 
 
-def create_style_contant(ctx: CodeBuilder) -> t.List[ast.stmt]:
+def create_style_contant(ctx: BuildContext) -> t.List[ast.stmt]:
     if ctx.is_layout:
         return []
 

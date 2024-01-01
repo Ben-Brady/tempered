@@ -40,7 +40,7 @@ def take_tags_until(
     ctx: ParseContext,
     scanner: TokenScanner,
     stop_tags: t.List[t.Type[tokens.Token]] = [],
-) -> t.List[template_ast.TemplateTag]:
+) -> t.List[template_ast.Tag]:
     tags = []
     while scanner.has_tokens:
         if scanner.is_next(*stop_tags):
@@ -55,7 +55,7 @@ def take_tags_until(
 
 def next_tag(
     ctx: ParseContext, scanner: TokenScanner
-) -> t.Union[template_ast.TemplateTag, None]:
+) -> t.Union[template_ast.Tag, None]:
     tag = scanner.pop()
     if isinstance(tag, tokens.LiteralToken):
         return tag.into_tag()
@@ -65,7 +65,7 @@ def next_tag(
     elif isinstance(tag, tokens.EscapedExprToken):
         return template_ast.ExprTag(parse_expr(tag.expr))
     elif isinstance(tag, tokens.HtmlExprToken):
-        return template_ast.HtmlTag(parse_expr(tag.expr))
+        return template_ast.RawExprTag(parse_expr(tag.expr))
     elif isinstance(tag, tokens.ComponentToken):
         return next_component(ctx, tag)
     elif isinstance(tag, tokens.StylesToken):
@@ -204,7 +204,7 @@ def next_if(
 ) -> template_ast.IfTag:
     condition = parse_expr(token.condition)
 
-    if_block: t.List[template_ast.TemplateTag] = take_tags_until(
+    if_block: t.List[template_ast.Tag] = take_tags_until(
         ctx=ctx,
         scanner=scanner,
         stop_tags=[
@@ -218,14 +218,14 @@ def next_if(
     while scanner.is_next(tokens.ElIfToken):
         elif_token = scanner.expect(tokens.ElIfToken)
         elif_condition = parse_expr(elif_token.condition)
-        block: t.List[template_ast.TemplateTag] = take_tags_until(
+        block: t.List[template_ast.Tag] = take_tags_until(
             ctx=ctx,
             scanner=scanner,
             stop_tags=[tokens.ElIfToken, tokens.ElseToken, tokens.IfEndToken],
         )
         elif_blocks.append((elif_condition, block))
 
-    else_block: t.Union[t.List[template_ast.TemplateTag], None] = None
+    else_block: t.Union[t.List[template_ast.Tag], None] = None
     if scanner.accept(tokens.ElseToken):
         else_block = take_tags_until(
             ctx=ctx,

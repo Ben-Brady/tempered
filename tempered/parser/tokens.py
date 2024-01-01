@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 @t.runtime_checkable
 class EasyParseToken(t.Protocol):
-    def into_tag(self) -> template_ast.TemplateTag:
+    def into_tag(self) -> template_ast.Tag:
         ...
 
 

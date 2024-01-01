@@ -21,7 +21,7 @@ class ExprTag(Tag):
 
 
 @dataclass
-class HtmlTag(Tag):
+class RawExprTag(Tag):
     value: ast.expr
 
 
@@ -71,19 +71,6 @@ class BlockTag(Tag):
     body: TemplateBlock
 
 
-TemplateTag: t.TypeAlias = t.Union[
-    LiteralTag,
-    HtmlTag,
-    ExprTag,
-    ComponentTag,
-    StyleTag,
-    IfTag,
-    ForTag,
-    AssignmentTag,
-    SlotTag,
-    BlockTag,
-]
-
 
 @dataclass
 class TemplateParameter:
@@ -115,4 +102,4 @@ class LayoutTemplate(Template):
     slots: t.List[SlotTag] = field(default_factory=list)
 
 
-TemplateBlock: t.TypeAlias = t.Sequence[TemplateTag]
+TemplateBlock: t.TypeAlias = t.Sequence[Tag]
