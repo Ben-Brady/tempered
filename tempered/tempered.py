@@ -87,6 +87,6 @@ class Tempered:
                 continue
 
             func = getattr(m, component_func_name(template.name))
-            templates[template.name] = Template(func)  # type: ignore
+            templates[template.name] = Template(func,self. _globals)  # type: ignore
 
         return Environment(templates=templates, globals={})

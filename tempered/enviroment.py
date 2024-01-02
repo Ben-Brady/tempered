@@ -4,10 +4,11 @@ from dataclasses import dataclass
 
 @dataclass
 class Template:
-    func: t.Callable[..., str]
+    _func: t.Callable[..., str]
+    _globals: t.Dict[str, t.Any]
 
     def render(self, **context: t.Any) -> str:
-        return self.func(**context)
+        return self._func(**context)
 
 
 class Environment:
