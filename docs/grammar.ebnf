@@ -20,17 +20,6 @@
 <component_end>             ::= ">}"
 <component_end_alternative> ::= "/>}"
 
-<for_keyword> ::= "for"
-<endfor_keyword> ::= "endfor"
-<set_keyword> ::= "set"
-<param_keyword> ::= "param"
-<include_keyword> ::= "include"
-<layout_keyword> ::= "layout"
-<slot_keyword> ::= "slot"
-<endslot_keyword> ::= "endslot"
-<block_keyword> ::= "block"
-<endblock_keyword> ::= "endblock"
-
 <if_statement> ::= <if_tag> <html> (<elif_tag> <html>)* (<else_tag> <html>)? <endif_tag>
 <if_tag> ::= (
     <statement_start> <whitespace> "if" <whitespace> <python_expr> <statement_end>
@@ -67,7 +56,7 @@
     <statement_start> <whitespace> "styles" <whitespace> <statement_end>
 )
 <slot_tag> ::= (
-    <statement_start> <whitespace> <slot_keyword> <whitespace> <ident>? <whitespace> "required"? <whitespace> <statement_end>
+    <statement_start> <whitespace> "slot" <whitespace> <ident>? <whitespace> "required"? <whitespace> <statement_end>
 )
 <endslot_tag> ::= (
     <statement_start> <whitespace> "endslot" <whitespace> <statement_end>
@@ -90,8 +79,8 @@
 <html> ::= (<unicode> | <control_escape>)*
 
 
-<python> ::= <unicode>+
-<python_expr> ::= <unicode>+
+<python> ::= (<unicode> | <control_escape>)+
+<python_expr> ::= <python>
 
 <string> ::= "\"" <unicode>* "\""
 
