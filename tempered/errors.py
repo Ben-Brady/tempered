@@ -2,12 +2,6 @@ from __future__ import annotations
 from pathlib import Path
 import typing_extensions as t
 from dataclasses import dataclass
-import sys
-
-try:
-    from functools import cached_property
-except Exception:
-    cached_property = property
 
 
 class BuildError(Exception):
@@ -85,16 +79,16 @@ class ErrorInfo:
     line_no: int
     offset: int
 
-    @cached_property
+    @property
     def lines(self) -> list[str]:
         return self.source.split("\n")
 
-    @cached_property
+    @property
     def err_line(self) -> str:
         line_index = self.line_no - 1
         return self.lines[line_index]
 
-    @cached_property
+    @property
     def prev_line(self) -> t.Union[str, None]:
         line_index = self.line_no - 1
         try:
@@ -102,7 +96,7 @@ class ErrorInfo:
         except KeyError:
             return None
 
-    @cached_property
+    @property
     def next_line(self) -> t.Union[str, None]:
         line_index = self.line_no - 1
         try:
