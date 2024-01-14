@@ -32,22 +32,11 @@ def parse_parameter(parameter: str) -> TemplateParameter:
 
 
 def parse_expr(expression: str) -> ast.expr:
-    expr = parse_stmt(expression)
-    if isinstance(expr, ast.Expr):
-        return expr.value
-    elif isinstance(expr, ast.expr):
-        return expr
-    else:
-        raise ValueError(f"Invalid Expr: {expression}")
+    return ast_utils.create_expr(expression)
 
 
 def parse_stmt(expression: str) -> ast.stmt:
-    module = ast.parse(expression)
-    if not isinstance(module, ast.Module):
-        raise ValueError(f"Invalid Expr: {expression}")
-
-    stmt = module.body[0]
-    return stmt
+    return ast_utils.create_stmt(expression, ast.stmt)
 
 
 def parse_ident(expr: str) -> ast.Name:

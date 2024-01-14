@@ -45,7 +45,7 @@ class SlotEndToken:
 
 
 @dataclass
-class BlockToken:
+class BlockStartToken:
     name: str
     is_required: bool
 
@@ -129,6 +129,6 @@ Token: t.TypeAlias = t.Union[
     LayoutToken,
     SlotToken,
     SlotEndToken,
-    BlockToken,
+    BlockStartToken,
     BlockEndToken,
 ]

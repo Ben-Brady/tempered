@@ -172,7 +172,7 @@ def take_slot_token(scanner: TextScanner) -> tokens.SlotToken:
     )
 
 
-def take_block_token(scanner: TextScanner) -> tokens.BlockToken:
+def take_block_token(scanner: TextScanner) -> tokens.BlockStartToken:
     name = python_utils.take_ident(scanner)
     take_whitespace(scanner)
 
@@ -180,7 +180,7 @@ def take_block_token(scanner: TextScanner) -> tokens.BlockToken:
     take_whitespace(scanner)
     scanner.expect(STATEMENT_END)
 
-    return tokens.BlockToken(name=name, is_required=is_required)
+    return tokens.BlockStartToken(name=name, is_required=is_required)
 
 
 def take_set_token(scanner: TextScanner) -> tokens.SetToken:

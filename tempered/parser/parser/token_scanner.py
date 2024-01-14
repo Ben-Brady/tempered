@@ -39,12 +39,3 @@ class TokenScanner:
             raise ValueError(f"Expected {token} but got {self.stream[0]!r}")
         else:
             return self.pop()  # type: ignore
-
-    T = t.TypeVar("T", bound=Token)
-
-    def take_while(self, token: t.Type[T]) -> t.Sequence[T]:
-        tokens = []
-        while self.is_next(token):
-            tokens.append(self.pop())
-
-        return tokens
