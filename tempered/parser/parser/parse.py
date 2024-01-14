@@ -7,7 +7,6 @@ import typing_extensions as t
 from dataclasses import dataclass, field
 
 
-
 @dataclass
 class ParseContext:
     body: template_ast.TemplateBlock = field(default_factory=list)
@@ -36,4 +35,3 @@ def parse_token_stream(tokens: t.Sequence[tokens.Token], has_css: bool) -> Parse
             ctx.body = [*ctx.body, template_ast.StyleTag()]
 
     return ctx
-

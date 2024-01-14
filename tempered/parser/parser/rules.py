@@ -76,40 +76,6 @@ class StyleIncludedRule(Rule[tokens.StylesIncludeToken]):
         return None
 
 
-class SlotRule(Rule[tokens.SlotToken]):
-    token = tokens.SlotToken
-
-    @staticmethod
-    def take(
-        ctx: ParseContext,
-        scanner: TokenScanner,
-        token: tokens.SlotToken,
-    ) -> t.Union[template_ast.Tag, None]:
-        ctx.is_layout = True
-
-        if token.name is None:
-            if ctx.has_default_slot:
-                raise ValueError("Template cannot have multiple default slots")
-
-            ctx.has_default_slot = True
-            return template_ast.SlotTag(name=None, default=None)
-
-        if token.is_required:
-            default_body = None
-        else:
-            default_body = take_tags_until(
-                ctx=ctx, scanner=scanner, stop_tags=[tokens.SlotEndToken]
-            )
-            scanner.expect(tokens.SlotEndToken)
-
-        slot = template_ast.SlotTag(
-            name=token.name,
-            default=default_body,
-        )
-        ctx.slots.append(slot)
-        return slot
-
-
 class StyleRule(Rule[tokens.StylesToken]):
     token = tokens.StylesToken
 
@@ -229,11 +195,7 @@ class IfRule(Rule[tokens.IfStartToken]):
         if_block: t.List[template_ast.Tag] = take_tags_until(
             ctx=ctx,
             scanner=scanner,
-            stop_tags=[
-                tokens.ElIfToken,
-                tokens.ElseToken,
-                tokens.IfEndToken,
-            ],
+            stop_tags=[tokens.ElIfToken, tokens.ElseToken, tokens.IfEndToken],
         )
 
         elif_blocks: t.List[t.Tuple[ast.expr, template_ast.TemplateBlock]] = []
@@ -288,6 +250,40 @@ class ForRule(Rule[tokens.ForStartToken]):
             iterable=iterable,
             loop_variable=loop_var,
         )
+
+
+class SlotRule(Rule[tokens.SlotToken]):
+    token = tokens.SlotToken
+
+    @staticmethod
+    def take(
+        ctx: ParseContext,
+        scanner: TokenScanner,
+        token: tokens.SlotToken,
+    ) -> t.Union[template_ast.Tag, None]:
+        ctx.is_layout = True
+
+        if token.name is None:
+            if ctx.has_default_slot:
+                raise ValueError("Template cannot have multiple default slots")
+
+            ctx.has_default_slot = True
+            return template_ast.SlotTag(name=None, default=None)
+
+        if token.is_required:
+            default_body = None
+        else:
+            default_body = take_tags_until(
+                ctx=ctx, scanner=scanner, stop_tags=[tokens.SlotEndToken]
+            )
+            scanner.expect(tokens.SlotEndToken)
+
+        slot = template_ast.SlotTag(
+            name=token.name,
+            default=default_body,
+        )
+        ctx.slots.append(slot)
+        return slot
 
 
 class BlockRule(Rule[tokens.BlockStartToken]):

@@ -71,7 +71,6 @@ class BlockTag(Tag):
     body: TemplateBlock
 
 
-
 @dataclass
 class TemplateParameter:
     name: str
