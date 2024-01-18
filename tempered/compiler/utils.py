@@ -26,7 +26,7 @@ def __resolve(name: str, context: dict[str, t.Any]) -> t.Any:
     elif name in __globals:
         return __globals[name]
     else:
-        raise RuntimeError(f"The variable {{name}} could not be resolved")
+        raise RuntimeError(f"The variable '{{name}}' could not be resolved")
 """
 ).body
 
