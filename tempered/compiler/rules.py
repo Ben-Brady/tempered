@@ -28,11 +28,11 @@ class Rule(t.Generic[T]):
         raise NotImplementedError
 
 
-class LiteralRule(Rule[tags.LiteralTag]):
-    tag = tags.LiteralTag
+class HtmlRule(Rule[tags.HtmlTag]):
+    tag = tags.HtmlTag
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.LiteralTag):
+    def construct(ctx: BuildContext, tag: tags.HtmlTag):
         ctx.add_expr(ast_utils.Constant(tag.body))
 
 
@@ -199,7 +199,7 @@ class ComponentRule(Rule[tags.ComponentTag]):
 
 
 default_rules: t.List[type[Rule]] = [
-    LiteralRule,
+    HtmlRule,
     ExprRule,
     RawExprRule,
     ComponentRule,

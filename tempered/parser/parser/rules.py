@@ -25,15 +25,15 @@ class Rule(t.Generic[T]):
         ...
 
 
-class LiteralRule(Rule[tokens.LiteralToken]):
-    token = tokens.LiteralToken
+class HtmlRule(Rule[tokens.HtmlToken]):
+    token = tokens.HtmlToken
 
     @staticmethod
     def take(
         ctx: ParseContext,
         scanner: TokenScanner,
-        token: tokens.LiteralToken,
-    ) -> template_ast.LiteralTag:
+        token: tokens.HtmlToken,
+    ) -> template_ast.HtmlTag:
         return token.into_tag()
 
 
@@ -319,7 +319,7 @@ rules: t.List[Rule] = [
     IfRule(),
     ForRule(),
     BlockRule(),
-    LiteralRule(),
+    HtmlRule(),
     EscapedExprRule(),
     HtmlExprRule(),
     StyleIncludedRule(),

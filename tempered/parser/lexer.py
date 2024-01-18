@@ -107,7 +107,7 @@ def take_param_token(scanner: TextScanner) -> tokens.Token:
     return tokens.ParameterToken(parameter)
 
 
-def take_literal_token(scanner: TextScanner) -> tokens.LiteralToken:
+def take_literal_token(scanner: TextScanner) -> tokens.HtmlToken:
     body = ""
     while scanner.has_text:
         if scanner.startswith(EXPR_START, STATEMENT_START, COMPONENT_START):
@@ -117,7 +117,7 @@ def take_literal_token(scanner: TextScanner) -> tokens.LiteralToken:
         else:
             body += scanner.pop()
 
-    return tokens.LiteralToken(body)
+    return tokens.HtmlToken(body)
 
 
 def take_expr_token(scanner: TextScanner) -> tokens.EscapedExprToken:

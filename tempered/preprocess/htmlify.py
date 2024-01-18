@@ -22,8 +22,8 @@ def convert_tokens_to_valid_html(
     html = ""
     token_lookup: t.Dict[str, tokens.Token] = {}
     for token in _tokens:
-        if isinstance(token, tokens.LiteralToken):
-            html += token.body
+        if isinstance(token, tokens.HtmlToken):
+            html += token.text
         else:
             token_id = generate_token_id()
             token_lookup[token_id] = token
@@ -43,7 +43,7 @@ def tokenised_html_to_tokens(
         known_keys = list(token_lookup.keys())
         text = scanner.take_until(known_keys)
         if len(text) > 0:
-            tokens_.append(tokens.LiteralToken(text))
+            tokens_.append(tokens.HtmlToken(text))
 
         if not scanner.has_text:
             break

@@ -11,7 +11,7 @@ class Tag(ABC):
 
 
 @dataclass
-class LiteralTag(Tag):
+class HtmlTag(Tag):
     body: str
 
 

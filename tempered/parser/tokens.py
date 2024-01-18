@@ -10,17 +10,16 @@ class EasyParseToken(t.Protocol):
 
 
 @dataclass
-class LiteralToken(EasyParseToken):
-    body: str
+class HtmlToken(EasyParseToken):
+    text: str
 
-    def into_tag(self) -> template_ast.LiteralTag:
-        return template_ast.LiteralTag(self.body)
+    def into_tag(self) -> template_ast.HtmlTag:
+        return template_ast.HtmlTag(self.text)
 
 
 @dataclass
-class StylesToken(EasyParseToken):
-    def into_tag(self) -> template_ast.StyleTag:
-        return template_ast.StyleTag()
+class StylesToken:
+    ...
 
 
 @dataclass
@@ -112,7 +111,7 @@ class SetToken:
 
 
 Token: t.TypeAlias = t.Union[
-    LiteralToken,
+    HtmlToken,
     ParameterToken,
     StylesToken,
     StylesIncludeToken,

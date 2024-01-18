@@ -6,11 +6,11 @@ def test_parse_if_block():
     block = template.body[0]
     assert isinstance(block, template_ast.IfTag)
     assert len(block.if_block) == 1
-    assert isinstance(block.if_block[0], template_ast.LiteralTag)
+    assert isinstance(block.if_block[0], template_ast.HtmlTag)
     assert (
         block.else_block
         and len(block.else_block) == 1
-        and isinstance(block.else_block[0], template_ast.LiteralTag)
+        and isinstance(block.else_block[0], template_ast.HtmlTag)
     )
 
 
@@ -21,6 +21,6 @@ def test_parse_if_block_with_condition():
     block = template.body[0]
     assert isinstance(block, template_ast.IfTag)
     assert len(block.if_block) == 1
-    assert isinstance(block.if_block[0], template_ast.LiteralTag)
+    assert isinstance(block.if_block[0], template_ast.HtmlTag)
     assert block.else_block and len(block.else_block) == 1
-    assert isinstance(block.else_block[0], template_ast.LiteralTag)
+    assert isinstance(block.else_block[0], template_ast.HtmlTag)
