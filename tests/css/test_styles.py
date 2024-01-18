@@ -87,6 +87,27 @@ def test_sass_styles_are_transpiled_with_indent():
     assert style and style.text == "a b{color:red}"
 
 
+def test_html_scope_classes_applied_once():
+    func = build_template(
+        """
+        <a>
+        </a>
+        <style>
+            a { color: red; }
+        </style>
+        <style>
+            a { font-weight: 1rem; }
+        </style>
+    """
+    )
+
+    html = func(with_styles=True)
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    style = soup.find("a")
+    classes = style.attrs["class"]
+    assert len(classes) == 1
+
+
 @pytest.mark.skip("https://github.com/ndparker/rcssmin/issues/15")
 def test_font_imports_arent_mangled():
     FONT_URL_1 = "https://fonts.googleapis.com/css?family=Open Sans:400"

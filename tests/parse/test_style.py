@@ -1,4 +1,4 @@
-from tempered.preprocess import create_scoped_css, minify_css
+from tempered.preprocess import transform_css, minify_css
 import bs4
 from rcssmin import cssmin
 
@@ -12,7 +12,7 @@ def test_preprocess_extracts_style_tags():
         div { color: red;}
     </style>
     """
-    html, css = create_scoped_css(HTML)
+    html, css = transform_css(HTML)
     soup = bs4.BeautifulSoup(html, "html.parser")
     assert len(soup.find_all("style")) == 0
 
@@ -25,7 +25,7 @@ def test_preprocess_extracts_global_css():
         }
     </style>
     """
-    html, css = create_scoped_css(HTML)
+    html, css = transform_css(HTML)
     assert minify_css(css) == "body{background:black}"
 
 
@@ -39,7 +39,7 @@ def test_preprocess_scopes_css():
         }
     </style>
     """
-    html, css = create_scoped_css(HTML)
+    html, css = transform_css(HTML)
     soup = bs4.BeautifulSoup(html, "html.parser")
     div = soup.find("div")
 
@@ -57,7 +57,7 @@ def test_preprocess_doesnt_override_clases():
         div { background: black; }
     </style>
     """
-    html, css = create_scoped_css(HTML)
+    html, css = transform_css(HTML)
     soup = bs4.BeautifulSoup(html, "html.parser")
     div = soup.find("div")
     assert div and isinstance(div, bs4.element.Tag), "div should exist"

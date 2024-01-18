@@ -38,7 +38,7 @@ def _parse_template(
     html, token_lookup = htmlify.convert_tokens_to_valid_html(tokens)
 
     # Process HTML
-    html, css = preprocess.create_scoped_css(html, prefix=name)
+    html, css = preprocess.transform_css(html, prefix=name)
     css = minify_css(css)
     html = minify_html(html)
 
