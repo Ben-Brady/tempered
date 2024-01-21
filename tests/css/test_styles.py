@@ -108,15 +108,15 @@ def test_html_scope_classes_applied_once():
     assert len(classes) == 1
 
 
-@pytest.mark.skip("https://github.com/ndparker/rcssmin/issues/15")
-def test_font_imports_arent_mangled():
-    FONT_URL_1 = "https://fonts.googleapis.com/css?family=Open Sans:400"
-    FONT_URL_2 = "https://fonts.googleapis.com/css?family=Open Sans:400|Open Sans:700"
+def test_font_imports_arent_rearranged():
+    FONT_URL = "https://fonts.googleapis.com/css?family=Open%20Sans:400"
     func = build_template(
         f"""
-        <style global>
-            @import url('{FONT_URL_1}');
-            @import url('{FONT_URL_2}');
+        <style>
+            a {{ color: red; }}
+        </style>
+        <style>
+            @import url('{FONT_URL}');
         </style>
     """
     )
@@ -125,4 +125,5 @@ def test_font_imports_arent_mangled():
     soup = bs4.BeautifulSoup(html, "html.parser")
     style = soup.find("style")
     assert style
-    assert FONT_URL_1 in style.text and FONT_URL_2 in style.text
+    assert style.text.startswith("@import")
+

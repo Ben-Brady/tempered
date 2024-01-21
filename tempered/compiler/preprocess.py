@@ -8,15 +8,21 @@ def calculate_required_css(
     lookup: t.Dict[str, Template],
 ) -> str:
     components_used = calculate_dependencies(template, lookup)
-    component_cache.clear()
     css_fragments = [lookup[comp].css for comp in components_used]
     return " ".join(css_fragments)
 
 
 component_cache: t.Dict[str, t.Set[str]] = {}
 
-
 def calculate_dependencies(
+    template: Template,
+    lookup: t.Dict[str, Template],
+) -> Sequence[str]:
+    dependencies = _calculate_dependencies(template, lookup)
+    component_cache.clear()
+    return dependencies
+
+def _calculate_dependencies(
     template: Template,
     lookup: t.Dict[str, Template],
 ) -> Sequence[str]:

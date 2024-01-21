@@ -2,6 +2,7 @@ from .. import ast_utils
 from ..parser import Template, LayoutTemplate
 from .utils import FILE_HEADER
 from . import preprocess, validate
+from ..preprocess.css import finalise_css
 from .template import create_template_function
 import ast
 from typing import Sequence
@@ -27,6 +28,7 @@ def compile_module(
             layout = layout_lookup[template.layout]
 
         css = preprocess.calculate_required_css(template, lookup)
+        css = finalise_css(css)
         func = create_template_function(template, layout, css)
         functions.append(func)
 

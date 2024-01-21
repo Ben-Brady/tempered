@@ -12,7 +12,7 @@ html: t.TypeAlias = str
 css: t.TypeAlias = str
 
 
-def transform_css(body: str, prefix: str = "tempered") -> t.Tuple[html, css]:
+def extract_css_from_html(body: str, prefix: str = "tempered") -> t.Tuple[html, css]:
     soup = bs4.BeautifulSoup(body, "html.parser")
     css = ""
 

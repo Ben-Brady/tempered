@@ -1,5 +1,7 @@
-from .css import transform_css
+from .extract import extract_css_from_html
+from .finalise import finalise_css
 
 __all__ = [
-    "transform_css",
+    "extract_css_from_html",
+    "finalise_css",
 ]

@@ -1,6 +1,6 @@
-from .css import transform_css
+from .css import extract_css_from_html
 from .minify import minify_css, minify_html
 from . import htmlify
 
 
-__all__ = ["transform_css", "htmlify", "minify_css", "minify_html"]
+__all__ = ["extract_css_from_html", "htmlify", "minify_css", "minify_html"]
