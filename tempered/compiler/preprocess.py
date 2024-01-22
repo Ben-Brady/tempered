@@ -14,6 +14,7 @@ def calculate_required_css(
 
 component_cache: t.Dict[str, t.Set[str]] = {}
 
+
 def calculate_dependencies(
     template: Template,
     lookup: t.Dict[str, Template],
@@ -21,6 +22,7 @@ def calculate_dependencies(
     dependencies = _calculate_dependencies(template, lookup)
     component_cache.clear()
     return dependencies
+
 
 def _calculate_dependencies(
     template: Template,

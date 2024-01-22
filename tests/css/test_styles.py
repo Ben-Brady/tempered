@@ -126,4 +126,3 @@ def test_font_imports_arent_rearranged():
     style = soup.find("style")
     assert style
     assert style.text.startswith("@import")
-
