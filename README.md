@@ -73,3 +73,8 @@ Templates are transpiled inmto python functions, this provides increased perform
 [View Benchmarks Here](https://github.com/Ben-Brady/tempered/tree/main/benchmarks)
 
 ## Type Hinted
+
+Optional python type information is dynamically created when compiling templates. This means whilst developing you can be provided type information about parameters and existing templates automatically.
+
+[Type Hinting.webm](https://github.com/Ben-Brady/tempered/assets/64110708/35fd09f1-b7ab-47e0-802a-6fb3e0dbb6e9)
+
