@@ -1,10 +1,10 @@
 from .parse import parse_template
-from . import template_ast, tokens
+from . import template_ast, lexer
 from .template_ast import Template, LayoutTemplate, TemplateParameter
 
 __all__ = [
+    "lexer",
     "template_ast",
-    "tokens",
     "parse_template",
     "Template",
     "LayoutTemplate",

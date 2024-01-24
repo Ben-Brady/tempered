@@ -6,32 +6,36 @@ from pathlib import Path
 from abc import ABC
 
 
-class Tag(ABC):
+class Node(ABC):
+    pass
+
+
+class SingleTagNode(Node):
     pass
 
 
 @dataclass
-class HtmlTag(Tag):
-    body: str
+class HtmlNode(SingleTagNode):
+    html: str
 
 
 @dataclass
-class ExprTag(Tag):
+class ExprNode(SingleTagNode):
     value: ast.expr
 
 
 @dataclass
-class RawExprTag(Tag):
+class RawExprNode(SingleTagNode):
     value: ast.expr
 
 
 @dataclass
-class StyleTag(Tag):
+class StyleNode(SingleTagNode):
     """Place styles in component here"""
 
 
 @dataclass
-class ComponentTag(Tag):
+class ComponentNode(SingleTagNode):
     # Needed to prevent CSS from being created multiple times
     # Also to prevent HTML from being escaped
     component_name: str
@@ -39,56 +43,62 @@ class ComponentTag(Tag):
 
 
 @dataclass
-class IfTag(Tag):
+class IfNode(Node):
     condition: ast.expr
     if_block: TemplateBlock
-    else_block: t.Union[TemplateBlock, None]
+    else_block: t.Optional[TemplateBlock]
     elif_blocks: t.List[t.Tuple[ast.expr, TemplateBlock]] = field(default_factory=list)
 
 
 @dataclass
-class ForTag(Tag):
-    iterable: ast.expr
+class ForNode(Node):
     loop_variable: ast.Name
+    iterable: ast.expr
     loop_block: TemplateBlock
 
 
 @dataclass
-class AssignmentTag(Tag):
+class AssignmentNode(SingleTagNode):
     target: ast.expr
     value: ast.expr
 
 
 @dataclass
-class SlotTag(Tag):
-    name: t.Union[str, None]
-    default: t.Union[TemplateBlock, None]
+class SlotNode(Node):
+    name: t.Optional[str]
+    default: t.Optional[TemplateBlock]
 
 
 @dataclass
-class BlockTag(Tag):
-    name: t.Union[str, None]
+class BlockNode(Node):
+    name: t.Optional[str]
     body: TemplateBlock
 
 
 @dataclass
 class TemplateParameter:
     name: str
-    type: t.Union[ast.expr, None] = None
-    default: t.Union[ast.expr, None] = None
+    type: t.Optional[ast.expr] = None
+    default: t.Optional[ast.expr] = None
+
+
+@dataclass
+class SlotInfo:
+    name: t.Optional[str]
+    is_required: bool = False
 
 
 @dataclass
 class Template:
     name: str
     is_layout = False
-    file: t.Union[Path, None] = None
+    file: t.Optional[Path] = None
     parameters: t.List[TemplateParameter] = field(default_factory=list)
 
     body: TemplateBlock = field(default_factory=list)
     css: str = ""
     layout: t.Union[str, None] = None
-    components_calls: t.List[ComponentTag] = field(default_factory=list)
+    components_calls: t.List[ComponentNode] = field(default_factory=list)
     style_includes: t.Set[str] = field(default_factory=set)
 
     blocks: t.Set[str] = field(default_factory=set)
@@ -98,7 +108,7 @@ class Template:
 class LayoutTemplate(Template):
     is_layout = True
     has_default_slot: bool = False
-    slots: t.List[SlotTag] = field(default_factory=list)
+    slots: t.List[SlotInfo] = field(default_factory=list)
 
 
-TemplateBlock: t.TypeAlias = t.Sequence[Tag]
+TemplateBlock: t.TypeAlias = t.Sequence[Node]

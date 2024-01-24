@@ -27,7 +27,7 @@ class InvalidTemplate(BuildError):
 
 
 class ParserException(BuildError):
-    error_info: ErrorInfo | None = None
+    error_info: t.Optional[ErrorInfo] = None
 
     @classmethod
     def create(

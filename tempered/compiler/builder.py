@@ -2,7 +2,7 @@ from __future__ import annotations
 from ..parser.template_ast import (
     Template,
     LayoutTemplate,
-    Tag,
+    Node,
 )
 from .accumulators import Variable
 import ast
@@ -38,7 +38,7 @@ class BuildContext:
         if not self.output_variable.assigned:
             self.body.extend(self.output_variable.assign())
 
-    def construct_tag(self, tag: Tag):
+    def construct_tag(self, tag: Node):
         rules = {rule.tag: rule for rule in self.rules}
         rule = rules.get(type(tag))
         if rule is None:
@@ -46,7 +46,7 @@ class BuildContext:
 
         rule.construct(self, tag)
 
-    def create_block(self, tags: t.Sequence[Tag]) -> t.Sequence[ast.stmt]:
+    def create_block(self, tags: t.Sequence[Node]) -> t.Sequence[ast.stmt]:
         ctx_block = self.create_subcontext()
         for tag in tags:
             ctx_block.construct_tag(tag)
@@ -56,7 +56,7 @@ class BuildContext:
     def create_variable(
         self,
         name: t.Union[str, ast.Name],
-        tags: t.Sequence[Tag],
+        tags: t.Sequence[Node],
     ) -> t.List[ast.stmt]:
         ctx_assign = self.create_subcontext(name)
 

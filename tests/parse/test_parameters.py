@@ -36,8 +36,8 @@ def _assert_single_parameter(
 def test_parse_removes_parameters():
     template = parse_template("abc", "{%param a%}" "{%param b%}" "a")
     block = template.body[0]
-    assert isinstance(block, template_ast.HtmlTag)
-    assert "a" in block.body
+    assert isinstance(block, template_ast.HtmlNode)
+    assert "a" in block.html
 
 
 def test_parse_parameter_single():

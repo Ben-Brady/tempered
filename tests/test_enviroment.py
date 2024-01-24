@@ -9,9 +9,7 @@ def test_types_are_created():
     tempered = Tempered()
     tempered.add_template_from_string(
         "profile",
-        """
-        {% param name: str = "Ben" %}
-    """,
+        '{% param name: str = "Ben Brady" %}',
     )
 
     assert not TYPES_FILE.exists()
@@ -25,9 +23,7 @@ def test_types_are_valid_python():
     tempered = Tempered()
     tempered.add_template_from_string(
         "profile",
-        """
-        {% param name: str = "Ben" %}
-    """,
+        '{% param name: str = "Ben Brady" %}',
     )
     tempered.build_enviroment(generate_types=True)
     source = TYPES_FILE.read_text()
@@ -38,10 +34,7 @@ def test_get_template_on_nonexist_template_returns_None():
     tempered = Tempered()
     tempered.add_template_from_string(
         "profile",
-        """
-        {% param name: str = "Ben" %}
-        {% param foo: t.Dict[str, None] = "Ben" %}
-    """,
+        '{% param name: str = "Ben Brady" %}',
     )
     env = tempered.build_enviroment(generate_types=True)
     assert env.get_template("foo") is None

@@ -1,5 +1,5 @@
-from ..parser import tokens
-from ..parser.text_scanner import TextScanner
+from . import tags, template_ast
+from .scanner import TextScanner
 import typing_extensions as t
 import random
 
@@ -16,34 +16,34 @@ def generate_token_id() -> str:
     # Must have space before to force it to be quoted
 
 
-def convert_tokens_to_valid_html(
-    _tokens: t.Sequence[tokens.Token],
-) -> t.Tuple[str, t.Dict[str, tokens.Token]]:
+def convert_tags_to_valid_html(
+    _tags: t.Sequence[tags.Tag],
+) -> t.Tuple[str, t.Dict[str, tags.Tag]]:
     html = ""
-    token_lookup: t.Dict[str, tokens.Token] = {}
-    for token in _tokens:
-        if isinstance(token, tokens.HtmlToken):
-            html += token.text
+    token_lookup: t.Dict[str, tags.Tag] = {}
+    for tag in _tags:
+        if isinstance(tag, template_ast.HtmlNode):
+            html += tag.html
         else:
             token_id = generate_token_id()
-            token_lookup[token_id] = token
+            token_lookup[token_id] = tag
             html += token_id
 
     return html, token_lookup
 
 
-def tokenised_html_to_tokens(
-    html: str, token_lookup: t.Dict[str, tokens.Token]
-) -> t.Sequence[tokens.Token]:
+def convert_tagged_html_to_tokens(
+    html: str, token_lookup: t.Dict[str, tags.Tag]
+) -> t.Sequence[tags.Tag]:
     TOKEN_ID_LENGTH = len(generate_token_id())
 
     scanner = TextScanner(html)
-    tokens_: t.List[tokens.Token] = []
+    tokens_: t.List[tags.Tag] = []
     while scanner.has_text:
         known_keys = list(token_lookup.keys())
         text = scanner.take_until(known_keys)
         if len(text) > 0:
-            tokens_.append(tokens.HtmlToken(text))
+            tokens_.append(template_ast.HtmlNode(text))
 
         if not scanner.has_text:
             break

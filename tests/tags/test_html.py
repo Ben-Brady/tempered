@@ -2,7 +2,7 @@ from . import build_template
 import pytest
 
 
-def test_text_isnte_escaped():
+def test_text_isnt_escaped():
     component = build_template(
         """
         {%param foo%}

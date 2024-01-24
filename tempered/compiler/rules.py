@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from .builder import BuildContext
 
 
-T = t.TypeVar("T", bound=tags.Tag, infer_variance=True)
+T = t.TypeVar("T", bound=tags.Node, infer_variance=True)
 
 
 class Rule(t.Generic[T]):
@@ -28,35 +28,35 @@ class Rule(t.Generic[T]):
         raise NotImplementedError
 
 
-class HtmlRule(Rule[tags.HtmlTag]):
-    tag = tags.HtmlTag
+class HtmlRule(Rule[tags.HtmlNode]):
+    tag = tags.HtmlNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.HtmlTag):
-        ctx.add_expr(ast_utils.Constant(tag.body))
+    def construct(ctx: BuildContext, tag: tags.HtmlNode):
+        ctx.add_expr(ast_utils.Constant(tag.html))
 
 
-class ExprRule(Rule[tags.ExprTag]):
-    tag = tags.ExprTag
+class ExprRule(Rule[tags.ExprNode]):
+    tag = tags.ExprNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.ExprTag):
+    def construct(ctx: BuildContext, tag: tags.ExprNode):
         ctx.add_expr(create_escape_call(value=tag.value))
 
 
-class RawExprRule(Rule[tags.RawExprTag]):
-    tag = tags.RawExprTag
+class RawExprRule(Rule[tags.RawExprNode]):
+    tag = tags.RawExprNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.RawExprTag):
+    def construct(ctx: BuildContext, tag: tags.RawExprNode):
         ctx.add_expr(tag.value)
 
 
-class AssignmentRule(Rule[tags.AssignmentTag]):
-    tag = tags.AssignmentTag
+class AssignmentRule(Rule[tags.AssignmentNode]):
+    tag = tags.AssignmentNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.AssignmentTag):
+    def construct(ctx: BuildContext, tag: tags.AssignmentNode):
         ctx.body.append(
             ast_utils.Assign(
                 target=tag.target,
@@ -65,22 +65,23 @@ class AssignmentRule(Rule[tags.AssignmentTag]):
         )
 
 
-class IfRule(Rule[tags.IfTag]):
-    tag = tags.IfTag
+class IfRule(Rule[tags.IfNode]):
+    tag = tags.IfNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.IfTag):
+    def construct(ctx: BuildContext, tag: tags.IfNode):
         ctx.ensure_output_assigned()
 
-        if_body = ctx.create_block(tag.if_block)
+        empty_body = [ast_utils.create_stmt("...", ast.Expr)]
+        if_body = ctx.create_block(tag.if_block) or empty_body
 
         elif_blocks: t.List[t.Tuple[ast.expr, t.Sequence[ast.stmt]]] = []
         for condition, elif_block in tag.elif_blocks:
-            elif_body = ctx.create_block(elif_block)
+            elif_body = ctx.create_block(elif_block) or empty_body
             elif_blocks.append((condition, elif_body))
 
         if tag.else_block:
-            else_body = ctx.create_block(tag.else_block)
+            else_body = ctx.create_block(tag.else_block) or empty_body
         else:
             else_body = None
 
@@ -94,11 +95,11 @@ class IfRule(Rule[tags.IfTag]):
         )
 
 
-class ForRule(Rule[tags.ForTag]):
-    tag = tags.ForTag
+class ForRule(Rule[tags.ForNode]):
+    tag = tags.ForNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.ForTag):
+    def construct(ctx: BuildContext, tag: tags.ForNode):
         ctx.ensure_output_assigned()
 
         for_body = ctx.create_block(tag.loop_block)
@@ -113,11 +114,11 @@ class ForRule(Rule[tags.ForTag]):
             )
 
 
-class BlockRule(Rule[tags.BlockTag]):
-    tag = tags.BlockTag
+class BlockRule(Rule[tags.BlockNode]):
+    tag = tags.BlockNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.BlockTag):
+    def construct(ctx: BuildContext, tag: tags.BlockNode):
         ctx.body.extend(
             ctx.create_variable(
                 name=slot_variable_name(tag.name),
@@ -126,11 +127,11 @@ class BlockRule(Rule[tags.BlockTag]):
         )
 
 
-class SlotRule(Rule[tags.SlotTag]):
-    tag = tags.SlotTag
+class SlotRule(Rule[tags.SlotNode]):
+    tag = tags.SlotNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.SlotTag):
+    def construct(ctx: BuildContext, tag: tags.SlotNode):
         slot_param = ast_utils.Name(slot_parameter(tag.name))
 
         if tag.default is None:
@@ -148,11 +149,11 @@ class SlotRule(Rule[tags.SlotTag]):
         ctx.add_expr(slot_param)
 
 
-class StyleRule(Rule[tags.StyleTag]):
-    tag = tags.StyleTag
+class StyleRule(Rule[tags.StyleNode]):
+    tag = tags.StyleNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.StyleTag):
+    def construct(ctx: BuildContext, tag: tags.StyleNode):
         if ctx.uses_layout:
             return  # Styles are placed in the layout template
         if ctx.css is None and not ctx.is_layout:
@@ -181,11 +182,11 @@ class StyleRule(Rule[tags.StyleTag]):
         )
 
 
-class ComponentRule(Rule[tags.ComponentTag]):
-    tag = tags.ComponentTag
+class ComponentRule(Rule[tags.ComponentNode]):
+    tag = tags.ComponentNode
 
     @staticmethod
-    def construct(ctx: BuildContext, tag: tags.ComponentTag):
+    def construct(ctx: BuildContext, tag: tags.ComponentNode):
         func = ast_utils.Name(tag.component_name)
         keywords = tag.keywords.copy()
 

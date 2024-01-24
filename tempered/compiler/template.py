@@ -43,21 +43,13 @@ def create_template_function(
             )
         )
 
-        if template.has_default_slot:
-            arguements.append(
-                TemplateParameter(
-                    name=slot_parameter(None),
-                    type=ast_utils.Str,
-                )
-            )
-
         for slot in template.slots:
-            if slot.default:
-                type = ast_utils.Union(ast_utils.Str, ast_utils.None_)
-                default = ast_utils.Constant(None)
-            else:
+            if slot.is_required:
                 type = ast_utils.Str
                 default = None
+            else:
+                type = ast_utils.Union(ast_utils.Str, ast_utils.None_)
+                default = ast_utils.Constant(None)
 
             arguements.append(
                 TemplateParameter(

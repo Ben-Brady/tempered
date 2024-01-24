@@ -375,10 +375,10 @@ def If(
     return if_statement
 
 
-T = t.TypeVar("T", bound=ast.stmt)
+TStmt = t.TypeVar("TStmt", bound=ast.stmt)
 
 
-def create_stmt(code: str, type: t.Type[T]) -> T:
+def create_stmt(code: str, type: t.Type[TStmt]) -> TStmt:
     module = ast.parse(code)
     if len(module.body) != 1:
         raise RuntimeError("Generated code a single stmt")
@@ -387,11 +387,17 @@ def create_stmt(code: str, type: t.Type[T]) -> T:
     if not isinstance(expr, type):
         raise RuntimeError(f"Generated code was not {type}")
 
-    return t.cast(T, expr)
+    return t.cast(TStmt, expr)
 
 
-def create_expr(code: str) -> ast.expr:
+TExpr = t.TypeVar("TExpr", bound=ast.expr)
+
+
+def create_expr(code: str, type: t.Type[TExpr] = ast.expr) -> TExpr:
     expr = create_stmt(code, ast.Expr)
+    if not isinstance(expr.value, type):
+        raise RuntimeError(f"Generated code was not {type}")
+
     return expr.value
 
 

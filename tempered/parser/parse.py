@@ -1,7 +1,10 @@
-from ..preprocess import htmlify, minify_css, minify_html
 from .. import errors, preprocess
-from . import lexer, template_ast
-from .parser import parse_token_stream
+from . import htmlify, lexer, template_ast, tags, tree, introspection
+from .tags import parse_tokens_to_tags
+from .tree import parse_tags_to_template_ast
+from .preprocess import preprocess_html
+from .postprocess import postprocess
+from .introspection import create_template_info
 from pathlib import Path
 import typing_extensions as t
 
@@ -35,42 +38,45 @@ def _parse_template(
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
     tokens = lexer.to_token_stream(html, file=file)
-    html, token_lookup = htmlify.convert_tokens_to_valid_html(tokens)
+    tags = parse_tokens_to_tags(tokens)
+    html, token_lookup = htmlify.convert_tags_to_valid_html(tags)
 
     # Process HTML
     html, css = preprocess.extract_css_from_html(html, prefix=name)
-    html = minify_html(html)
+    html = preprocess_html(html)
     # CSS in minified later
 
     # Reconvert the HTML back into tokens
-    tokens = htmlify.tokenised_html_to_tokens(html, token_lookup)
+    tags = htmlify.convert_tagged_html_to_tokens(html, token_lookup)
 
     # Parse tokens into a body
-    ctx = parse_token_stream(tokens, has_css=len(css) > 0)
+    body = parse_tags_to_template_ast(tags)
+    info = create_template_info(tags, css)
+    body = postprocess(body, info)
 
-    if ctx.is_layout:
-        return template_ast.LayoutTemplate(
-            name=name,
-            file=file,
-            parameters=ctx.parameters,
-            body=ctx.body,
-            css=css,
-            components_calls=ctx.components_calls,
-            style_includes=ctx.style_includes,
-            layout=ctx.layout,
-            blocks=ctx.blocks,
-            slots=ctx.slots,
-            has_default_slot=ctx.has_default_slot,
-        )
-    else:
+    if not info.is_layout:
         return template_ast.Template(
             name=name,
             file=file,
-            parameters=ctx.parameters,
-            body=ctx.body,
+            body=body,
+            parameters=info.parameters,
             css=css,
-            components_calls=ctx.components_calls,
-            style_includes=ctx.style_includes,
-            layout=ctx.layout,
-            blocks=ctx.blocks,
+            components_calls=info.components_calls,
+            style_includes=info.style_includes,
+            layout=info.layout,
+            blocks=info.blocks,
+        )
+    else:
+        return template_ast.LayoutTemplate(
+            name=name,
+            file=file,
+            body=body,
+            css=css,
+            parameters=info.parameters,
+            components_calls=info.components_calls,
+            style_includes=info.style_includes,
+            layout=info.layout,
+            blocks=info.blocks,
+            slots=info.slots,
+            has_default_slot=info.has_default_slot,
         )
