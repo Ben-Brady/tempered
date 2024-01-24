@@ -35,7 +35,8 @@ def test_kwargs_passed_to_layout():
 
 def test_kwargs_passed_to_component():
     func = build_templates(
-        "{<child()>}",
+        '{% import Child from "child" %}'
+        "{<Child()>}",
         ("child", "{{ foo }}"),
     )
 

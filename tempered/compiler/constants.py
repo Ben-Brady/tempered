@@ -1,6 +1,7 @@
 import ast
 from .. import ast_utils
 import typing_extensions as t
+import string
 
 
 CSS_VARIABLE = "__css"
@@ -37,7 +38,8 @@ def create_escape_call(value: ast.expr) -> ast.expr:
 
 
 def component_func_name(template_name: str) -> str:
-    return template_name
+    IDENT_CHARS = string.ascii_letters + string.digits + "_"
+    return "".join(char for char in template_name if char in IDENT_CHARS)
 
 
 def slot_variable_name(slot_name: t.Union[str, None]) -> str:
