@@ -135,6 +135,7 @@ def next_html_token(scanner: TextScanner) -> t.Iterable[Token]:
 def next_statement_token(scanner: TextScanner) -> t.Iterable[Token]:
     yield take_token(scanner, STATEMENT_START, StatementStartToken)
     take_whitespace(scanner)
+
     keyword = take_ident(scanner)
     yield KeywordToken(keyword)
     take_whitespace(scanner)

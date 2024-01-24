@@ -1,6 +1,6 @@
 from .. import ast_utils
 from ..parser import Template, LayoutTemplate, TemplateParameter
-from .utils import (
+from .constants import (
     slot_parameter,
     component_func_name,
     layout_func_name,

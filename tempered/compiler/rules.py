@@ -2,7 +2,7 @@ from __future__ import annotations
 import typing_extensions as t
 from .. import ast_utils
 from ..parser import template_ast as tags
-from .utils import (
+from .constants import (
     create_escape_call,
     slot_variable_name,
     slot_parameter,

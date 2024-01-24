@@ -2,7 +2,6 @@ from . import parser, ast_utils
 import ast
 import string
 import typing_extensions as t
-from .compiler.utils import component_func_name
 from pathlib import Path
 
 

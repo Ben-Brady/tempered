@@ -1,6 +1,6 @@
 from . import parser, build, types
 from .enviroment import Template, Environment
-from .compiler.utils import component_func_name
+from .compiler.constants import component_func_name
 from pathlib import Path
 from types import ModuleType
 import typing_extensions as t

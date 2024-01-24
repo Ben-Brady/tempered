@@ -1,5 +1,5 @@
 from .. import ast_utils
-from .utils import (
+from .constants import (
     NAME_LOOKUP_VARIABLE,
     KWARGS_VARIABLE,
     WITH_STYLES_PARAMETER,

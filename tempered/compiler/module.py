@@ -1,6 +1,6 @@
 from .. import ast_utils
 from ..parser import Template, LayoutTemplate
-from .utils import FILE_HEADER, NAME_LOOKUP_VARIABLE
+from .constants import FILE_HEADER, NAME_LOOKUP_VARIABLE
 from . import preprocess, validate
 from ..preprocess.css import finalise_css
 from .template import create_template_function
