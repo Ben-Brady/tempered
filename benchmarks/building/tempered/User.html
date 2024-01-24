@@ -1,5 +1,8 @@
-{% layout "layout" %}
 {% param user: "Profile" %}
+
+{% layout "layout.html" %}
+{% import UsernameEdit from "components/UsernameEdit.html" %}
+{% import Thumbnail from "components/Thumbnail.html" %}
 
 {% block title %} @{{user.username}} {% endblock %}
 

@@ -13,10 +13,6 @@ def benchmark_render(
     folder: str,
     context: dict = {},
 ):
-    render_tempered = setup_tempered(f"{folder}/tempered", entry_point, context)
-    render_jinja2 = setup_jinja2(f"{folder}/jinja", f"{entry_point}.html", context)
-    render_django = setup_django(f"{folder}/django", f"{entry_point}.html", context)
-
     runs: dict[str, float] = {}
 
     def bench(name, func):
@@ -33,8 +29,14 @@ def benchmark_render(
         runs[name] = per_second
 
     print(name.title())
+
+    render_tempered = setup_tempered(f"{folder}/tempered", entry_point, context)
     bench("Tempered", render_tempered)
+
+    render_jinja2 = setup_jinja2(f"{folder}/jinja", entry_point, context)
     bench("Jinja2", render_jinja2)
+
+    render_django = setup_django(f"{folder}/django", entry_point, context)
     bench("Django", render_django)
 
 
@@ -45,8 +47,7 @@ def benchmark_build():
     count = 25
     duration = timeit.timeit(lambda: templates.build_memory(), number=count)
     duration /= count
-    print(f"Tempered Building")
-    print(f" {'tempered':>10}: {duration:2f}s")
+    print(f"Tempered Building: {duration:2f}s")
 
 
 os.chdir(Path(__file__).parent)
@@ -54,17 +55,17 @@ benchmark_build()
 benchmark_render(
     name="Full Page Application",
     context={"user": user},
-    entry_point="page",
+    entry_point="page.html",
     folder="./real_world",
 )
 benchmark_render(
     name="Partials",
     context={"profile": user},
-    entry_point="page",
+    entry_point="page.html",
     folder="./partials",
 )
 benchmark_render(
     name="Static Pages",
-    entry_point="page",
+    entry_point="page.html",
     folder="./static",
 )

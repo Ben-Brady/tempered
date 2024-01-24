@@ -1,6 +1,10 @@
-{% layout "layout" %}
 {% param video %}
 {% param recommendations: list %}
+
+{% import UserIcon from "components/UserIcon.html" %}
+{% import Thumbnail from "components/Thumbnail.html" %}
+{% import CommentSection from "components/CommentSection.html" %}
+{% layout "layout.html" %}
 
 {% block title%}{{video.title}}{%endblock%}
 

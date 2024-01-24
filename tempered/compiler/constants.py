@@ -38,8 +38,7 @@ def create_escape_call(value: ast.expr) -> ast.expr:
 
 
 def component_func_name(template_name: str) -> str:
-    IDENT_CHARS = string.ascii_letters + string.digits + "_"
-    return "".join(char for char in template_name if char in IDENT_CHARS)
+    return filter_non_ident_chars(template_name)
 
 
 def slot_variable_name(slot_name: t.Union[str, None]) -> str:
@@ -57,7 +56,14 @@ def slot_parameter(slot_name: t.Union[str, None]) -> str:
 
 
 def layout_func_name(template_name: str) -> str:
+    template_name = filter_non_ident_chars(template_name)
     return f"__{template_name}_layout"
+
+
+def filter_non_ident_chars(name: str) -> str:
+    IDENT_CHARS = string.ascii_letters + string.digits + "_"
+    name = "".join(char for char in name if char in IDENT_CHARS)
+    return name
 
 
 def create_resolve_call(name: str):

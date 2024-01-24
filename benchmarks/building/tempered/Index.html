@@ -1,7 +1,9 @@
-{% layout "layout" %}
 {% param videos: list %}
 
-{% block title%}Home{% endblock %}
+{% layout "layout.html" %}
+{% import VideoScroll from "components/VideoScroll.html" %}
+
+{% block title %}Home{% endblock %}
 
 <div id="scroll">
     {<VideoScroll(videos=videos)>}

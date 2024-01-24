@@ -1,6 +1,9 @@
 {%param videos %}
 {%param page: int = 0 %}
 
+{% import Thumbnail from "components/Thumbnail.html" %}
+{% import LoadingIcon from "components/LoadingIcon.html" %}
+
 {% for video in videos %}
     {<Thumbnail(video=video)>}
 {% endfor %}

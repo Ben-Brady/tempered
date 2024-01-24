@@ -1,6 +1,8 @@
 {% param comment %}
 {% param editting: bool = False %}
 
+{% import UserIcon from "components/UserIcon.html" %}
+
 <div class="comment" hx-target="closest .comment" hx-swap="outerHTML">
     <div class="left">
         <div class="icon">

@@ -1,5 +1,7 @@
 {% param upload_id: int|None = None %}
 
+{% import ProgressBar from "components/ProgressBar.html" %}
+
 <div id="page">
     <div id="video-section">
         {% if not upload_id %}

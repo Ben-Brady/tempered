@@ -1,5 +1,7 @@
-{% layout "layout" %}
 {% param upload_id: int|None = None %}
+
+{% layout "layout.html" %}
+{% import UploadPage from "components/UploadPage.html" %}
 
 {% block title %}Upload{% endblock %}
 

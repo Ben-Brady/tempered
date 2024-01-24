@@ -39,12 +39,20 @@ class Tempered:
         self._globals[name] = value
 
     def add_template_folder(self, folder: t.Union[Path, str]):
-        for file in Path(folder).glob("**/*.*"):
-            self.add_template(file)
+        folder = Path(folder)
+        for file in folder.glob("**/*.*"):
+            name = str(file)[len(str(folder) + "/"):]
+            body = file.read_text()
+            template_info = TemplateInfo(
+                name=name,
+                body=body,
+                file=file,
+            )
+            self._templates.append(template_info)
 
     def add_template(self, file: t.Union[Path, str]):
         file = Path(file)
-        name = file.stem
+        name = str(file)
         body = file.read_text()
         template_info = TemplateInfo(
             name=name,
