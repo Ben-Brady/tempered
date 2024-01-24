@@ -3,12 +3,11 @@ import tempered
 import pytest
 
 
-@pytest.mark.skip
 def test_importing_components():
     render = build_templates(
         """
         {% import Foo from "foo" %}
-        {<Foo/>}
+        {<Foo()/>}
     """,
         ("foo", """Hello World"""),
     )

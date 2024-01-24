@@ -26,8 +26,9 @@ def test_components_prevent_css_duplication():
     CSS_KEY = "TEMPERED"
     component = build_templates(
         """
-            {<child()>}
-            {<child()>}
+            {% import Child from "child" %}
+            {<Child()>}
+            {<Child()>}
         """,
         (
             "child",
@@ -46,17 +47,13 @@ def test_components_prevent_css_duplication():
 def test_components_calculated_nested_children():
     CSS_KEY = "TEMPERED"
     component = build_templates(
-        "{<a()>}",
-        ("a", "{<b()>}"),
-        ("b", "{<c()>}"),
-        ("c", "{<d()>}"),
+        '{% import A from "a" %} {<A()>}',
+        ("a", '{% import B from "b" %} {<B()>}'),
+        ("b", '{% import C from "c" %} {<C()>}'),
+        ("c", '{% import D from "d" %} {<D()>}'),
         (
             "d",
-            f"""
-         <style>
-            a {{ color: {CSS_KEY}; }}
-         </style>
-        """,
+            f"<style>a {{ color: {CSS_KEY}; }}</style>",
         ),
     )
     html = component()
