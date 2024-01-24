@@ -41,7 +41,7 @@ class Tempered:
     def add_template_folder(self, folder: t.Union[Path, str]):
         folder = Path(folder)
         for file in folder.glob("**/*.*"):
-            name = str(file)[len(str(folder) + "/"):]
+            name = str(file)[len(str(folder) + "/") :]
             body = file.read_text()
             template_info = TemplateInfo(
                 name=name,

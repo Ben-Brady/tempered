@@ -59,4 +59,3 @@ def _check_for_non_existant_blocks(template: Template, lookup: t.Dict[str, Templ
                 name=template.name,
                 file=template.file,
             )
-

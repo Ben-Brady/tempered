@@ -37,9 +37,6 @@ def compile_module(
     body = [
         *FILE_HEADER,
         *functions,
-        ast_utils.Assign(
-            NAME_LOOKUP_VARIABLE,
-            ast_utils.Constant(name_func_map)
-        ),
+        ast_utils.Assign(NAME_LOOKUP_VARIABLE, ast_utils.Constant(name_func_map)),
     ]
     return ast_utils.Module(body)
