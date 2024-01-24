@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .. import ast_utils
-from . import lexer, scanner, template_ast
+from . import lexer, template_ast
 from .scanner import Scanner
 from dataclasses import dataclass
 import ast
@@ -160,6 +160,7 @@ def next_statement_tag(scanner: TokenScanner) -> Tag:
         "layout": lambda _: LayoutTag(take_string_token(scanner)),
         "styles": lambda _: template_ast.StyleNode(),
         "include": lambda _: IncludeTag(take_string_token(scanner)),
+        "import": _next_import_tag,
         "param": _next_param_tag,
     }
     tag = statement_funcs[keyword](scanner)
@@ -174,6 +175,16 @@ def _next_assign_tag(scanner: TokenScanner) -> Tag:
     return template_ast.AssignmentNode(
         target=ast_utils.Name(target),
         value=expr,
+    )
+
+
+def _next_import_tag(scanner: TokenScanner) -> Tag:
+    target = scanner.expect(lexer.IdentToken).name
+    expect_keyword(scanner, "from")
+    name = take_string_token(scanner)
+    return template_ast.ImportNode(
+        target=target,
+        name=name,
     )
 
 

@@ -6,6 +6,7 @@ import typing_extensions as t
 CSS_VARIABLE = "__css"
 WITH_STYLES_PARAMETER = "with_styles"
 OUTPUT_VARIABLE = "__html"
+NAME_LOOKUP_VARIABLE = "_name_lookup"
 KWARGS_VARIABLE = "context"
 
 

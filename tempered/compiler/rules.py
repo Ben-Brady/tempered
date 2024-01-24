@@ -57,12 +57,27 @@ class AssignmentRule(Rule[tags.AssignmentNode]):
 
     @staticmethod
     def construct(ctx: BuildContext, tag: tags.AssignmentNode):
-        ctx.body.append(
-            ast_utils.Assign(
-                target=tag.target,
-                value=tag.value,
-            )
+        assign = ast_utils.Assign(
+            target=tag.target,
+            value=tag.value,
         )
+        ctx.body.append(assign)
+
+
+class ImportRule(Rule[tags.ImportNode]):
+    tag = tags.ImportNode
+
+    @staticmethod
+    def construct(ctx: BuildContext, tag: tags.ImportNode):
+        template_func = ast_utils.Index(
+            ast_utils.Name("_name_lookup"),
+            ast_utils.Constant(tag.name),
+        )
+        assign = ast_utils.Assign(
+            target=tag.target,
+            value=template_func,
+        )
+        ctx.body.append(assign)
 
 
 class IfRule(Rule[tags.IfNode]):
@@ -210,4 +225,5 @@ default_rules: t.List[type[Rule]] = [
     StyleRule,
     BlockRule,
     SlotRule,
+    ImportRule,
 ]

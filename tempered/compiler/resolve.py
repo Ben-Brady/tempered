@@ -1,5 +1,10 @@
 from .. import ast_utils
-from .utils import KWARGS_VARIABLE, WITH_STYLES_PARAMETER, create_resolve_call
+from .utils import (
+    NAME_LOOKUP_VARIABLE,
+    KWARGS_VARIABLE,
+    WITH_STYLES_PARAMETER,
+    create_resolve_call,
+)
 import ast
 import builtins
 from functools import lru_cache
@@ -18,6 +23,7 @@ class NameTransformer(ast.NodeTransformer):
     RESERVED_NAMES = (
         KWARGS_VARIABLE,
         WITH_STYLES_PARAMETER,
+        NAME_LOOKUP_VARIABLE,
     )
     known_names: t.List[str]
 

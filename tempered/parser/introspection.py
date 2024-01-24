@@ -13,6 +13,7 @@ class TemplateInfo:
     has_default_slot: bool = False
     slots: t.List[template_ast.SlotInfo] = field(default_factory=list)
 
+    imports: t.List[template_ast.ImportNode] = field(default_factory=list)
     components_calls: t.List[template_ast.ComponentNode] = field(default_factory=list)
     style_includes: t.Set[str] = field(default_factory=set)
     styles_set: bool = False
@@ -31,11 +32,12 @@ ParseRules: t.TypeAlias = t.List[
 
 def create_template_info(stream: t.Sequence[tags.Tag], css: str) -> TemplateInfo:
     pragma_rules: ParseRules = [
-        (tags.IncludeTag, include_pragma),
+        (template_ast.ImportNode, import_pragma),
         (template_ast.StyleNode, style_pragma),
+        (template_ast.ComponentNode, component_prgama),
+        (tags.IncludeTag, include_pragma),
         (tags.LayoutTag, layout_pragma),
         (tags.ParameterTag, parameter_pragma),
-        (template_ast.ComponentNode, component_prgama),
         (tags.SlotStartTag, slot_pragma),
         (tags.BlockStartTag, block_pragma),
     ]
@@ -118,3 +120,7 @@ def slot_pragma(ctx: TemplateInfo, token: tags.SlotStartTag) -> None:
 def block_pragma(ctx: TemplateInfo, token: tags.SlotStartTag) -> None:
     if token.name is not None:
         ctx.blocks.add(token.name)
+
+
+def import_pragma(ctx: TemplateInfo, token: template_ast.ImportNode) -> None:
+    ctx.imports.append(token)

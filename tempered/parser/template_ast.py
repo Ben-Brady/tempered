@@ -43,6 +43,18 @@ class ComponentNode(SingleTagNode):
 
 
 @dataclass
+class AssignmentNode(SingleTagNode):
+    target: ast.expr
+    value: ast.expr
+
+
+@dataclass
+class ImportNode(SingleTagNode):
+    target: str
+    name: str
+
+
+@dataclass
 class IfNode(Node):
     condition: ast.expr
     if_block: TemplateBlock
@@ -55,12 +67,6 @@ class ForNode(Node):
     loop_variable: ast.Name
     iterable: ast.expr
     loop_block: TemplateBlock
-
-
-@dataclass
-class AssignmentNode(SingleTagNode):
-    target: ast.expr
-    value: ast.expr
 
 
 @dataclass
@@ -94,6 +100,7 @@ class Template:
     is_layout = False
     file: t.Optional[Path] = None
     parameters: t.List[TemplateParameter] = field(default_factory=list)
+    imports: t.List[ImportNode] = field(default_factory=list)
 
     body: TemplateBlock = field(default_factory=list)
     css: str = ""

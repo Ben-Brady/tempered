@@ -65,6 +65,7 @@ def _parse_template(
             style_includes=info.style_includes,
             layout=info.layout,
             blocks=info.blocks,
+            imports=info.imports,
         )
     else:
         return template_ast.LayoutTemplate(
@@ -79,4 +80,5 @@ def _parse_template(
             blocks=info.blocks,
             slots=info.slots,
             has_default_slot=info.has_default_slot,
+            imports=info.imports,
         )

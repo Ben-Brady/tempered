@@ -154,11 +154,15 @@ def next_statement_token(scanner: TextScanner) -> t.Iterable[Token]:
     elif keyword == "param":  # {% param expr %}
         yield take_python_stmt(scanner, STATEMENT_END)
     elif keyword == "layout":  # {% layout string %}
-        yield take_string(scanner)
+        yield take_string_token(scanner)
     elif keyword == "include":  # {% include string %}
-        yield take_string(scanner)
+        yield take_string_token(scanner)
     elif keyword == "block":  # {% block ident %}
         yield take_ident_token(scanner)
+    elif keyword == "import":  # {% import Name from "" %}
+        yield take_ident_token(scanner)
+        yield take_keyword(scanner, "from")
+        yield take_string_token(scanner)
     elif keyword == "for":  # {% for ident in expr %}
         yield take_ident_token(scanner)
         yield take_keyword(scanner, "in")
@@ -231,7 +235,7 @@ def take_ident(scanner: TextScanner) -> str:
     return ident
 
 
-def take_string(scanner: TextScanner) -> Token:
+def take_string_token(scanner: TextScanner) -> Token:
     TERMINATORS = ("'", '"')
 
     terminator = scanner.take(*TERMINATORS)
