@@ -159,7 +159,7 @@ If omitted, styles are placed at the end of the component
 ### Style Include
 
 ```html
-{%include post%}
+{%include "post.html" %}
 
 <head>
     {% styles %}
@@ -190,28 +190,36 @@ Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
 Use `{% html %}` to include literal html without escaping
 
 ```html
-{%param markdown_html: str}
+{%param markdown_html: str %}
 <div>
     {% html markdown_html %}
 </div>
 ```
 
-### Component
+### Component / Import
 
-Use `{<Component()>}` for a component, call this like
+Use `{<Component()>}` for a component, call this like:
 
 ```html
+{% import Post from "post.html" %}
+
 <div>
     {<Post(title="Lorum Ipsum")>}
 </div>
 ```
 
-### Set
-
-Use `{% set  %}` to set a variables
+You have to import components using the import syntax. You can specify any target name.
 
 ```html
-{%param post %}
+{% import ANY_NAME from "template_name.html" %}
+```
+
+### Set
+
+Use `{% set  %}` to set a variable
+
+```html
+{% param post %}
 <div>
     {% set title = post.title.lower() %}
 </div>
@@ -226,7 +234,7 @@ This can also be paired with control flow
 Use `{%if %}` and `{% endif %}` for control flow, there are two control flow structures
 
 ```html
-{%param link: str|None = None}
+{% param link: str | None = None %}
 
 {% if link %}
     <a href="{{link}}">
@@ -238,7 +246,7 @@ Use `{%if %}` and `{% endif %}` for control flow, there are two control flow str
 You can also have an else block
 
 ```html
-{%param src: str|None = None}
+{% param src: str|None = None %}
 
 {% if src %}
     <img src="{{src}}" alt=""/>
@@ -247,18 +255,20 @@ You can also have an else block
 {% endif %}
 ```
 
-As well as an elif block
+As well as elif blocks
 
 ```html
-{%param number: int}
+{% param number: int %}
 
 <span>
     {% if number < 10 %}
         {{ number }} is less than 10
     {% elif number < 100 %}
         {{ number }} is less than 100
+    {% elif number < 1000 %}
+        {{ number }} is less than 1000
     {% else %}
-        {{ number }} is bigger than 100
+        {{ number }} is bigger than 1000
     {% endif %}
 </span>
 ```
@@ -268,11 +278,11 @@ As well as an elif block
 Use `{%for %}`
 
 ```html
-{%param commments: list[str] %}
+{% param commments: list[str] %}
 
 {% for comment in comments %}
     <span>
-        {{comment}}
+        {{ comment }}
     </span>
 {% endfor %}
 ```
