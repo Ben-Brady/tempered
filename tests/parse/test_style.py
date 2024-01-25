@@ -1,4 +1,4 @@
-from tempered.preprocess import extract_css_from_html, minify_css
+from tempered.css import extract_css_from_html, minify_css
 import bs4
 from rcssmin import cssmin
 

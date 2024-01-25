@@ -1,10 +1,9 @@
-from .. import errors, preprocess
-from . import htmlify, lexer, template_ast, tags, tree, introspection
+from .. import errors
+from ..css import extract_css_from_html
+from . import htmlify, lexer, template_ast, tree, introspection
 from .tags import parse_tokens_to_tags
-from .tree import parse_tags_to_template_ast
 from .preprocess import preprocess_html
 from .postprocess import postprocess
-from .introspection import create_template_info
 from pathlib import Path
 import typing_extensions as t
 
@@ -42,7 +41,7 @@ def _parse_template(
     html, token_lookup = htmlify.convert_tags_to_valid_html(tags)
 
     # Process HTML
-    html, css = preprocess.extract_css_from_html(html, prefix=name)
+    html, css = extract_css_from_html(html, prefix=name)
     html = preprocess_html(html)
     # CSS in minified later
 
@@ -50,10 +49,19 @@ def _parse_template(
     tags = htmlify.convert_tagged_html_to_tokens(html, token_lookup)
 
     # Parse tokens into a body
-    body = parse_tags_to_template_ast(tags)
-    info = create_template_info(tags, css)
-    body = postprocess(body, info)
+    body = tree.parse_tags_to_template_ast(tags)
+    info = introspection.create_template_info(tags, css)
+    body = postprocess(body, css, info)
+    return construct_template_obj(name, file, body, css, info)
 
+
+def construct_template_obj(
+    name: str,
+    file: t.Optional[Path],
+    body: template_ast.TemplateBlock,
+    css: str,
+    info: introspection.TemplateInfo,
+) -> template_ast.Template:
     if not info.is_layout:
         return template_ast.Template(
             name=name,

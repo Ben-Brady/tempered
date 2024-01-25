@@ -1,4 +1,4 @@
-from ... import errors
+from .. import errors
 import typing_extensions as t
 import warnings
 import textwrap

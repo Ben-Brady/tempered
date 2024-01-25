@@ -1,5 +1,5 @@
 from . import sass, scoped
-from ... import errors
+from .. import errors
 import bs4
 import typing_extensions as t
 import warnings

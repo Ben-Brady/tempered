@@ -4,14 +4,14 @@ from . import template_ast
 import typing_extensions as t
 
 
-def postprocess(body: TemplateBlock, info: TemplateInfo) -> TemplateBlock:
-    body = place_styles(body, info)
+def postprocess(body: TemplateBlock, css: str, info: TemplateInfo) -> TemplateBlock:
+    body = place_styles(body, css, info)
     return body
 
 
-def place_styles(body: TemplateBlock, info: TemplateInfo) -> TemplateBlock:
+def place_styles(body: TemplateBlock, css: str, info: TemplateInfo) -> TemplateBlock:
     has_css_includes = len(info.style_includes) > 0 or len(info.components_calls) > 0
-    has_css = len(info.css) > 0 or has_css_includes
+    has_css = len(css) > 0 or has_css_includes
 
     if info.styles_set:
         return body

@@ -1,5 +1,5 @@
 import tinycss2
-from tempered.preprocess.css.scoped import apply_scope_to_css
+from tempered.css.scoped import apply_scope_to_css
 
 
 def assert_rule_transformed(scope: str, css: str, expected: str):

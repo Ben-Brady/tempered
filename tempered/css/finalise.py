@@ -1,6 +1,5 @@
 import tinycss2
 from tinycss2.ast import Node, AtRule
-from ..minify import minify_css
 from rcssmin import cssmin
 import typing_extensions as t
 
@@ -26,3 +25,13 @@ def place_font_imports_at_start(css: str) -> str:
     rules.sort(key=sort_rules, reverse=True)
     css = tinycss2.serialize(rules)
     return css
+
+
+def minify_css(css: str) -> str:
+    minified_css = cssmin(css)
+    if isinstance(minified_css, str):
+        return minified_css
+    elif isinstance(minified_css, (bytes, bytearray)):
+        return minified_css.decode()
+    else:
+        raise TypeError("Expected str or bytes")
