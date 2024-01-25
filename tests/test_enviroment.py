@@ -65,3 +65,10 @@ def test_enviroment_templates_render_correctly():
     env = tempered.build_enviroment(generate_types=True)
     output = env.get_template("profile").render(name="Dave")
     assert "Hello Dave" in output
+
+
+def test_enviroment_from_string():
+    env = Tempered().build_enviroment()
+    template = env.from_string("<div>{{ x }}</div>")
+    html = template.render(x=1)
+    assert html == "<div>1</div>"

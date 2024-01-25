@@ -19,7 +19,7 @@ import typing_extensions as t
 
 __globals = {{}}
 
-def reigster_global(name: str, value: t.Any):
+def register_global(name: str, value: t.Any):
     __globals[name] = value
 
 def __resolve(name: str, context: dict[str, t.Any]) -> t.Any:

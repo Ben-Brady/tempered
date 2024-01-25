@@ -118,7 +118,8 @@ class Environment:
     )
 
     FROM_STRING = ast_utils.create_stmt(
-        "def from_string(self, template: str) -> Template:...", ast.FunctionDef
+        "def from_string(self, template: str) -> Template:...",
+        ast.FunctionDef,
     )
     enviroment = ast_utils.create_stmt(enviroment_base, ast.ClassDef)
     enviroment.body.extend(overloads)

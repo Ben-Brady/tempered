@@ -1,5 +1,6 @@
 from . import parser, ast_utils
 from .compiler.module import compile_module
+from .compiler.constants import component_func_name
 import sys
 import importlib
 from importlib.util import spec_from_loader, module_from_spec
@@ -47,6 +48,17 @@ def build_to(
     return module
 
 
+def build_single_template(
+    template: parser.Template,
+    templates: t.List[parser.Template],
+    globals: t.Dict[str, t.Any],
+) -> t.Callable[..., str]:
+    module = build_memory([template, *templates], globals)
+    _register_globals(module, globals)
+    func = getattr(module, component_func_name(template.name))
+    return func
+
+
 def build_static(
     templates: t.List[parser.Template],
     globals: t.Dict[str, t.Any],
@@ -61,11 +73,7 @@ def build_static(
         BUILD_FILE.touch()
         components = _load_static_file()
 
-    return build_to(
-        components,
-        templates,
-        globals,
-    )
+    return build_to(components, templates, globals)
 
 
 def _load_static_file():
@@ -81,4 +89,4 @@ def _register_globals(
     globals: t.Dict[str, t.Any],
 ):
     for name, value in globals.items():
-        module.reigster_global(name, value)
+        module.register_global(name, value)
