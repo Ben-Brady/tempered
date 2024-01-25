@@ -1,6 +1,6 @@
 from . import parser, build, types
 from .enviroment import Template, Environment
-from .compiler.constants import component_func_name
+from .compiler.constants import NAME_LOOKUP_VARIABLE
 from pathlib import Path
 from types import ModuleType
 import typing_extensions as t
@@ -72,15 +72,6 @@ class Tempered:
     def _parse_templates(self) -> t.List[parser.Template]:
         return [template.parse() for template in self._templates]
 
-    def build_to(self, module: ModuleType) -> None:
-        build.build_to(module, self._parse_templates(), self._globals)
-
-    def build_memory(self) -> ModuleType:
-        return build.build_memory(self._parse_templates(), self._globals)
-
-    def build_static(self):
-        return build.build_static(self._parse_templates(), self._globals)
-
     def build_enviroment(self, generate_types: bool = True) -> Environment:
         template_objs = self._parse_templates()
         m = build.build_memory(template_objs, self._globals)
@@ -91,10 +82,7 @@ class Tempered:
 
         templates: t.Dict[str, Template] = {}
         for template in template_objs:
-            if template.is_layout:
-                continue
+            func = getattr(m, NAME_LOOKUP_VARIABLE)[template.name]
+            templates[template.name] = Template(func, template)  # type: ignore
 
-            func = getattr(m, component_func_name(template.name))
-            templates[template.name] = Template(func, template)
-
-        return Environment(templates=templates, globals={})
+        return Environment(templates=templates, globals=self._globals)

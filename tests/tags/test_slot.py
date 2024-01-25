@@ -6,7 +6,7 @@ import tempered
 
 def test_default_slot():
     component = build_templates(
-        "{% layout 'layout' %}" "B",
+        "{% layout 'layout' %}B",
         (
             "layout",
             "<title>A{% slot %}C</title>",
@@ -97,8 +97,8 @@ def test_many_named_slots_replaces_default():
     component = build_templates(
         """
         {% layout "layout" %}
-        {% block a %}A{%endblock%}
-        {% block b %}B{%endblock%}
+        {% block a %}A{% endblock %}
+        {% block b %}B{% endblock %}
     """,
         (
             "layout",
@@ -111,6 +111,6 @@ def test_many_named_slots_replaces_default():
     )
 
     soup = bs4.BeautifulSoup(component())
-    assert soup.find("a") and "A" in soup.find("a").text
-    assert soup.find("b") and "B" in soup.find("b").text
-    assert soup.find("c") and "C" in soup.find("c").text
+    assert soup.find("a") and "A" in soup.find("a").text  # type: ignore
+    assert soup.find("b") and "B" in soup.find("b").text  # type: ignore
+    assert soup.find("c") and "C" in soup.find("c").text  # type: ignore

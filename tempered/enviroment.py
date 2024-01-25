@@ -17,9 +17,13 @@ class Environment:
     _globals: t.Dict[str, Template]
     _from_string_cache: t.Dict[str, Template]
 
-    def __init__(self, templates: t.Dict[str, Template], globals: t.Dict[str, t.Any]):
-        self._templates = templates
-        self._globals = globals
+    def __init__(
+        self,
+        templates: t.Optional[t.Dict[str, Template]] = None,
+        globals: t.Optional[t.Dict[str, t.Any]] = None,
+    ):
+        self._templates = templates or {}
+        self._globals = globals or {}
         self._from_string_cache = {}
 
     def get_template(self, name: str) -> t.Optional[Template]:

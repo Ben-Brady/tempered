@@ -102,8 +102,11 @@ class Template:
 def create_enviroment(overloads: t.List[ast.FunctionDef]) -> ast.ClassDef:
     enviroment_base = """
 class Environment:
-    def __init__(self, templates: t.Dict[str, Template], globals: t.Dict[str, t.Any]):
-        ...
+    def __init__(
+        self,
+        templates: t.Optional[t.Dict[str, Template]] = None,
+        globals: t.Optional[t.Dict[str, t.Any]] = None,
+    ): ...
 
 """
     GET_TEMPLATE_NONE_OVERLOAD = ast_utils.create_stmt(
