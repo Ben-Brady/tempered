@@ -96,10 +96,9 @@ def override_enviroment(enviroment: ast.ClassDef, overloads: t.List[ast.Function
     )
     GET_TEMPLATE_NONE_OVERLOAD.decorator_list = [T_OVERLOAD]
 
+    enviroment.body.insert(0, GET_TEMPLATE_NONE_OVERLOAD)
     for overload in overloads:
         enviroment.body.insert(0, overload)
-
-    enviroment.body.insert(0, GET_TEMPLATE_NONE_OVERLOAD)
 
 
 def create_t_literal(value: str) -> ast.expr:
