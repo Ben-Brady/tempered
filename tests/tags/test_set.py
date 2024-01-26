@@ -1,7 +1,4 @@
 from . import build_template
-import pytest
-import tinycss2
-import tempered
 
 
 def test_single_constant_assignment():

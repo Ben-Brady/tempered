@@ -59,3 +59,35 @@ def test_components_calculated_nested_children():
     )
     html = component()
     assert html.count(CSS_KEY) == 1, html
+
+
+def test_components_take_parameters():
+    component = build_templates(
+        '{% import Comp from "comp" %}{<Comp(foo="bar")>}',
+        ("comp", "{% param foo: str %}{{foo}}"),
+    )
+    html = component()
+    assert "bar" in html
+
+
+def test_components_allows_default_parameters():
+    component = build_templates(
+        '{% import Comp from "comp" %}{<Comp()>}',
+        ("comp", '{% param foo: str = "bar" %}{{foo}}'),
+    )
+    html = component()
+    assert "bar" in html
+
+
+def test_components_allows_mixed_parameters():
+    component = build_templates(
+        '{% import Comp from "comp" %}{<Comp(bar="bar")>}',
+        (
+            "comp",
+            '{% param foo: str = "foo" %}'
+            '{% param bar: str %}'
+            '{{foo}}-{{bar}}',
+        ),
+    )
+    html = component()
+    assert "foo-bar" in html

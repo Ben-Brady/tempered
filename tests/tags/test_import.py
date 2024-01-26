@@ -35,5 +35,5 @@ def test_raise_error_on_invalid_import():
             {% import Foo from "foo" %}
             {<Foo/>}
         """,
-            ("bar", """Hello World"""),
+            ("bar", "Hello World"),
         )

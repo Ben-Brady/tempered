@@ -10,6 +10,7 @@ def validate_templates(templates: t.Sequence[Template]):
         _check_for_missing_layout(template, template_lookup)
         _check_for_missing_blocks(template, template_lookup)
         _check_for_non_existant_blocks(template, template_lookup)
+        _check_for_duplicate_parameters(template)
 
 
 def _check_for_missing_layout(template: Template, lookup: t.Dict[str, Template]):
@@ -59,3 +60,13 @@ def _check_for_non_existant_blocks(template: Template, lookup: t.Dict[str, Templ
                 name=template.name,
                 file=template.file,
             )
+
+
+def _check_for_duplicate_parameters(template: Template):
+    names = [param.name for param in template.parameters]
+    if len(names) != len(set(names)):
+        raise InvalidTemplate.create(
+            msg="Duplicate parameter names",
+            name=template.name,
+            file=template.file,
+        )
