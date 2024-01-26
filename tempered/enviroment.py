@@ -27,13 +27,13 @@ class Environment:
         self._globals = globals or {}
         self._from_string_cache = {}
 
-    def get_template(self, name: str) -> t.Optional[Template]:
-        return self._templates.get(name, None)
+    def get_template(self, template_name: str) -> t.Optional[Template]:
+        return self._templates.get(template_name, None)
 
-    def render_template(self, name: str, **context: t.Any) -> str:
-        template = self.get_template(name)
+    def render_template(self, template_name: str, **context: t.Any) -> str:
+        template = self.get_template(template_name)
         if template is None:
-            raise ValueError(f"Template {name} not found")
+            raise ValueError(f"Template '{template_name}' not found")
 
         return template.render(**context)
 

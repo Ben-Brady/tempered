@@ -1,5 +1,5 @@
 "Generate native python functions from HTML templates"
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 from . import errors as errors
 from .enviroment import Environment as Environment
 from .enviroment import Template as Template

@@ -27,10 +27,15 @@ def build_types(templates: t.List[parser.Template]) -> None:
     get_template_overloads = [
         create_get_template_overload(template) for template in templates
     ]
+    render_template_overloads = [
+        create_render_template_overload(template) for template in templates
+    ]
 
     enviroment = find_class(body, "Environment")
-    override_enviroment(enviroment, get_template_overloads)
-
+    override_enviroment(
+        enviroment,
+        overloads=[*get_template_overloads, *render_template_overloads],
+    )
     source = ast_utils.unparse(ast_utils.Module(body))
     TYPES_FILE.write_text(source)
 
@@ -45,7 +50,8 @@ def find_class(body: t.List[ast.stmt], name: str) -> ast.ClassDef:
 
 
 def create_get_template_overload(template: parser.Template) -> ast.FunctionDef:
-    """Creates
+    """
+    Creates a function definition similar to this
     ```python
     def get_template(self, name: Literal["foo.html"]) -> _FooTemplate:
         ...
@@ -54,7 +60,7 @@ def create_get_template_overload(template: parser.Template) -> ast.FunctionDef:
     class_name = create_template_class_name(template)
 
     func_def = ast_utils.create_stmt(
-        "def get_template(self, name: str) -> t.Optional[Template]: ...",
+        "def get_template(self, template_name: str) -> t.Optional[Template]: ...",
         ast.FunctionDef,
     )
     name_arg = func_def.args.args[1]
@@ -64,14 +70,43 @@ def create_get_template_overload(template: parser.Template) -> ast.FunctionDef:
     return func_def
 
 
+def create_render_template_overload(template: parser.Template) -> ast.FunctionDef:
+    """
+    Creates a function definition similar to this
+    ```python
+    def render(self, name: Literal["foo.html"], **context) -> _FooTemplate:
+        ...
+    ```
+    """
+    func_def = ast_utils.create_stmt(
+        "def render_template(self, name: str, **context: t.Any) -> str: ...",
+        ast.FunctionDef,
+    )
+    func_def.decorator_list = [T_OVERLOAD]
+    func_def.args = ast_utils.Arguments(
+        args=[
+            ast_utils.Arg("self"),
+            ast_utils.Arg("template_name", create_t_literal(template.name)),
+        ],
+        kwonlyargs=[
+            ast_utils.Arg(param.name, param.type) for param in template.parameters
+        ],
+        kw_defaults=[param.default for param in template.parameters],
+        kwarg=ast_utils.Arg("context", ast_utils.Name("t.Any")),
+    )
+    return func_def
+
+
 def create_template_class(
     template: parser.Template, body: t.List[ast.stmt]
 ) -> ast.ClassDef:
     """Creates an object similar to this
     ```python
     class _ExampleTemplate
-        def render(self, *, foo: str, bar: str, context: t.Any)
-    ```"""
+        def render(self, *, foo: str, bar: str, **context: t.Any):
+            pass
+    ```
+    """
 
     class_def = deepcopy(find_class(body, "Template"))
     class_def.name = create_template_class_name(template)
@@ -91,14 +126,21 @@ def create_template_class(
 
 def override_enviroment(enviroment: ast.ClassDef, overloads: t.List[ast.FunctionDef]):
     GET_TEMPLATE_NONE_OVERLOAD = ast_utils.create_stmt(
-        "def get_template(self, name: str) -> None: ...",
+        "def get_template(self, template_name: str) -> None: ...",
         ast.FunctionDef,
     )
     GET_TEMPLATE_NONE_OVERLOAD.decorator_list = [T_OVERLOAD]
+    RENDER_TEMPLATE_NONE_OVERLOAD = ast_utils.create_stmt(
+        "def render_template(self, template_name: str, **context: t.Any) -> t.NoReturn: ...",
+        ast.FunctionDef,
+    )
+    RENDER_TEMPLATE_NONE_OVERLOAD.decorator_list = [T_OVERLOAD]
 
-    enviroment.body.insert(0, GET_TEMPLATE_NONE_OVERLOAD)
     for overload in overloads:
         enviroment.body.insert(0, overload)
+
+    enviroment.body.insert(len(overloads), GET_TEMPLATE_NONE_OVERLOAD)
+    enviroment.body.insert(len(overloads), RENDER_TEMPLATE_NONE_OVERLOAD)
 
 
 def create_t_literal(value: str) -> ast.expr:
