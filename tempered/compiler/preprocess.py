@@ -19,12 +19,12 @@ def calculate_dependencies(
     template: Template,
     lookup: t.Dict[str, Template],
 ) -> Sequence[str]:
-    dependencies = _calculate_dependencies(template, lookup)
+    dependencies = _recursively_calculate_dependencies(template, lookup)
     component_cache.clear()
     return dependencies
 
 
-def _calculate_dependencies(
+def _recursively_calculate_dependencies(
     template: Template,
     lookup: t.Dict[str, Template],
 ) -> Sequence[str]:

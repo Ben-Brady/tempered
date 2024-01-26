@@ -10,7 +10,7 @@ NAME_LOOKUP_VARIABLE = "_name_lookup"
 KWARGS_VARIABLE = "context"
 
 
-FILE_HEADER = ast.parse(
+FILE_HEADER = ast_utils.parse(
     f"""
 from __future__ import annotations as _
 from tempered._internals import escape as __escape
@@ -29,7 +29,7 @@ def __resolve(name: str, context: dict[str, t.Any]) -> t.Any:
     else:
         raise RuntimeError(f"The variable '{{name}}' could not be resolved")
 """
-).body
+)
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
