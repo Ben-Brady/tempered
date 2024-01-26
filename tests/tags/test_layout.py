@@ -1,7 +1,7 @@
-from . import build_template, build_templates
-from tempered import Tempered
 import bs4
 import pytest
+from tempered import Tempered
+from . import build_template, build_templates
 
 
 def test_layout_extend_with_default_slot():

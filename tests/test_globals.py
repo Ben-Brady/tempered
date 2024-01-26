@@ -1,5 +1,5 @@
-from tempered import Tempered
 import typing_extensions as t
+from tempered import Tempered
 
 
 def build_template(

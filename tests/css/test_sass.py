@@ -1,6 +1,6 @@
-from . import build_template
 import bs4
 import pytest
+from . import build_template
 
 
 def test_scss_styles_are_transpiled():

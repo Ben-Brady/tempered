@@ -1,6 +1,6 @@
 import tempered
-from typing_extensions import Callable
 import typing_extensions as t
+from typing_extensions import Callable
 
 
 def build_template(template: str) -> Callable:

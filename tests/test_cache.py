@@ -1,6 +1,6 @@
-from . import build_template
 import time
 import pytest
+from . import build_template
 
 
 @pytest.mark.skip("Cache removed temporarily")

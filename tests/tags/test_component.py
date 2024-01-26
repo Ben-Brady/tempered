@@ -1,7 +1,7 @@
-from . import build_template, build_templates
 import pytest
 import tinycss2
 import tempered
+from . import build_template, build_templates
 
 
 def test_components_can_have_optional_closing_tag():

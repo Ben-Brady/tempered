@@ -1,5 +1,4 @@
 from tempered.parser import parse_template, template_ast
-import ast
 
 
 def test_parse_component_block():

@@ -1,7 +1,7 @@
-from . import build_templates
-import pytest
 import bs4
+import pytest
 import tempered
+from . import build_templates
 
 
 def test_default_slot():
@@ -13,7 +13,7 @@ def test_default_slot():
         ),
     )
     html = component()
-    soup = bs4.BeautifulSoup(html)
+    soup = bs4.BeautifulSoup(html, features="html.parser")
     tag = soup.find("title")
     assert tag and "ABC" in tag.text
 
@@ -32,7 +32,7 @@ def test_single_named_slot():
         ),
     )
 
-    soup = bs4.BeautifulSoup(component())
+    soup = bs4.BeautifulSoup(component(), features="html.parser")
     tag = soup.find("title")
     assert tag and "replace" in tag.text
 
@@ -51,7 +51,7 @@ def test_single_named_required_slot():
         ),
     )
 
-    soup = bs4.BeautifulSoup(component())
+    soup = bs4.BeautifulSoup(component(), features="html.parser")
     tag = soup.find("title")
     assert tag and "replace" in tag.text
 
@@ -69,7 +69,7 @@ def test_single_named_slot_default():
         ),
     )
 
-    soup = bs4.BeautifulSoup(component())
+    soup = bs4.BeautifulSoup(component(), features="html.parser")
     tag = soup.find("title")
     assert tag and "default value" in tag.text
 
@@ -88,7 +88,7 @@ def test_single_named_slot_replaces_default():
         ),
     )
 
-    soup = bs4.BeautifulSoup(component())
+    soup = bs4.BeautifulSoup(component(), features="html.parser")
     tag = soup.find("title")
     assert tag and "replacement value" in tag.text
 
@@ -110,7 +110,7 @@ def test_many_named_slots_replaces_default():
         ),
     )
 
-    soup = bs4.BeautifulSoup(component())
+    soup = bs4.BeautifulSoup(component(), features="html.parser")
     assert soup.find("a") and "A" in soup.find("a").text  # type: ignore
     assert soup.find("b") and "B" in soup.find("b").text  # type: ignore
     assert soup.find("c") and "C" in soup.find("c").text  # type: ignore

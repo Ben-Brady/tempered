@@ -1,6 +1,6 @@
-from ..utils import build_templates
-import tempered
 import pytest
+import tempered
+from ..utils import build_templates
 
 
 def test_importing_components():

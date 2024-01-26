@@ -1,5 +1,5 @@
-from . import build_template
 import pytest
+from . import build_template
 
 
 def test_text_isnt_escaped():

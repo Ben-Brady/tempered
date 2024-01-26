@@ -1,7 +1,7 @@
-from . import build_template
-import bs4
 import sys
+import bs4
 import pytest
+from . import build_template
 
 
 def test_simple_expr_works():

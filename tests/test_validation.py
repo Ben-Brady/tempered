@@ -1,6 +1,6 @@
+import pytest
 import tempered
 from . import build_template, build_templates
-import pytest
 
 
 def test_checks_detect_missing_layout():

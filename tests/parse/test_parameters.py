@@ -1,9 +1,9 @@
+import ast
+import sys
+import pytest
+import typing_extensions as t
 from tempered import ast_utils
 from tempered.parser import parse_template, template_ast
-import ast
-import typing_extensions as t
-import pytest
-import sys
 
 
 class Unset:
