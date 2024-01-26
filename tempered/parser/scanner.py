@@ -42,35 +42,33 @@ class Scanner(t.Generic[TToken]):
         else:
             return self.pop()  # type: ignore
 
-
 class TextScanner:
     original: str
     position: int = 0
     file: t.Union[Path, None]
 
     if t.TYPE_CHECKING:
-        text: array[str]
+        text: str
 
     def __init__(self, html: str, file: t.Union[Path, None] = None):
         self.file = file
         self.original = html
-        if sys.version_info >= (3, 13):
-            self.text = array("w", html[::-1])
-        else:
-            self.text = array("u", html[::-1])
+        self.text = html
 
     @property
     def has_text(self) -> bool:
         return len(self.text) != 0
 
     def pop(self) -> str:
-        return self.text.pop()
+        char = self.text[0]
+        self.text = self.text[1:]
+        return char
 
     def accept(self, text: str) -> bool:
         if not self.startswith(text):
             return False
 
-        self.text = self.text[: -len(text)]
+        self.text = self.text[len(text) :]
         self.position += len(text)
         return True
 
@@ -82,11 +80,13 @@ class TextScanner:
 
         raise self.error(f"Expected {match!r}")
 
-    def startswith(self, *text: str) -> bool:
-        for match in text:
-            prefix = self.text[-len(match) : :][::-1].tounicode()
+    def startswith(self, text: str) -> bool:
+        prefix = self.text[: len(text)]
+        return prefix == text
 
-            if prefix == match:
+    def startswith_many(self, *text: str) -> bool:
+        for match in text:
+            if self.startswith(match):
                 return True
 
         return False
@@ -125,7 +125,7 @@ class TextScanner:
 
         text = ""
         while self.has_text:
-            if self.startswith(*matches):
+            if self.startswith_many(*matches):
                 break
 
             text += self.pop()
@@ -135,7 +135,7 @@ class TextScanner:
     def take_while(self, *matches: str) -> str:
         text = ""
         while self.has_text:
-            if not self.startswith(*matches):
+            if not self.startswith_many(*matches):
                 break
 
             text += self.pop()

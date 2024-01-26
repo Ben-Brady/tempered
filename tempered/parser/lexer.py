@@ -122,7 +122,7 @@ def next_component_token(scanner: TextScanner) -> t.Iterable[Token]:
 def next_html_token(scanner: TextScanner) -> t.Iterable[Token]:
     body = ""
     while scanner.has_text:
-        if scanner.startswith(EXPR_START, STATEMENT_START, COMPONENT_START):
+        if scanner.startswith_many(EXPR_START, STATEMENT_START, COMPONENT_START):
             break
         elif scanner.accept(CONTROL_ESCAPE):
             body += "{"
@@ -180,7 +180,7 @@ def next_statement_token(scanner: TextScanner) -> t.Iterable[Token]:
 
 
 def slot_token(scanner: TextScanner) -> t.Iterable[Token]:
-    if scanner.startswith(*IDENT_START):
+    if scanner.startswith_many(*IDENT_START):
         yield take_ident_token(scanner)
 
     if scanner.accept("required"):

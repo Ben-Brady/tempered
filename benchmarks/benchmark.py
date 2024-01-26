@@ -43,29 +43,34 @@ def benchmark_render(
 def benchmark_build():
     templates = tempered.Tempered("./building/tempered")
     start = time.perf_counter()
+    duration = 5
+    end = start + duration
 
-    count = 25
-    duration = timeit.timeit(lambda: templates.build_memory(), number=count)
-    duration /= count
+    compiles = 0
+    while time.perf_counter() < end:
+        templates.build_enviroment()
+        compiles += 1
+
+    duration = duration / compiles
     print(f"Tempered Building: {duration:2f}s")
 
 
 os.chdir(Path(__file__).parent)
 benchmark_build()
-benchmark_render(
-    name="Full Page Application",
-    context={"user": user},
-    entry_point="page.html",
-    folder="./real_world",
-)
-benchmark_render(
-    name="Partials",
-    context={"profile": user},
-    entry_point="page.html",
-    folder="./partials",
-)
-benchmark_render(
-    name="Static Pages",
-    entry_point="page.html",
-    folder="./static",
-)
+# benchmark_render(
+#     name="Full Page Application",
+#     context={"user": user},
+#     entry_point="page.html",
+#     folder="./real_world",
+# )
+# benchmark_render(
+#     name="Partials",
+#     context={"profile": user},
+#     entry_point="page.html",
+#     folder="./partials",
+# )
+# benchmark_render(
+#     name="Static Pages",
+#     entry_point="page.html",
+#     folder="./static",
+# )
