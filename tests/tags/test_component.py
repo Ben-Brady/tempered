@@ -84,9 +84,11 @@ def test_components_allows_mixed_parameters():
         '{% import Comp from "comp" %}{<Comp(bar="bar")>}',
         (
             "comp",
-            '{% param foo: str = "foo" %}'
-            '{% param bar: str %}'
-            '{{foo}}-{{bar}}',
+            """
+            {% param foo: str = "foo" %}
+            {% param bar: str %}
+            {{foo}}-{{bar}}
+            """,
         ),
     )
     html = component()

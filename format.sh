@@ -1,2 +1,3 @@
-python3 -m isort tempered
-python3 -m black tempered/ tests/
+autoflake --in-place -r tempered
+isort tempered
+black tempered/ tests/
