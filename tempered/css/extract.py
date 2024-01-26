@@ -1,9 +1,9 @@
-from . import sass, scoped
-from .. import errors
-import bs4
-import typing_extensions as t
 import warnings
+import bs4
 from bs4 import MarkupResemblesLocatorWarning
+import typing_extensions as t
+from .. import errors
+from . import sass, scoped
 
 warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 

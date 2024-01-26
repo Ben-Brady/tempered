@@ -1,8 +1,8 @@
-from .scanner import TextScanner
-import typing_extensions as t
 import string
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
+import typing_extensions as t
+from .scanner import TextScanner
 
 CONTROL_ESCAPE = r"\{"
 EXPR_START = "{{"

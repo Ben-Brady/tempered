@@ -1,17 +1,16 @@
 from __future__ import annotations
+import ast
 import typing_extensions as t
 from .. import ast_utils
 from ..parser import template_ast as tags
 from .constants import (
-    create_escape_call,
-    slot_variable_name,
-    slot_parameter,
-    WITH_STYLES_PARAMETER,
     CSS_VARIABLE,
     KWARGS_VARIABLE,
+    WITH_STYLES_PARAMETER,
+    create_escape_call,
+    slot_parameter,
+    slot_variable_name,
 )
-import ast
-import typing_extensions as t
 
 if t.TYPE_CHECKING:
     from .builder import BuildContext

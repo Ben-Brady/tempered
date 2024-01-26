@@ -1,9 +1,8 @@
-from . import template_ast, tags
-from .. import ast_utils
-from .scanner import Scanner
-import typing_extensions as t
 import ast
-
+import typing_extensions as t
+from .. import ast_utils
+from . import tags, template_ast
+from .scanner import Scanner
 
 TagScanner = Scanner[tags.Tag]
 T = t.TypeVar("T", bound=tags.Tag)

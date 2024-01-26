@@ -1,6 +1,6 @@
-from .. import ast_utils
 import ast
 import typing_extensions as t
+from .. import ast_utils
 
 
 class Variable:

@@ -1,6 +1,6 @@
 import tinycss2
-from tinycss2.ast import Node, AtRule
 from rcssmin import cssmin
+from tinycss2.ast import AtRule, Node
 import typing_extensions as t
 
 

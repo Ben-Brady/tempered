@@ -1,10 +1,9 @@
-from . import parser, ast_utils
 import ast
 import string
-import typing_extensions as t
-from pathlib import Path
 from copy import deepcopy
-
+from pathlib import Path
+import typing_extensions as t
+from . import ast_utils, parser
 
 ORIGINAL_FILE = Path(__file__).parent.joinpath("enviroment.py")
 TYPES_FILE = ORIGINAL_FILE.with_suffix(".pyi")

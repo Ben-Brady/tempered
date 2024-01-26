@@ -1,7 +1,7 @@
+import typing_extensions as t
+from . import template_ast
 from .introspection import TemplateInfo
 from .template_ast import Node, TemplateBlock
-from . import template_ast
-import typing_extensions as t
 
 
 def postprocess(body: TemplateBlock, css: str, info: TemplateInfo) -> TemplateBlock:

@@ -1,7 +1,7 @@
 from __future__ import annotations
+from dataclasses import dataclass
 from pathlib import Path
 import typing_extensions as t
-from dataclasses import dataclass
 
 
 class BuildError(Exception):

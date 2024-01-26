@@ -1,7 +1,7 @@
+import random
+import typing_extensions as t
 from . import tags, template_ast
 from .scanner import TextScanner
-import typing_extensions as t
-import random
 
 TOKEN_LENGTH = 16
 TOKEN_REGEX = rf"\ TEMPERED_[A-Z0-9]{{{TOKEN_LENGTH}}}"

@@ -1,8 +1,8 @@
-from ..errors import ParserException
-import typing_extensions as t
-from array import array
 import sys
+from array import array
 from pathlib import Path
+import typing_extensions as t
+from ..errors import ParserException
 
 TToken = t.TypeVar("TToken")
 

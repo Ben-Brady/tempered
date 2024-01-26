@@ -1,11 +1,11 @@
 from __future__ import annotations
+import ast
+from abc import ABC
+from dataclasses import dataclass
+import typing_extensions as t
 from .. import ast_utils
 from . import lexer, template_ast
 from .scanner import Scanner
-from dataclasses import dataclass
-import ast
-import typing_extensions as t
-from abc import ABC
 
 
 class CompositeTag(ABC):

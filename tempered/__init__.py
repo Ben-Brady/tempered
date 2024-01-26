@@ -1,10 +1,10 @@
 "Generate native python functions from HTML templates"
 __version__ = "0.9.0"
-from .tempered import Tempered as Tempered
-from .enviroment import Environment as Environment, Template as Template
 from . import errors as errors
-from .errors import ParserException, InvalidTemplate, BuildError
-
+from .enviroment import Environment as Environment
+from .enviroment import Template as Template
+from .errors import BuildError, InvalidTemplate, ParserException
+from .tempered import Tempered as Tempered
 
 __all__ = [
     "Tempered",

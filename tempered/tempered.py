@@ -1,10 +1,10 @@
-from . import parser, build, types
-from .enviroment import Template, Environment
-from .compiler.constants import NAME_LOOKUP_VARIABLE
+from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
 import typing_extensions as t
-from dataclasses import dataclass
+from . import build, parser, types
+from .compiler.constants import NAME_LOOKUP_VARIABLE
+from .enviroment import Environment, Template
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 

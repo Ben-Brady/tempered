@@ -1,8 +1,7 @@
 import ast
-from .. import ast_utils
-import typing_extensions as t
 import string
-
+import typing_extensions as t
+from .. import ast_utils
 
 CSS_VARIABLE = "__css"
 WITH_STYLES_PARAMETER = "with_styles"

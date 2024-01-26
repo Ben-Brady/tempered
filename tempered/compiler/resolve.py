@@ -1,14 +1,14 @@
-from .. import ast_utils
-from .constants import (
-    NAME_LOOKUP_VARIABLE,
-    KWARGS_VARIABLE,
-    WITH_STYLES_PARAMETER,
-    create_resolve_call,
-)
 import ast
 import builtins
 from functools import lru_cache
 import typing_extensions as t
+from .. import ast_utils
+from .constants import (
+    KWARGS_VARIABLE,
+    NAME_LOOKUP_VARIABLE,
+    WITH_STYLES_PARAMETER,
+    create_resolve_call,
+)
 
 
 def create_resolve_for_unknown_variables(

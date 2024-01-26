@@ -1,13 +1,9 @@
 from __future__ import annotations
-from ..parser.template_ast import (
-    Template,
-    LayoutTemplate,
-    Node,
-)
-from .accumulators import Variable
 import ast
 from dataclasses import dataclass, field
 import typing_extensions as t
+from ..parser.template_ast import LayoutTemplate, Node, Template
+from .accumulators import Variable
 
 if t.TYPE_CHECKING:
     from .rules import Rule

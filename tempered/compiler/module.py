@@ -1,9 +1,8 @@
 import ast
 from typing import Sequence
-
 from .. import ast_utils
 from ..css import finalise_css
-from ..parser import Template, LayoutTemplate
+from ..parser import LayoutTemplate, Template
 from . import preprocess, validate
 from .constants import FILE_HEADER, NAME_LOOKUP_VARIABLE
 from .template import create_template_function

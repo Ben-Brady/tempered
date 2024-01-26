@@ -1,6 +1,6 @@
-from ..parser import Template
 from typing import Sequence
 import typing_extensions as t
+from ..parser import Template
 
 
 def calculate_required_css(

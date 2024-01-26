@@ -1,6 +1,6 @@
-from . import template_ast, tags, scanner
-import typing_extensions as t
 from dataclasses import dataclass, field
+import typing_extensions as t
+from . import scanner, tags, template_ast
 
 
 @dataclass

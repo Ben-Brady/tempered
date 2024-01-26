@@ -1,7 +1,7 @@
-from ..errors import InvalidTemplate
-from ..parser.template_ast import Template, LayoutTemplate
-from .preprocess import calculate_dependencies
 import typing_extensions as t
+from ..errors import InvalidTemplate
+from ..parser.template_ast import LayoutTemplate, Template
+from .preprocess import calculate_dependencies
 
 
 def validate_templates(templates: t.Sequence[Template]):

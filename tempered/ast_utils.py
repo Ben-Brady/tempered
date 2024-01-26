@@ -1,7 +1,7 @@
 import ast
-from typing_extensions import Any, Iterable, Sequence
-import typing_extensions as t
 import sys
+import typing_extensions as t
+from typing_extensions import Any, Iterable, Sequence
 
 NoneType = type(None)
 

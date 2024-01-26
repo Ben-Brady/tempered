@@ -1,11 +1,11 @@
-from .. import errors
-from ..css import extract_css_from_html
-from . import htmlify, lexer, template_ast, tree, introspection
-from .tags import parse_tokens_to_tags
-from .preprocess import preprocess_html
-from .postprocess import postprocess
 from pathlib import Path
 import typing_extensions as t
+from .. import errors
+from ..css import extract_css_from_html
+from . import htmlify, introspection, lexer, template_ast, tree
+from .postprocess import postprocess
+from .preprocess import preprocess_html
+from .tags import parse_tokens_to_tags
 
 
 def parse_template(

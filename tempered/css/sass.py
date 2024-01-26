@@ -1,7 +1,7 @@
-from .. import errors
-import typing_extensions as t
-import warnings
 import textwrap
+import warnings
+import typing_extensions as t
+from .. import errors
 
 try:
     import sass

@@ -1,21 +1,21 @@
-from .. import ast_utils
-from ..parser import Template, LayoutTemplate, TemplateParameter
-from .constants import (
-    slot_parameter,
-    component_func_name,
-    layout_func_name,
-    create_layout_call,
-    WITH_STYLES_PARAMETER,
-    OUTPUT_VARIABLE,
-    KWARGS_VARIABLE,
-    CSS_VARIABLE,
-)
-from .resolve import create_resolve_for_unknown_variables
-from .builder import BuildContext
-from .accumulators import Variable
-from .rules import default_rules
 import ast
 import typing_extensions as t
+from .. import ast_utils
+from ..parser import LayoutTemplate, Template, TemplateParameter
+from .accumulators import Variable
+from .builder import BuildContext
+from .constants import (
+    CSS_VARIABLE,
+    KWARGS_VARIABLE,
+    OUTPUT_VARIABLE,
+    WITH_STYLES_PARAMETER,
+    component_func_name,
+    create_layout_call,
+    layout_func_name,
+    slot_parameter,
+)
+from .resolve import create_resolve_for_unknown_variables
+from .rules import default_rules
 
 
 def create_template_function(
