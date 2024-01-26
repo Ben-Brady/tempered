@@ -7,8 +7,9 @@ import tempered
 def test_components_can_have_optional_closing_tag():
     component = build_templates(
         """
-            {<comp ()/>}
-            {<comp ()>}
+        {% import Comp from "comp" %}
+            {<Comp ()/>}
+            {<Comp ()>}
         """,
         (
             "comp",

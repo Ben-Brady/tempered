@@ -13,5 +13,5 @@ def build_templates(template: str, *other_templates: t.Tuple[str, str]) -> Calla
     for name, body in other_templates:
         components.add_template_from_string(name, body)
 
-    env = components.build_enviroment()
+    env = components.build_enviroment(generate_types=False)
     return env.from_string(template).render

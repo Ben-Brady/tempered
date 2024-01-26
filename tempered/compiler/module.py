@@ -1,11 +1,12 @@
-from .. import ast_utils
-from ..parser import Template, LayoutTemplate
-from .constants import FILE_HEADER, NAME_LOOKUP_VARIABLE
-from . import preprocess, validate
-from ..css import finalise_css
-from .template import create_template_function
 import ast
 from typing import Sequence
+
+from .. import ast_utils
+from ..css import finalise_css
+from ..parser import Template, LayoutTemplate
+from . import preprocess, validate
+from .constants import FILE_HEADER, NAME_LOOKUP_VARIABLE
+from .template import create_template_function
 
 
 def compile_module(

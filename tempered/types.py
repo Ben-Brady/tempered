@@ -3,9 +3,11 @@ import ast
 import string
 import typing_extensions as t
 from pathlib import Path
+from copy import deepcopy
 
 
-TYPES_FILE = Path(__file__).parent.joinpath("enviroment.pyi")
+ORIGINAL_FILE = Path(__file__).parent.joinpath("enviroment.py")
+TYPES_FILE = ORIGINAL_FILE.with_suffix(".pyi")
 T_OVERLOAD = ast_utils.create_expr("t.overload")
 
 
@@ -15,48 +17,42 @@ def clear_types() -> None:
 
 
 def build_types(templates: t.List[parser.Template]) -> None:
-    BASE = """
-import typing_extensions as t
-from dataclasses import dataclass
+    with open(ORIGINAL_FILE) as f:
+        source = f.read()
 
-class Template:
-    def render(self, **context: t.Any) -> str:
-        pass
-"""
-    body = ast_utils.parse(BASE)
+    body = ast_utils.parse(source)
 
-    template_overloads = []
-    for template in templates:
-        IDENT_CHARS = string.ascii_letters + string.digits + "_"
-        template_ident = "".join(ch for ch in template.name if ch in IDENT_CHARS)
-        class_name = f"_{template_ident}Template"
+    template_classes = [create_template_class(template, body) for template in templates]
+    body.extend(template_classes)
 
-        class_def = create_template_class(template, class_name)
-        overload = create_template_overload(template, class_name)
-        body.append(class_def)
-        template_overloads.append(overload)
+    get_template_overloads = [
+        create_get_template_overload(template) for template in templates
+    ]
 
-    enviroment = create_enviroment(template_overloads)
-    body.append(enviroment)
+    enviroment = find_class(body, "Environment")
+    override_enviroment(enviroment, get_template_overloads)
+
     source = ast_utils.unparse(ast_utils.Module(body))
     TYPES_FILE.write_text(source)
 
 
-def create_template_overload(
-    template: parser.Template, class_name: str
-) -> ast.FunctionDef:
+def find_class(body: t.List[ast.stmt], name: str) -> ast.ClassDef:
+    for node in body:
+        if isinstance(node, ast.ClassDef):
+            if node.name == name:
+                return node
+
+    raise RuntimeError("Could not find Environment class")
+
+
+def create_get_template_overload(template: parser.Template) -> ast.FunctionDef:
     """Creates
     ```python
     def get_template(self, name: Literal["foo.html"]) -> _FooTemplate:
         ...
     ```
     """
-
-    def create_t_literal(value: str) -> ast.expr:
-        return ast_utils.Index(
-            ast_utils.create_expr("t.Literal"),
-            ast_utils.Constant(value),
-        )
+    class_name = create_template_class_name(template)
 
     func_def = ast_utils.create_stmt(
         "def get_template(self, name: str) -> t.Optional[Template]: ...",
@@ -69,29 +65,24 @@ def create_template_overload(
     return func_def
 
 
-def create_template_class(template: parser.Template, class_name: str) -> ast.ClassDef:
+def create_template_class(
+    template: parser.Template, body: t.List[ast.stmt]
+) -> ast.ClassDef:
     """Creates an object similar to this
     ```python
     class _ExampleTemplate
         def render(self, *, foo: str, bar: str, context: t.Any)
     ```"""
 
-    template_base = """
-class Template:
-    def render(self, **context: t.Any) -> str:
-        ...
-"""
-    class_def = ast_utils.create_stmt(template_base, ast.ClassDef)
-    class_def.name = class_name
+    class_def = deepcopy(find_class(body, "Template"))
+    class_def.name = create_template_class_name(template)
     template_params = [
         ast_utils.Arg(param.name, param.type) for param in template.parameters
     ]
     param_defaults = [param.default for param in template.parameters]
     render_func = t.cast(ast.FunctionDef, class_def.body[0])
     render_func.args = ast_utils.Arguments(
-        args=[
-            ast_utils.Arg("self"),
-        ],
+        args=[ast_utils.Arg("self")],
         kwonlyargs=template_params,
         kw_defaults=param_defaults,
         kwarg=ast_utils.Arg("context", ast_utils.Name("t.Any")),
@@ -99,34 +90,27 @@ class Template:
     return class_def
 
 
-def create_enviroment(overloads: t.List[ast.FunctionDef]) -> ast.ClassDef:
-    enviroment_base = """
-class Environment:
-    def __init__(
-        self,
-        templates: t.Optional[t.Dict[str, Template]] = None,
-        globals: t.Optional[t.Dict[str, t.Any]] = None,
-    ): ...
-
-"""
+def override_enviroment(enviroment: ast.ClassDef, overloads: t.List[ast.FunctionDef]):
     GET_TEMPLATE_NONE_OVERLOAD = ast_utils.create_stmt(
         "def get_template(self, name: str) -> None: ...",
         ast.FunctionDef,
     )
     GET_TEMPLATE_NONE_OVERLOAD.decorator_list = [T_OVERLOAD]
 
-    GET_TEMPLATE = ast_utils.create_stmt(
-        "def get_template(self, name: str) -> t.Optional[Template]: ...",
-        ast.FunctionDef,
+    for overload in overloads:
+        enviroment.body.insert(0, overload)
+
+    enviroment.body.insert(0, GET_TEMPLATE_NONE_OVERLOAD)
+
+
+def create_t_literal(value: str) -> ast.expr:
+    return ast_utils.Index(
+        ast_utils.create_expr("t.Literal"),
+        ast_utils.Constant(value),
     )
 
-    FROM_STRING = ast_utils.create_stmt(
-        "def from_string(self, template: str) -> Template:...",
-        ast.FunctionDef,
-    )
-    enviroment = ast_utils.create_stmt(enviroment_base, ast.ClassDef)
-    enviroment.body.extend(overloads)
-    enviroment.body.append(GET_TEMPLATE_NONE_OVERLOAD)
-    enviroment.body.append(GET_TEMPLATE)
-    enviroment.body.append(FROM_STRING)
-    return enviroment
+
+def create_template_class_name(template: parser.Template) -> str:
+    IDENT_CHARS = string.ascii_letters + string.digits + "_"
+    template_ident = "".join(ch for ch in template.name if ch in IDENT_CHARS)
+    return f"_{template_ident}Template"

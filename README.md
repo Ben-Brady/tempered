@@ -44,9 +44,9 @@ pip install tempered
 ```python
 from tempered import Tempered
 
-components = Tempered("./templates").build()
+env = Tempered("./templates").build_enviroment()
 
-print(components.Image(
+print(env.render_template("image.html",
     src="/example.png",
     alt="Example Post",
 ))

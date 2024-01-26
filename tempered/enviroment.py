@@ -1,3 +1,4 @@
+from __future__ import annotations
 from . import build, parser
 import typing_extensions as t
 from dataclasses import dataclass
@@ -28,6 +29,13 @@ class Environment:
 
     def get_template(self, name: str) -> t.Optional[Template]:
         return self._templates.get(name, None)
+
+    def render_template(self, name: str, **context: t.Any) -> str:
+        template = self.get_template(name)
+        if template is None:
+            raise ValueError(f"Template {name} not found")
+
+        return template.render(**context)
 
     def from_string(self, template: str) -> Template:
         if template in self._from_string_cache:
