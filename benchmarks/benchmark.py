@@ -51,7 +51,7 @@ def benchmark_build():
         templates.build_enviroment()
         compiles += 1
 
-    duration = (start - end) / compiles
+    duration = (end - start) / compiles
     print(f"Tempered Building: {duration:2f}s")
 
 
