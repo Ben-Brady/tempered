@@ -42,15 +42,17 @@ def benchmark_render(
 
 def benchmark_build():
     templates = tempered.Tempered("./building/tempered")
+    TARGET_DURATION = 5
+
     start = time.perf_counter()
-    duration = 5
-    end = start + duration
+    target_end = start + TARGET_DURATION
 
     compiles = 0
-    while time.perf_counter() < end:
+    while time.perf_counter() < target_end:
         templates.build_enviroment()
         compiles += 1
 
+    end = time.perf_counter()
     duration = (end - start) / compiles
     print(f"Tempered Building: {duration:2f}s")
 
