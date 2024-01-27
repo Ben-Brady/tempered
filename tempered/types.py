@@ -1,6 +1,5 @@
 import ast
 import string
-from copy import deepcopy
 from pathlib import Path
 import typing_extensions as t
 from . import ast_utils, parser

@@ -1,5 +1,3 @@
-import sys
-from array import array
 from pathlib import Path
 import typing_extensions as t
 from ..errors import ParserException
@@ -42,13 +40,13 @@ class Scanner(t.Generic[TToken]):
         else:
             return self.pop()  # type: ignore
 
+
 class TextScanner:
     original: str
     position: int = 0
     file: t.Union[Path, None]
+    text: str
 
-    if t.TYPE_CHECKING:
-        text: str
 
     def __init__(self, html: str, file: t.Union[Path, None] = None):
         self.file = file
