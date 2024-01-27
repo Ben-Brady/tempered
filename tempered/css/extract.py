@@ -38,7 +38,7 @@ def extract_css_from_html(body: str, prefix: str = "tempered") -> t.Tuple[html, 
         css += styles
         tag.decompose()
 
-    html = soup.prettify(formatter="minimal")
+    html = soup.decode()
     return html, css
 
 
