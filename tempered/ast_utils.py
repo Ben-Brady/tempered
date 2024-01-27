@@ -419,3 +419,15 @@ def unparse(node: ast.AST):
         import astor
 
         return astor.to_source(node).strip()
+
+
+T = t.TypeVar("T", bound=ast.AST)
+
+
+def copy(node: T) -> T:
+    if isinstance(node, ast.stmt):
+        return create_stmt(unparse(node), type(node))
+    elif isinstance(node, ast.expr):
+        return create_expr(unparse(node), type(node))
+    else:
+        return parse(unparse(node))

@@ -108,7 +108,7 @@ def create_template_class(
     ```
     """
 
-    class_def = deepcopy(find_class(body, "Template"))
+    class_def = ast_utils.copy(find_class(body, "Template"))
     class_def.name = create_template_class_name(template)
     template_params = [
         ast_utils.Arg(param.name, param.type) for param in template.parameters
