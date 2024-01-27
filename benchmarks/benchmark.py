@@ -59,20 +59,20 @@ def benchmark_build():
 
 os.chdir(Path(__file__).parent)
 benchmark_build()
-# benchmark_render(
-#     name="Full Page Application",
-#     context={"user": user},
-#     entry_point="page.html",
-#     folder="./real_world",
-# )
-# benchmark_render(
-#     name="Partials",
-#     context={"profile": user},
-#     entry_point="page.html",
-#     folder="./partials",
-# )
-# benchmark_render(
-#     name="Static Pages",
-#     entry_point="page.html",
-#     folder="./static",
-# )
+benchmark_render(
+    name="Full Page Application",
+    context={"user": user},
+    entry_point="page.html",
+    folder="./real_world",
+)
+benchmark_render(
+    name="Partials",
+    context={"profile": user},
+    entry_point="page.html",
+    folder="./partials",
+)
+benchmark_render(
+    name="Static Pages",
+    entry_point="page.html",
+    folder="./static",
+)
