@@ -122,8 +122,7 @@ def next_component_token(scanner: TextScanner) -> t.Iterable[Token]:
 def next_html_token(scanner: TextScanner) -> t.Iterable[Token]:
     body = ""
     while scanner.has_text:
-        if scanner.startswith("{"):
-            if scanner.startswith_many(EXPR_START, STATEMENT_START, COMPONENT_START):
+        if scanner.startswith("{") and scanner.startswith_many(EXPR_START, STATEMENT_START, COMPONENT_START):
                 break
 
         elif scanner.accept(CONTROL_ESCAPE):
