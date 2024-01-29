@@ -2,7 +2,7 @@ from pathlib import Path
 import typing_extensions as t
 from .. import errors
 from ..css import extract_css_from_html
-from . import htmlify, introspection, lexer, preprocess, postprocess, template_ast, tree
+from . import htmlify, introspection, lexer, postprocess, preprocess, template_ast, tree
 from .tags import parse_tokens_to_tags
 
 

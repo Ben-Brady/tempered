@@ -96,6 +96,7 @@ class SlotInfo:
 
 @dataclass
 class Template:
+    is_layout = False
     name: str
     file: t.Optional[Path] = None
     body: TemplateBlock = field(default_factory=list)
@@ -104,10 +105,8 @@ class Template:
     parameters: t.List[TemplateParameter] = field(default_factory=list)
     imports: t.List[ImportNode] = field(default_factory=list)
     style_includes: t.Set[str] = field(default_factory=set)
-
-    is_layout = False
     layout: t.Union[str, None] = None
-    
+
     components_calls: t.List[ComponentNode] = field(default_factory=list)
     blocks: t.Set[str] = field(default_factory=set)
 
