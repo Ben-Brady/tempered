@@ -2,9 +2,7 @@ from pathlib import Path
 import typing_extensions as t
 from .. import errors
 from ..css import extract_css_from_html
-from . import htmlify, introspection, lexer, template_ast, tree
-from .postprocess import postprocess
-from .preprocess import preprocess_html
+from . import htmlify, introspection, lexer, preprocess, postprocess, template_ast, tree
 from .tags import parse_tokens_to_tags
 
 
@@ -42,16 +40,18 @@ def _parse_template(
 
     # Process HTML
     html, css = extract_css_from_html(html, prefix=name)
-    html = preprocess_html(html)
-    # CSS in minified later
+    html = preprocess.minify_html(html)
+    # Note: CSS in minified later
 
     # Reconvert the HTML back into tokens
     tags = htmlify.convert_tagged_html_to_tokens(html, token_lookup)
-
-    # Parse tokens into a body
     body = tree.parse_tags_to_template_ast(tags)
+
+    # Postprocessing
     info = introspection.create_template_info(tags, css)
-    body = postprocess(body, css, info)
+    body = postprocess.place_default_style_node(body, info, css)
+
+    # Construct the final object
     return construct_template_obj(name, file, body, css, info)
 
 

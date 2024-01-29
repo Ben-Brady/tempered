@@ -97,17 +97,18 @@ class SlotInfo:
 @dataclass
 class Template:
     name: str
-    is_layout = False
     file: t.Optional[Path] = None
-    parameters: t.List[TemplateParameter] = field(default_factory=list)
-    imports: t.List[ImportNode] = field(default_factory=list)
-
     body: TemplateBlock = field(default_factory=list)
     css: str = ""
-    layout: t.Union[str, None] = None
-    components_calls: t.List[ComponentNode] = field(default_factory=list)
+
+    parameters: t.List[TemplateParameter] = field(default_factory=list)
+    imports: t.List[ImportNode] = field(default_factory=list)
     style_includes: t.Set[str] = field(default_factory=set)
 
+    is_layout = False
+    layout: t.Union[str, None] = None
+    
+    components_calls: t.List[ComponentNode] = field(default_factory=list)
     blocks: t.Set[str] = field(default_factory=set)
 
 

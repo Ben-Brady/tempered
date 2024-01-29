@@ -47,7 +47,6 @@ class TextScanner:
     file: t.Union[Path, None]
     text: str
 
-
     def __init__(self, html: str, file: t.Union[Path, None] = None):
         self.file = file
         self.original = html
