@@ -7,6 +7,9 @@ CSS_VARIABLE = "__css"
 WITH_STYLES_PARAMETER = "with_styles"
 OUTPUT_VARIABLE = "__html"
 NAME_LOOKUP_VARIABLE = "_name_lookup"
+REGISTER_GLOBAL_FUNC = "__register_global"
+REGISTER_TEMPLATE_DECORATOR = "__register_template_name"
+RESOLVE_FUNC = "__resolve"
 KWARGS_VARIABLE = "context"
 
 
@@ -17,11 +20,19 @@ from tempered._internals import escape as __escape
 import typing_extensions as t
 
 __globals = {{}}
+{NAME_LOOKUP_VARIABLE} = {{}}
 
-def __register_global(name: str, value: t.Any):
+def {REGISTER_GLOBAL_FUNC}(name: str, value: t.Any):
     __globals[name] = value
 
-def __resolve(name: str, context: dict[str, t.Any]) -> t.Any:
+def {REGISTER_TEMPLATE_DECORATOR}(name: str):
+    def wrapper(func):
+        {NAME_LOOKUP_VARIABLE}[name] = func
+        return func
+
+    return wrapper
+
+def {RESOLVE_FUNC}(name: str, context: dict[str, t.Any]) -> t.Any:
     if name in context:
         return context[name]
     elif name in __globals:
@@ -43,6 +54,13 @@ def component_func_name(template_name: str) -> str:
 def layout_func_name(template_name: str) -> str:
     template_name = filter_non_ident_chars(template_name)
     return f"__{template_name}_layout"
+
+
+def template_func_name(template_name: str, is_layout: bool) -> str:
+    if is_layout:
+        return layout_func_name(template_name)
+    else:
+        return component_func_name(template_name)
 
 
 def slot_variable_name(slot_name: t.Union[str, None]) -> str:
@@ -67,7 +85,7 @@ def filter_non_ident_chars(name: str) -> str:
 
 def create_resolve_call(name: str):
     return ast_utils.Call(
-        func=ast_utils.Name("__resolve"),
+        func=ast_utils.Name(RESOLVE_FUNC),
         arguments=[
             ast_utils.Constant(name),
             ast_utils.Name(KWARGS_VARIABLE),

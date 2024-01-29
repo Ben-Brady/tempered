@@ -8,6 +8,7 @@ from .constants import (
     CSS_VARIABLE,
     KWARGS_VARIABLE,
     OUTPUT_VARIABLE,
+    REGISTER_TEMPLATE_DECORATOR,
     WITH_STYLES_PARAMETER,
     component_func_name,
     create_layout_call,
@@ -68,6 +69,7 @@ def create_template_function(
     )
     func = ast_utils.Function(
         name=function_name,
+        decorators=[create_register_template_decorator(template.name)],
         args=construct_arguments(arguements),
         body=construct_body(ctx),
         returns=ast_utils.Name("str"),
@@ -138,3 +140,7 @@ def create_style_contant(ctx: BuildContext) -> t.List[ast.stmt]:
 
     ctx.css_variable = Variable(CSS_VARIABLE)
     return ctx.css_variable.assign(value)
+
+
+def create_register_template_decorator(name: str) -> ast.Call:
+    return ast_utils.Call(ast_utils.Name(REGISTER_TEMPLATE_DECORATOR), [ast.Str(name)])
