@@ -1,29 +1,24 @@
-from importlib.util import module_from_spec, spec_from_loader
-from types import ModuleType
 import typing_extensions as t
 from . import ast_utils, parser
-from .compiler.constants import component_func_name
+from .compiler.constants import REGISTER_GLOBAL_FUNC, template_func_name
 from .compiler.module import compile_module
 
 
-def build_memory(
+def build(
     templates: t.List[parser.Template],
     globals: t.Dict[str, t.Any],
-) -> ModuleType:
+) -> t.Dict[str, t.Any]:
     module_ast = compile_module(templates)
-
     source = ast_utils.unparse(module_ast)
 
-    spec = spec_from_loader(name="tempered.components", loader=None)
-    assert spec is not None
-    module = module_from_spec(spec)
-    exec(source, module.__dict__)
+    module_globals = {}
+    exec(source, module_globals)
 
     # Register globals
     for name, value in globals.items():
-        module.__register_global(name, value)
+        module_globals[REGISTER_GLOBAL_FUNC](name, value)
 
-    return module
+    return module_globals
 
 
 def build_single_template(
@@ -31,6 +26,7 @@ def build_single_template(
     templates: t.List[parser.Template],
     globals: t.Dict[str, t.Any],
 ) -> t.Callable[..., str]:
-    module = build_memory([template, *templates], globals)
-    func = getattr(module, component_func_name(template.name))
-    return func
+    module = build([template, *templates], globals)
+    func_name = template_func_name(template.name, template.is_layout)
+    template_func = module[func_name]
+    return template_func
