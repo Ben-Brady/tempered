@@ -39,8 +39,7 @@ def {RESOLVE_FUNC}(name: str, context: dict[str, t.Any]) -> t.Any:
         return __globals[name]
     else:
         raise RuntimeError(f"The variable '{{name}}' could not be resolved")
-"""
-)
+""")
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
@@ -79,8 +78,15 @@ def slot_parameter(slot_name: t.Union[str, None]) -> str:
 
 def filter_non_ident_chars(name: str) -> str:
     IDENT_CHARS = string.ascii_letters + string.digits + "_"
-    name = "".join(char for char in name if char in IDENT_CHARS)
-    return name
+
+    def encode_char(char: str) -> str:
+        if char in IDENT_CHARS:
+            return char
+        else:
+            code = ord(char)
+            return f"_{hex(code)[2:]}_"
+
+    return "".join(map(encode_char, name))
 
 
 def create_resolve_call(name: str):
