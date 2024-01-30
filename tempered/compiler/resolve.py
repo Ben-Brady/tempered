@@ -4,8 +4,8 @@ from functools import lru_cache
 import typing_extensions as t
 from .. import ast_utils
 from .constants import (
-    KWARGS_VARIABLE,
-    NAME_LOOKUP_VARIABLE,
+    KWARGS_VAR,
+    NAME_LOOKUP_VAR,
     WITH_STYLES_PARAMETER,
     create_resolve_call,
 )
@@ -21,9 +21,9 @@ def create_resolve_for_unknown_variables(
 
 class NameTransformer(ast.NodeTransformer):
     RESERVED_NAMES = (
-        KWARGS_VARIABLE,
+        KWARGS_VAR,
         WITH_STYLES_PARAMETER,
-        NAME_LOOKUP_VARIABLE,
+        NAME_LOOKUP_VAR,
     )
     known_names: t.List[str]
 

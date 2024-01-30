@@ -10,8 +10,12 @@ def build_template(template: str) -> Callable:
 
 def build_templates(template: str, *other_templates: t.Tuple[str, str]) -> Callable:
     components = tempered.Tempered()
-    for name, body in other_templates:
-        components.add_template_from_string(name, body)
 
+    templates = {}
+    templates["main"] = template
+    for name, body in other_templates:
+        templates[name] = body
+
+    components.add_templates_from_string(templates)
     env = components.build_enviroment(generate_types=False)
     return env.from_string(template).render

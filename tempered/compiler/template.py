@@ -6,9 +6,9 @@ from .accumulators import Variable
 from .builder import BuildContext
 from .constants import (
     CSS_VARIABLE,
-    KWARGS_VARIABLE,
-    OUTPUT_VARIABLE,
-    REGISTER_TEMPLATE_DECORATOR,
+    KWARGS_VAR,
+    OUTPUT_VAR,
+    REGISTER_TEMPLATE_NAME_DECORATOR,
     WITH_STYLES_PARAMETER,
     component_func_name,
     create_layout_call,
@@ -62,7 +62,7 @@ def create_template_function(
 
     ctx = BuildContext(
         template=template,
-        output_variable=Variable(OUTPUT_VARIABLE),
+        output_variable=Variable(OUTPUT_VAR),
         layout=layout,
         css=css if len(css) > 0 else None,
         rules=default_rules,
@@ -91,7 +91,7 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
         args.append(
             ast.arg(
                 arg=arguement.name,
-                annotation=arguement.type,
+                annotation=None,
             )
         )
         defaults.append(arguement.default)
@@ -99,7 +99,7 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
     return ast_utils.Arguments(
         kwonlyargs=args,
         kw_defaults=defaults,
-        kwarg=ast_utils.Arg(KWARGS_VARIABLE, ast_utils.create_expr("t.Any")),
+        kwarg=ast_utils.Arg(KWARGS_VAR, ast_utils.create_expr("t.Any")),
     )
 
 
@@ -143,4 +143,6 @@ def create_style_contant(ctx: BuildContext) -> t.List[ast.stmt]:
 
 
 def create_register_template_decorator(name: str) -> ast.Call:
-    return ast_utils.Call(ast_utils.Name(REGISTER_TEMPLATE_DECORATOR), [ast.Str(name)])
+    return ast_utils.Call(
+        ast_utils.Name(REGISTER_TEMPLATE_NAME_DECORATOR), [ast.Str(name)]
+    )

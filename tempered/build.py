@@ -1,32 +1,49 @@
 import typing_extensions as t
-from . import ast_utils, parser
-from .compiler.constants import REGISTER_GLOBAL_FUNC, template_func_name
-from .compiler.module import compile_module
+from . import ast_utils, parser, compiler
+from .compiler import constants
+from types import ModuleType
+from importlib.util import module_from_spec, spec_from_loader
 
 
-def build(
-    templates: t.List[parser.Template],
-    globals: t.Dict[str, t.Any],
-) -> t.Dict[str, t.Any]:
-    module_ast = compile_module(templates)
-    source = ast_utils.unparse(module_ast)
+def build_intial_module() -> ModuleType:
+    source = compiler.create_default_module_code()
 
-    module_globals = {}
-    exec(source, module_globals)
+    spec = spec_from_loader(name="tempered.generated", loader=None)
+    if spec is None:
+        raise RuntimeError("InteralError: Failed to create module spec")
+
+    module = module_from_spec(spec)
+    exec(source, module.__dict__)
 
     # Register globals
-    for name, value in globals.items():
-        module_globals[REGISTER_GLOBAL_FUNC](name, value)
 
-    return module_globals
+    return module
 
 
-def build_single_template(
-    template: parser.Template,
+def build_templates(
+    module: ModuleType,
     templates: t.List[parser.Template],
-    globals: t.Dict[str, t.Any],
+):
+    source = compiler.create_add_templates_code(templates, module)
+    exec(source, module.__dict__)
+
+
+def register_global(
+    module: ModuleType,
+    name: str,
+    value: t.Any,
+):
+    register_global = module.__dict__[constants.REGISTER_GLOBAL_FUNC]
+    register_global(name, value)
+
+
+def get_templates(module: ModuleType) -> t.List[parser.Template]:
+    return module.__dict__[constants.TEMPLATE_LIST_VAR]
+
+
+def get_template_func(
+    module: ModuleType, template: parser.Template
 ) -> t.Callable[..., str]:
-    module = build([template, *templates], globals)
-    func_name = template_func_name(template.name, template.is_layout)
-    template_func = module[func_name]
+    func_name = constants.template_func_name(template.name, template.is_layout)
+    template_func = module.__dict__[func_name]
     return template_func

@@ -5,8 +5,9 @@ from .. import ast_utils
 from ..parser import template_ast as tags
 from .constants import (
     CSS_VARIABLE,
-    KWARGS_VARIABLE,
+    KWARGS_VAR,
     WITH_STYLES_PARAMETER,
+    NAME_LOOKUP_VAR,
     create_escape_call,
     slot_parameter,
     slot_variable_name,
@@ -69,7 +70,7 @@ class ImportRule(Rule[tags.ImportNode]):
     @staticmethod
     def construct(ctx: BuildContext, tag: tags.ImportNode):
         template_func = ast_utils.Index(
-            ast_utils.Name("_name_lookup"),
+            ast_utils.Name(NAME_LOOKUP_VAR),
             ast_utils.Constant(tag.name),
         )
         assign = ast_utils.Assign(
@@ -208,7 +209,7 @@ class ComponentRule(Rule[tags.ComponentNode]):
         func_call = ast_utils.Call(
             func=func,
             keywords=keywords,
-            kwargs=ast_utils.Name(KWARGS_VARIABLE),
+            kwargs=ast_utils.Name(KWARGS_VAR),
         )
         ctx.add_expr(func_call)
 
