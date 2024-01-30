@@ -9,14 +9,23 @@ BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 
 
 class Tempered:
+    template_files: t.List[Path]
+    "All list all the template files used, useful for hot reloading"
+    generate_types: bool
+    "If True, will generate dynamic type hints"
+
     _module: ModuleType
     _from_string_cache: t.Dict[str, t.Callable[..., str]]
-    template_files: t.List[Path]
-    build_types: bool = True
 
-    def __init__(self, template_folder: t.Union[str, Path, None] = None):
+    def __init__(
+        self,
+        template_folder: t.Union[str, Path, None] = None,
+        *,
+        generate_types: bool = True,
+    ):
         self._from_string_cache = {}
         self.template_files = []
+        self.generate_types = generate_types
         self._module = build.build_intial_module()
         if template_folder:
             self.add_template_folder(template_folder)
@@ -64,13 +73,16 @@ class Tempered:
 
     def render_from_string(self, html: str, **context: t.Any) -> str:
         if html in self._from_string_cache:
-            return self._from_string_cache[html](**context)
+            func = self._from_string_cache[html]
+            return func(**context)
 
         string_hash = hex(zlib.crc32(html.encode()))[2:]
         name = f"annonomous_{string_hash}>"
         parsed_template = parser.parse_template(name, html)
         build.build_templates(self._module, [parsed_template])
-        return self._render_template(name, **context)
+        func = build.get_template_func(self._module, name)
+        self._from_string_cache[html] = func
+        return func(**context)
 
     def _render_template(self, name: str, **context: t.Any) -> str:
         func = build.get_template_func(self._module, name)
@@ -79,7 +91,7 @@ class Tempered:
     render_template = render.render_template
 
     def _reconstruct_types(self):
-        if not self.build_types:
+        if not self.generate_types:
             render.clear_types()
             return
 
