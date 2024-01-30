@@ -1,8 +1,8 @@
-import typing_extensions as t
-from . import ast_utils, parser, compiler
-from .compiler import constants
-from types import ModuleType
 from importlib.util import module_from_spec, spec_from_loader
+from types import ModuleType
+import typing_extensions as t
+from . import ast_utils, compiler, parser
+from .compiler import constants
 
 
 def build_intial_module() -> ModuleType:
@@ -14,8 +14,6 @@ def build_intial_module() -> ModuleType:
 
     module = module_from_spec(spec)
     exec(source, module.__dict__)
-
-    # Register globals
 
     return module
 

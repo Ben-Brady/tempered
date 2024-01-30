@@ -1,7 +1,7 @@
 import ast
+import pickle
 import string
 import typing_extensions as t
-import pickle
 from .. import ast_utils
 
 CSS_VARIABLE = "__css"

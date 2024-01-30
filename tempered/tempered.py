@@ -1,10 +1,9 @@
 from pathlib import Path
+from types import ModuleType
 import typing_extensions as t
 from . import build, parser, types
 from .compiler.constants import template_func_name
 from .enviroment import Environment, Template
-from types import ModuleType
-
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 

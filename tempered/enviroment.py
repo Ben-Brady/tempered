@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
-import typing_extensions as t
 from types import ModuleType
+import typing_extensions as t
 from . import build, parser
 
 

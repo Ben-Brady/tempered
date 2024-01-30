@@ -6,8 +6,8 @@ from ..parser import template_ast as tags
 from .constants import (
     CSS_VARIABLE,
     KWARGS_VAR,
-    WITH_STYLES_PARAMETER,
     NAME_LOOKUP_VAR,
+    WITH_STYLES_PARAMETER,
     create_escape_call,
     slot_parameter,
     slot_variable_name,
