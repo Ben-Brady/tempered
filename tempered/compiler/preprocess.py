@@ -1,15 +1,18 @@
 from typing import Sequence
 import typing_extensions as t
+from .. css import finalise_css
 from ..parser import Template
 
 
-def calculate_required_css(
+def generate_css(
     template: Template,
     lookup: t.Dict[str, Template],
 ) -> str:
     components_used = calculate_dependencies(template, lookup)
     css_fragments = [lookup[comp].css for comp in components_used]
-    return " ".join(css_fragments)
+    css = " ".join(css_fragments)
+    css = finalise_css(css)
+    return css
 
 
 component_cache: t.Dict[str, t.Set[str]] = {}

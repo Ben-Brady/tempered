@@ -5,7 +5,7 @@ from ..parser import LayoutTemplate, Template, TemplateParameter
 from .accumulators import Variable
 from .builder import BuildContext
 from . import constants
-from .utils import (
+from .calls import (
     component_func_name,
     create_layout_call,
     layout_func_name,

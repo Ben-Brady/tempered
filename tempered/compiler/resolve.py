@@ -4,7 +4,7 @@ from functools import lru_cache
 import typing_extensions as t
 from .. import ast_utils
 from . import constants
-from .utils import create_resolve_call
+from .calls import create_resolve_call
 
 
 def create_resolve_for_unknown_variables(
@@ -43,19 +43,7 @@ class NameTransformer(ast.NodeTransformer):
         self.known_names = self.known_names[: -len(loop_vars)]
         return output_node
 
-    def visit_ListComp(self, node: ast.ListComp):
-        return self._comprehension(node)
-
-    def visit_SetComp(self, node: ast.SetComp):
-        return self._comprehension(node)
-
-    def visit_DictComp(self, node: ast.DictComp):
-        return self._comprehension(node)
-
-    def visit_GeneratorExp(self, node: ast.GeneratorExp):
-        return self._comprehension(node)
-
-    def _comprehension(
+    def _visit_comp(
         self, node: t.Union[ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp]
     ):
         loop_vars = []
@@ -79,6 +67,11 @@ class NameTransformer(ast.NodeTransformer):
             self.known_names.pop()
 
         return node
+
+    visit_GeneratorExp = _visit_comp
+    visit_ListComp = _visit_comp
+    visit_SetComp = _visit_comp
+    visit_DictComp = _visit_comp
 
     def resolve(self, name: ast.Name) -> ast.expr:
         if (

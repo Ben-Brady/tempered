@@ -2,14 +2,27 @@ from __future__ import annotations
 import ast
 import typing_extensions as t
 from .. import ast_utils
-from ..parser import template_ast
+from ..parser.template_ast import (
+    Node,
+    HtmlNode,
+    ExprNode,
+    ComponentNode,
+    RawExprNode,
+    AssignmentNode,
+    ImportNode,
+    IfNode,
+    ForNode,
+    SlotNode,
+    BlockNode,
+    StyleNode,
+)
 from .constants import (
     CSS_VARIABLE,
     KWARGS_VAR,
     NAME_LOOKUP_VAR,
     WITH_STYLES,
 )
-from .utils import (
+from .calls import (
     create_escape_call,
     slot_parameter,
     slot_variable_name,
@@ -23,30 +36,26 @@ else:
 RuleReturnType = t.Union[t.Iterable[ast.stmt], None]
 
 
-def construct_html(ctx: BuildContext, tag: template_ast.HtmlNode) -> RuleReturnType:
+def construct_html(ctx: BuildContext, tag: HtmlNode) -> RuleReturnType:
     yield ctx.create_add_expr(ast_utils.Constant(tag.html))
 
 
-def construct_expr(ctx: BuildContext, tag: template_ast.ExprNode) -> RuleReturnType:
+def construct_expr(ctx: BuildContext, tag: ExprNode) -> RuleReturnType:
     yield ctx.create_add_expr(create_escape_call(value=tag.value))
 
 
-def construct_raw_expr(
-    ctx: BuildContext, tag: template_ast.RawExprNode
-) -> RuleReturnType:
+def construct_raw_expr(ctx: BuildContext, tag: RawExprNode) -> RuleReturnType:
     yield ctx.create_add_expr(tag.value)
 
 
-def construct_assign(
-    ctx: BuildContext, tag: template_ast.AssignmentNode
-) -> RuleReturnType:
+def construct_assign(ctx: BuildContext, tag: AssignmentNode) -> RuleReturnType:
     yield ast_utils.Assign(
         target=tag.target,
         value=tag.value,
     )
 
 
-def construct_import(ctx: BuildContext, tag: template_ast.ImportNode) -> RuleReturnType:
+def construct_import(ctx: BuildContext, tag: ImportNode) -> RuleReturnType:
     template_func = ast_utils.Index(
         ast_utils.Name(NAME_LOOKUP_VAR),
         ast_utils.Constant(tag.name),
@@ -57,7 +66,7 @@ def construct_import(ctx: BuildContext, tag: template_ast.ImportNode) -> RuleRet
     )
 
 
-def construct_if(ctx: BuildContext, tag: template_ast.IfNode) -> RuleReturnType:
+def construct_if(ctx: BuildContext, tag: IfNode) -> RuleReturnType:
     ctx.ensure_output_assigned()
     EMPTY_BODY = [ast_utils.create_stmt("...", ast.Expr)]
 
@@ -85,27 +94,27 @@ def construct_if(ctx: BuildContext, tag: template_ast.IfNode) -> RuleReturnType:
     )
 
 
-def construct_for(ctx: BuildContext, tag: template_ast.ForNode) -> RuleReturnType:
+def construct_for(ctx: BuildContext, tag: ForNode) -> RuleReturnType:
     ctx.ensure_output_assigned()
 
     for_body = ctx.create_block(tag.loop_block)
     if len(for_body) > 0:
         yield ast.For(
-            target=tag.loop_variable,
+            target=tag.target,
             iter=tag.iterable,
             body=for_body,
             orelse=[],
         )
 
 
-def construct_block(ctx: BuildContext, tag: template_ast.BlockNode) -> RuleReturnType:
+def construct_block(ctx: BuildContext, tag: BlockNode) -> RuleReturnType:
     yield from ctx.save_block_output_to_variable(
         output=slot_variable_name(tag.name),
         tags=tag.body,
     )
 
 
-def construct_slot(ctx: BuildContext, tag: template_ast.SlotNode) -> RuleReturnType:
+def construct_slot(ctx: BuildContext, tag: SlotNode) -> RuleReturnType:
     slot_param = ast_utils.Name(slot_parameter(tag.name))
 
     if tag.default is None:
@@ -123,7 +132,7 @@ def construct_slot(ctx: BuildContext, tag: template_ast.SlotNode) -> RuleReturnT
     yield ctx.create_add_expr(slot_param)
 
 
-def construct_styles(ctx: BuildContext, tag: template_ast.StyleNode) -> RuleReturnType:
+def construct_styles(ctx: BuildContext, tag: StyleNode) -> RuleReturnType:
     if ctx.uses_layout:
         return  # Styles are placed in the layout template
     if ctx.css is None and not ctx.is_layout:
@@ -150,9 +159,7 @@ def construct_styles(ctx: BuildContext, tag: template_ast.StyleNode) -> RuleRetu
     )
 
 
-def construct_component(
-    ctx: BuildContext, tag: template_ast.ComponentNode
-) -> RuleReturnType:
+def construct_component(ctx: BuildContext, tag: ComponentNode) -> RuleReturnType:
     func = ast_utils.Name(tag.component_name)
     keywords = tag.keywords.copy()
 
@@ -165,22 +172,23 @@ def construct_component(
     yield ctx.create_add_expr(func_call)
 
 
-T = t.TypeVar("T", bound=template_ast.Node, infer_variance=True)
+T = t.TypeVar("T", bound=Node, infer_variance=True)
 Rule: t.TypeAlias = t.Tuple[
     t.Type[T],
     t.Callable[[BuildContext, T], RuleReturnType],
 ]
 
 default_rules: t.List[Rule] = [
-    (template_ast.HtmlNode, construct_html),
-    (template_ast.ExprNode, construct_expr),
-    (template_ast.ComponentNode, construct_component),
-    (template_ast.RawExprNode, construct_raw_expr),
-    (template_ast.AssignmentNode, construct_assign),
-    (template_ast.ImportNode, construct_import),
-    (template_ast.IfNode, construct_if),
-    (template_ast.ForNode, construct_for),
-    (template_ast.SlotNode, construct_slot),
-    (template_ast.BlockNode, construct_block),
-    (template_ast.StyleNode, construct_styles),
+    (HtmlNode, construct_html),
+    (ExprNode, construct_expr),
+    (ComponentNode, construct_component),
+    (RawExprNode, construct_raw_expr),
+    (AssignmentNode, construct_assign),
+    (ImportNode, construct_import),
+    (IfNode, construct_if),
+    (ForNode, construct_for),
+    (SlotNode, construct_slot),
+    (BlockNode, construct_block),
+    (StyleNode, construct_styles),
 ]
+a = default_rules[0]

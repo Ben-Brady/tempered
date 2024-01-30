@@ -82,9 +82,3 @@ def create_layout_call(
         kwargs=ast_utils.Name(constants.KWARGS_VAR),
     )
 
-
-def create_pickled_obj(obj: t.Any) -> ast.expr:
-    return ast_utils.Call(
-        func=ast_utils.Name("__pickle.loads"),
-        arguments=[ast_utils.Constant(pickle.dumps(obj))],
-    )
