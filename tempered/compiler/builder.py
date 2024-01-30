@@ -7,6 +7,8 @@ from .accumulators import Variable
 
 if t.TYPE_CHECKING:
     from .rules import Rule
+else:
+    Rule = t.Any
 
 
 @dataclass
@@ -15,7 +17,7 @@ class BuildContext:
     layout: t.Optional[LayoutTemplate]
     css: t.Optional[str]
     output_variable: Variable
-    rules: list[t.Type[Rule]]
+    rules: t.List[Rule]
     css_variable: t.Optional[Variable] = None
     body: t.List[ast.stmt] = field(default_factory=list)
 
@@ -30,17 +32,22 @@ class BuildContext:
     def add_expr(self, expr: ast.expr):
         self.body.append(self.output_variable.create_add(expr))
 
+    def create_add_expr(self, expr: ast.expr):
+        return self.output_variable.create_add(expr)
+
     def ensure_output_assigned(self):
         if not self.output_variable.assigned:
             self.body.extend(self.output_variable.assign())
 
     def construct_tag(self, tag: Node):
-        rules = {rule.tag: rule for rule in self.rules}
+        rules = {tag: func for (tag, func) in self.rules}
         rule = rules.get(type(tag))
         if rule is None:
             raise NotImplementedError(f"Tag {tag} not implemented")
 
-        rule.construct(self, tag)
+        tag_body = rule(self, tag)
+        if tag_body is not None:
+            self.body.extend(tag_body)
 
     def create_block(self, tags: t.Sequence[Node]) -> t.Sequence[ast.stmt]:
         ctx_block = self.create_subcontext()
@@ -49,12 +56,12 @@ class BuildContext:
 
         return ctx_block.body
 
-    def create_variable(
+    def save_block_output_to_variable(
         self,
-        name: t.Union[str, ast.Name],
+        output: t.Union[str, ast.Name],
         tags: t.Sequence[Node],
     ) -> t.List[ast.stmt]:
-        ctx_assign = self.create_subcontext(name)
+        ctx_assign = self.create_subcontext(output)
 
         for tag in tags:
             ctx_assign.construct_tag(tag)

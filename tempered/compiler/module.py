@@ -3,7 +3,7 @@ from types import ModuleType
 import typing_extensions as t
 from .. import ast_utils, parser
 from ..css import finalise_css
-from . import constants, preprocess, validate
+from . import constants, preprocess, validate, utils
 from .template import create_template_function
 
 
@@ -42,7 +42,7 @@ def create_add_templates_code(
         register_call = ast_utils.Expr(
             ast_utils.Call(
                 func=ast_utils.Name(constants.REGISTER_TEMPLATE_FUNC),
-                arguments=[constants.create_pickled_obj(template)],
+                arguments=[utils.create_pickled_obj(template)],
             )
         )
         register_calls.append(register_call)

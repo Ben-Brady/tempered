@@ -4,12 +4,8 @@ from .. import ast_utils
 from ..parser import LayoutTemplate, Template, TemplateParameter
 from .accumulators import Variable
 from .builder import BuildContext
-from .constants import (
-    CSS_VARIABLE,
-    KWARGS_VAR,
-    OUTPUT_VAR,
-    REGISTER_TEMPLATE_NAME_DECORATOR,
-    WITH_STYLES_PARAMETER,
+from . import constants
+from .utils import (
     component_func_name,
     create_layout_call,
     layout_func_name,
@@ -27,7 +23,7 @@ def create_template_function(
     arguements = [*template.parameters]
     arguements.append(
         TemplateParameter(
-            name=WITH_STYLES_PARAMETER,
+            name=constants.WITH_STYLES,
             type=ast_utils.Name("bool"),
             default=ast_utils.Constant(True),
         )
@@ -39,7 +35,7 @@ def create_template_function(
         function_name = layout_func_name(template.name)
         arguements.append(
             TemplateParameter(
-                name=CSS_VARIABLE,
+                name=constants.CSS_VARIABLE,
                 type=ast_utils.Str,
             )
         )
@@ -62,7 +58,7 @@ def create_template_function(
 
     ctx = BuildContext(
         template=template,
-        output_variable=Variable(OUTPUT_VAR),
+        output_variable=Variable(constants.OUTPUT_VAR),
         layout=layout,
         css=css if len(css) > 0 else None,
         rules=default_rules,
@@ -99,7 +95,10 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
     return ast_utils.Arguments(
         kwonlyargs=args,
         kw_defaults=defaults,
-        kwarg=ast_utils.Arg(KWARGS_VAR, ast_utils.create_expr("t.Any")),
+        kwarg=ast_utils.Arg(
+            name=constants.KWARGS_VAR,
+            annotation=ast_utils.create_expr("t.Any"),
+        ),
     )
 
 
@@ -120,7 +119,7 @@ def construct_body(ctx: BuildContext) -> t.Sequence[ast.AST]:
         output_value = create_layout_call(
             layout_name=ctx.layout.name,
             default_slot=output_value,
-            css=ast_utils.Name(CSS_VARIABLE),
+            css=ast_utils.Name(constants.CSS_VARIABLE),
             has_default_slot=ctx.layout.has_default_slot,
             blocks=ctx.template.blocks,
         )
@@ -138,11 +137,11 @@ def create_style_contant(ctx: BuildContext) -> t.List[ast.stmt]:
 
     value = ast_utils.Constant(ctx.css or "")
 
-    ctx.css_variable = Variable(CSS_VARIABLE)
+    ctx.css_variable = Variable(constants.CSS_VARIABLE)
     return ctx.css_variable.assign(value)
 
 
 def create_register_template_decorator(name: str) -> ast.Call:
     return ast_utils.Call(
-        ast_utils.Name(REGISTER_TEMPLATE_NAME_DECORATOR), [ast.Str(name)]
+        ast_utils.Name(constants.REGISTER_TEMPLATE_NAME_DECORATOR), [ast.Str(name)]
     )
