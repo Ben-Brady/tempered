@@ -4,7 +4,8 @@ authors = [{name = "Ben Brady", email = "benbrady04.bb@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
-dynamic = ["version", "description"]
+description = "A fast, strongly typed html templating library for python"
+dynamic = ["version"]
 dependencies = [
     "beautifulsoup4~=4.12.2",
     "minify-html~=0.15.0",
