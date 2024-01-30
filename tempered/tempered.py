@@ -16,6 +16,7 @@ class Tempered:
 
     def __init__(self, template_folder: t.Union[str, Path, None] = None):
         self._from_string_cache = {}
+        self.template_files = []
         self._module = build.build_intial_module()
         if template_folder:
             self.add_template_folder(template_folder)
@@ -28,6 +29,7 @@ class Tempered:
         FOLDER_PREFIX = f"{folder}/"
         templates = []
         for file in folder.glob("**/*.*"):
+            self.template_files.append(file)
             name = str(file)
             name = name[len(FOLDER_PREFIX) :]
             html = file.read_text()
@@ -39,6 +41,8 @@ class Tempered:
 
     def add_template(self, file: t.Union[Path, str]):
         file = Path(file)
+        self.template_files.append(file)
+
         name = str(file)
         html = file.read_text()
         template = parser.parse_template(name, html, file)
