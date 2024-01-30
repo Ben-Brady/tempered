@@ -1,18 +1,20 @@
+from __future__ import annotations
+import zlib
 from pathlib import Path
 from types import ModuleType
 import typing_extensions as t
-from . import build, parser, types
-from .compiler.constants import template_func_name
-from .enviroment import Environment, Template
+from . import build, parser
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 
 
 class Tempered:
     _module: ModuleType
+    _from_string_cache: t.Dict[str, t.Callable[..., str]]
     template_files: t.List[Path]
 
     def __init__(self, template_folder: t.Union[str, Path, None] = None):
+        self._from_string_cache = {}
         self._module = build.build_intial_module()
         if template_folder:
             self.add_template_folder(template_folder)
@@ -51,11 +53,16 @@ class Tempered:
         ]
         build.build_templates(self._module, template_objs)
 
-    def build_enviroment(self, generate_types: bool = True) -> Environment:
-        templates = build.get_templates(self._module)
-        if generate_types:
-            types.build_types(templates)
-        else:
-            types.clear_types()
+    def render_from_string(self, html: str, **context: t.Any) -> str:
+        if html in self._from_string_cache:
+            return self._from_string_cache[html](**context)
 
-        return Environment(self._module)
+        string_hash = hex(zlib.crc32(html.encode()))[2:]
+        name = f"annonomous_{string_hash}>"
+        parsed_template = parser.parse_template(name, html)
+        build.build_templates(self._module, [parsed_template])
+        return self.render_template(name, **context)
+
+    def render_template(self, template_name: str, **context: t.Any) -> str:
+        func = build.get_template_func(self._module, template_name)
+        return func(**context)

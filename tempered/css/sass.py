@@ -19,14 +19,12 @@ def transform_sass(css: str, lang: t.Literal["sass", "scss"]) -> str:
 
     if lang == "sass":
         css = textwrap.dedent(css)
-        return sass.compile(
-            string=css,
-            output_style="compressed",
-            indented=True,  # sass rules
-        )
+        indented = True
     else:
-        return sass.compile(
-            string=css,
-            output_style="compressed",
-            indented=False,  # scss rules
-        )
+        indented = False
+
+    return sass.compile(
+        string=css,
+        indented=indented,  # sass/css rules
+        output_style="compressed",
+    )

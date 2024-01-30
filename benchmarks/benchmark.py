@@ -47,7 +47,7 @@ def benchmark_build():
 
     compiles = 0
     while time.perf_counter() < target_end:
-        tempered.Tempered("./building/tempered").build_enviroment()
+        tempered.Tempered("./building/tempered")
         compiles += 1
 
     end = time.perf_counter()

@@ -64,13 +64,6 @@ def layout_func_name(template_name: str) -> str:
     return f"__{template_name}_layout"
 
 
-def template_func_name(template_name: str, is_layout: bool) -> str:
-    if is_layout:
-        return layout_func_name(template_name)
-    else:
-        return component_func_name(template_name)
-
-
 def slot_variable_name(slot_name: t.Union[str, None]) -> str:
     if slot_name is None:
         return OUTPUT_VAR

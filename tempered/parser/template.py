@@ -20,9 +20,10 @@ def parse_template(
     except errors.ParserException as e:
         raise e
     except Exception as e:
-        msg = f"Failed to parse template {name}"
         if file:
-            msg += f" in {file}"
+            msg = f"Failed to parse template {name} in {file}"
+        else:
+            msg = f"Failed to parse template {name}"
 
         raise errors.ParserException(msg) from e
 

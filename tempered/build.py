@@ -39,9 +39,6 @@ def get_templates(module: ModuleType) -> t.List[parser.Template]:
     return module.__dict__[constants.TEMPLATE_LIST_VAR]
 
 
-def get_template_func(
-    module: ModuleType, template: parser.Template
-) -> t.Callable[..., str]:
-    func_name = constants.template_func_name(template.name, template.is_layout)
-    template_func = module.__dict__[func_name]
-    return template_func
+def get_template_func(module: ModuleType, name: str) -> t.Callable[..., str]:
+    lookup = module.__dict__[constants.NAME_LOOKUP_VAR]
+    return lookup[name]

@@ -2,6 +2,7 @@ import ast
 import sys
 import typing_extensions as t
 from typing_extensions import Any, Iterable, Sequence
+import textwrap
 
 NoneType = type(None)
 
@@ -383,6 +384,7 @@ TStmt = t.TypeVar("TStmt", bound=ast.stmt)
 
 
 def create_stmt(code: str, type: t.Type[TStmt]) -> TStmt:
+    code = textwrap.dedent(code)
     module = ast.parse(code)
     if len(module.body) != 1:
         raise RuntimeError("Generated code a single stmt")
