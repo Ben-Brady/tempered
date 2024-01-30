@@ -48,3 +48,8 @@ def test_elif_block():
 def test_empty_if_block():
     component = build_template("{% if True %}{% endif %}")
     assert component() == ""
+
+
+def test_empty_if_blocks():
+    component = build_template("{% if True %}{% elif True %}{% else %}{% endif %}")
+    assert component() == ""
