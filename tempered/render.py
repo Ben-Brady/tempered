@@ -1,5 +1,4 @@
 "This is a seperate file in order to generate custom types"
-import typing_extensions as t
 import ast
 from pathlib import Path
 import typing_extensions as t
@@ -32,6 +31,18 @@ def build_types(templates: t.List[parser.Template]) -> None:
     render_template_overloads = [
         create_render_template_overload(template) for template in templates
     ]
+
+    default_render_template = ast_utils.create_stmt(
+        """
+        @t.overload
+        def render_template(self, template_name: str, **context: t.Any) -> str:
+            ...
+        """,
+        ast.FunctionDef,
+    )
+
+    render_template_overloads.append(default_render_template)
+    render_template_overloads.append(ast_utils.copy(default_render_template))
 
     index = 0
     for index, node in enumerate(body):
@@ -73,5 +84,3 @@ def create_render_template_overload(template: parser.Template) -> ast.FunctionDe
         kwarg=ast_utils.Arg("context", ast_utils.Name("t.Any")),
     )
     return func_def
-
-
