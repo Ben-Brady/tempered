@@ -25,15 +25,16 @@ class Tempered:
         *,
         generate_types: bool = True,
     ):
+        self._from_string_cache = {}
+        self.template_files = []
+        self._module = module.TemperedModule()
+
         self.generate_types = generate_types
         if template_folder:
             self.add_template_folder(template_folder)
         if static_folder:
             self.static_folder = Path(static_folder)
 
-        self._from_string_cache = {}
-        self.template_files = []
-        self._module = module.TemperedModule()
 
     def add_global(self, name: str, value: t.Any):
         self._module.register_global(name, value)
