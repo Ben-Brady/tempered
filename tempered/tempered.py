@@ -3,7 +3,7 @@ import zlib
 from pathlib import Path
 from types import ModuleType
 import typing_extensions as t
-from . import build, parser
+from . import build, parser, render
 
 BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
 
@@ -12,6 +12,7 @@ class Tempered:
     _module: ModuleType
     _from_string_cache: t.Dict[str, t.Callable[..., str]]
     template_files: t.List[Path]
+    build_types: bool = True
 
     def __init__(self, template_folder: t.Union[str, Path, None] = None):
         self._from_string_cache = {}
@@ -34,6 +35,7 @@ class Tempered:
             templates.append(template)
 
         build.build_templates(self._module, templates)
+        self._reconstruct_types()
 
     def add_template(self, file: t.Union[Path, str]):
         file = Path(file)
@@ -41,10 +43,12 @@ class Tempered:
         html = file.read_text()
         template = parser.parse_template(name, html, file)
         build.build_templates(self._module, [template])
+        self._reconstruct_types()
 
     def add_template_from_string(self, name: str, html: str):
         template = parser.parse_template(name, html, file=None)
         build.build_templates(self._module, [template])
+        self._reconstruct_types()
 
     def add_templates_from_string(self, templates: t.Dict[str, str]):
         template_objs = [
@@ -52,6 +56,7 @@ class Tempered:
             for name, html in templates.items()
         ]
         build.build_templates(self._module, template_objs)
+        self._reconstruct_types()
 
     def render_from_string(self, html: str, **context: t.Any) -> str:
         if html in self._from_string_cache:
@@ -61,8 +66,17 @@ class Tempered:
         name = f"annonomous_{string_hash}>"
         parsed_template = parser.parse_template(name, html)
         build.build_templates(self._module, [parsed_template])
-        return self.render_template(name, **context)
+        return self._render_template(name, **context)
 
-    def render_template(self, template_name: str, **context: t.Any) -> str:
-        func = build.get_template_func(self._module, template_name)
+    def _render_template(self, name: str, **context: t.Any) -> str:
+        func = build.get_template_func(self._module, name)
         return func(**context)
+
+    render_template = render.render_template
+
+    def _reconstruct_types(self):
+        if not self.build_types:
+            render.clear_types()
+            return
+
+        render.build_types(build.get_templates(self._module))
