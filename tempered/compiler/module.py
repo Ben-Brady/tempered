@@ -13,10 +13,9 @@ def create_default_module_code() -> str:
 
 def create_add_templates_code(
     templates: t.List[parser.Template],
-    module: ModuleType,
+    existing_templates: t.List[parser.Template],
 ) -> str:
-    suplimental_templates = module.__dict__[constants.TEMPLATE_LIST_VAR]
-    all_templates = [*templates, *suplimental_templates]
+    all_templates = [*templates, *existing_templates]
 
     validate.validate_templates(all_templates)
     lookup = {template.name: template for template in all_templates}
