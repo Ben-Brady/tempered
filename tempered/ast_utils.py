@@ -1,8 +1,8 @@
 import ast
 import sys
+import textwrap
 import typing_extensions as t
 from typing_extensions import Any, Iterable, Sequence
-import textwrap
 
 NoneType = type(None)
 
