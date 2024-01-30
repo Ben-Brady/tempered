@@ -104,7 +104,7 @@ def take_for(
     scanner.expect(tags.ForEndTag)
 
     return template_ast.ForNode(
-        loop_variable=ast_utils.Name(tag.loop_variable),
+        target=tag.target,
         iterable=tag.iterable,
         loop_block=block,
     )

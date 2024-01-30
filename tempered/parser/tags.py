@@ -39,7 +39,7 @@ class IfEndTag(CompositeTag):
 @dataclass
 class ForStartTag(CompositeTag):
     iterable: ast.expr
-    loop_variable: str
+    target: ast.expr
 
 
 @dataclass
@@ -232,9 +232,19 @@ def _next_slot_tag(scanner: TokenScanner) -> Tag:
 
 def _next_for_token(scanner: TokenScanner) -> Tag:
     ident = scanner.expect(lexer.IdentToken).name
+
+    loop_variables = [ident]
+    while accept_keyword(scanner, ","):
+        loop_variables.append(take_ident_token(scanner))
+
     expect_keyword(scanner, "in")
     iterable = take_python_expr(scanner)
-    return ForStartTag(iterable, ident)
+    if len(loop_variables) != 1:
+        target = ast_utils.Tuple(ast_utils.Name(name) for name in loop_variables)
+    else:
+        target = ast_utils.Name(loop_variables[0])
+
+    return ForStartTag(iterable, target)
 
 
 def take_string_token(scanner: TokenScanner) -> str:
@@ -259,6 +269,18 @@ def take_python_expr(scanner: TokenScanner, type: t.Type[TExpr] = ast.expr) -> T
 def take_python_stmt(scanner: TokenScanner, type: t.Type[TStmt] = ast.stmt) -> TStmt:
     token = scanner.expect(lexer.PythonStmtToken)
     return ast_utils.create_stmt(token.stmt, type)
+
+
+def accept_keyword(scanner: TokenScanner, keyword: str) -> bool:
+    if not scanner.is_next(lexer.KeywordToken):
+        return False
+
+    keyword_token = t.cast(lexer.KeywordToken, scanner.peek())
+    if keyword_token.keyword == keyword:
+        scanner.pop()
+        return True
+    else:
+        return False
 
 
 def expect_keyword(scanner: TokenScanner, keyword: str):

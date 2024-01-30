@@ -34,6 +34,9 @@ class Scanner(t.Generic[TToken]):
         else:
             return None
 
+    def peek(self) -> TToken:
+        return self.stream[0]
+
     def expect(self, token: t.Type[T]) -> T:
         if not self.is_next(token):  # type: ignore
             raise ValueError(f"Expected {token} but got {self.stream[0]!r}")

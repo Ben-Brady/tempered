@@ -64,7 +64,7 @@ class IfNode(Node):
 
 @dataclass
 class ForNode(Node):
-    loop_variable: ast.Name
+    target: ast.expr
     iterable: ast.expr
     loop_block: TemplateBlock
 

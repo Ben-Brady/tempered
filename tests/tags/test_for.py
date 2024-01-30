@@ -22,6 +22,18 @@ def test_for_range_loop():
         assert str(i) in html
 
 
+def test_for_loop_multiple_targets_loop():
+    component = build_template(
+        """
+        {% for key, value in foo.items() %}
+            {{ key }}={{ value}}
+        {% endfor %}
+    """
+    )
+    html = component(foo={"a": 1})
+    assert "a=1" in html
+
+
 def test_for_each_loop():
     component = build_template(
         """

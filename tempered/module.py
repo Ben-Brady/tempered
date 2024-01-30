@@ -15,7 +15,7 @@ class TemperedModule:
 
         module = module_from_spec(spec)
 
-        source = compiler.create_default_module_code()
+        source = compiler.default_module_code()
         exec(source, module.__dict__)
         self.module = module
 
@@ -32,5 +32,9 @@ class TemperedModule:
 
     def build_templates(self, templates: t.List[parser.Template]):
         existing_templates = self.get_templates()
-        source = compiler.create_add_templates_code(templates, existing_templates)
+        source = compiler.create_template_functions_code(templates, existing_templates)
         exec(source, self.module.__dict__)
+
+        register_template = self.module.__dict__[constants.REGISTER_TEMPLATE_FUNC]
+        for template in templates:
+            register_template(template)

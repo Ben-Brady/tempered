@@ -167,10 +167,8 @@ def next_statement_token(scanner: TextScanner) -> t.Iterable[Token]:
         yield take_ident_token(scanner)
         yield take_keyword(scanner, "from")
         yield take_string_token(scanner)
-    elif keyword == "for":  # {% for ident in expr %}
-        yield take_ident_token(scanner)
-        yield take_keyword(scanner, "in")
-        yield take_python_expr(scanner, STATEMENT_END)
+    elif keyword == "for":  # {% for ident_a, ident_b in expr %}
+        yield from for_token(scanner)
     elif keyword == "slot":  # {% slot name? required? %}
         yield from slot_token(scanner)
     elif keyword in {"else", "endif", "endfor", "styles", "endslot", "endblock"}:
@@ -190,6 +188,19 @@ def slot_token(scanner: TextScanner) -> t.Iterable[Token]:
         yield KeywordToken("required")
 
     take_whitespace(scanner)
+
+
+def for_token(scanner: TextScanner) -> t.Iterable[Token]:
+    yield take_ident_token(scanner)
+    take_whitespace(scanner)
+    while scanner.startswith(","):
+        yield take_keyword(scanner, ",")
+        take_whitespace(scanner)
+        yield take_ident_token(scanner)
+        take_whitespace(scanner)
+
+    yield take_keyword(scanner, "in")
+    yield take_python_expr(scanner, STATEMENT_END)
 
 
 def take_keyword(scanner: TextScanner, keyword: str) -> Token:
