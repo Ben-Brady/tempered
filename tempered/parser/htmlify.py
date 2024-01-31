@@ -4,7 +4,6 @@ from . import tags, template_ast
 from .scanner import TextScanner
 
 TOKEN_LENGTH = 16
-TOKEN_REGEX = rf"\ TEMPERED_[A-Z0-9]{{{TOKEN_LENGTH}}}"
 
 
 def generate_token_id() -> str:
