@@ -6,7 +6,9 @@
 import components
 from tempered import Tempered
 
-tempered = Tempered()
+tempered = Tempered(
+    template_folder="./templates",
+) # Initial Creationg
 
 tempered.add_template("./templates/comment.html")
 tempered.add_template_folder("./templates")
@@ -15,65 +17,19 @@ tempered.add_template_from_string("TEMPLATE_NAME", """
 """)
 ```
 
-## Building
+## Type Generating
 
-Tempered offers several ways to build your templates, you can either:
+By default, tempered will create a dynamic type stubs file alongside the libraries files. This is dynamically updated to fit the currently encoded templates. It enabled IDEs to provide autocomplete on templates names as well as.
 
-- Build in memory
-- Build to a static file
-- Build to a module
+However, this may not play well with some IDEs. Additionally, it increases build times and uses IO to write the stubs file, it's recommended to disabled in production.
 
-### build_memory
-
-Building in memory provides the simplist build system, however it provides no-intelisense. It runs the python coded through exec and transforms it into a module.
-
-### build_static
-
-Building staticly saves the generated templates to a file inside the tempered folder, this means that the code can recieve intelisense and type checking. However, this relies on rather weak type inferance and doesn't work sometimes.
-
-### build_to
-
-Build module allows you have a local file built into. This provides the strongest guarentee of type saftey as a local file is always type checked.
-
-Additionally when building into this module, tempered will override the import cache meaning that this update will apply even if you've already imported
+It can be disabled by adding `generate_types=False` to the Tempered constructor.
 
 ```python
-# components.py
-# EMPTY
+Tempered(generate_types=False)
 ```
 
-```python
-import components
-from tempered import Tempered
 
-tempered = Tempered()
-tempered.add_template_from_string("Comment", """
-    {% param author: str %}
-    {% param text: str %}
-    <div>
-        <h2>{{ author }}</h2>
-        <p>{{ text }}</p>
-    </div>
-""")
-
-tempered.build_to(components)
-print(components.Comment(
-    author="Ben Brady",
-    text="This library is pretty goated"
-))
-```
-
-```python
-# components.py AFTER
-from __future__ import annotations as __annotations
-import typing as __typing
-from tempered._internals import escape as __escape
-
-
-def Comment(*, author: str, text: str, with_styles: bool = True, **kwargs: __typing.Any) -> str:
-    return f'  <div><h2>{__escape(author)}</h2><p>{__escape(text)}</div>'
-
-```
 
 ## Templates
 
@@ -104,9 +60,13 @@ If you want to disable CSS scoping, you can place a global attribute on your sty
 
 #### `with_styles`
 
-If you want to use a component without including it's styles, you can use the `with_styles` parameter to prevent include the CSS. This is useful for when you place components into a page using javascript or HTMX.
+If you want to use a component without including it's styles, you can use the `with_styles` parameter to prevent include the CSS. This is useful for when you place components into a page using AJAX/HTMX.
 
-#### Scss
+```python
+tempered.render_template("partial.html", with_styles=False)
+```
+#### Sass
+
 
 If you want to use sass, you can declare it on a style tag with `lang="scss"` or `lang="sass"` to get sass or scss respectively
 
