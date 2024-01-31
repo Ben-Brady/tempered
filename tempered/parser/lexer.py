@@ -210,8 +210,7 @@ def take_keyword(scanner: TextScanner, keyword: str) -> Token:
 
 
 def take_whitespace(scanner: TextScanner):
-    WHITESPACE_CHARS = list(string.whitespace)
-    scanner.take_while(*WHITESPACE_CHARS)
+    scanner.take_while(*WHITESPACE)
 
 
 def take_python_expr(scanner: TextScanner, *stop_tokens: str) -> Token:
