@@ -4,8 +4,6 @@ from pathlib import Path
 import typing_extensions as t
 from . import module, parser, render
 
-BUILD_FILE = Path(__file__).parent.joinpath("generated/__components.py")
-
 
 class Tempered:
     template_files: t.List[Path]
