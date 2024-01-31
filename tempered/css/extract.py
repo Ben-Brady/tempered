@@ -8,12 +8,20 @@ from . import sass, scoped
 warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 
+try:
+    import lxml
+
+    html_parser = "lxml"
+except ImportError:
+    html_parser = "html.parser"
+
+
 html: t.TypeAlias = str
 css: t.TypeAlias = str
 
 
 def extract_css_from_html(body: str, prefix: str = "tempered") -> t.Tuple[html, css]:
-    soup = bs4.BeautifulSoup(body, "html.parser")
+    soup = bs4.BeautifulSoup(body, html_parser)
     css = ""
 
     style_tags = t.cast(t.List[bs4.Tag], soup.find_all("style"))
