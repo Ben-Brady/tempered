@@ -9,7 +9,7 @@ warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 
 try:
-    import lxml
+    import lxml as _
 
     html_parser = "lxml"
 except ImportError:

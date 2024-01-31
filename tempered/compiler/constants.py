@@ -16,7 +16,6 @@ FILE_HEADER = f"""
 from __future__ import annotations as _
 from tempered._internals import escape as {ESCAPE_FUNC}
 from tempered import parser as __parser
-import pickle as __pickle
 import typing_extensions as t
 
 {GLOBALS_VAR} = {{}}

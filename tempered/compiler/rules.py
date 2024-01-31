@@ -33,19 +33,19 @@ if t.TYPE_CHECKING:
 else:
     BuildContext = t.Any
 
-RuleReturnType = t.Union[t.Iterable[ast.stmt], None]
+RuleReturnType: t.TypeAlias = t.Union[t.Iterable[ast.stmt], None]
 
 
 def construct_html(ctx: BuildContext, tag: HtmlNode) -> RuleReturnType:
-    yield ctx.create_add_expr(ast_utils.Constant(tag.html))
+    yield ctx.add_expr(ast_utils.Constant(tag.html))
 
 
 def construct_expr(ctx: BuildContext, tag: ExprNode) -> RuleReturnType:
-    yield ctx.create_add_expr(create_escape_call(value=tag.value))
+    yield ctx.add_expr(create_escape_call(value=tag.value))
 
 
 def construct_raw_expr(ctx: BuildContext, tag: RawExprNode) -> RuleReturnType:
-    yield ctx.create_add_expr(tag.value)
+    yield ctx.add_expr(tag.value)
 
 
 def construct_assign(ctx: BuildContext, tag: AssignmentNode) -> RuleReturnType:
@@ -118,7 +118,7 @@ def construct_slot(ctx: BuildContext, tag: SlotNode) -> RuleReturnType:
     slot_param = ast_utils.Name(slot_parameter(tag.name))
 
     if tag.default is None:
-        yield ctx.create_add_expr(slot_param)
+        yield ctx.add_expr(slot_param)
         return
 
     if_stmt = ast_utils.If(
@@ -129,7 +129,7 @@ def construct_slot(ctx: BuildContext, tag: SlotNode) -> RuleReturnType:
         ),
     )
     yield if_stmt
-    yield ctx.create_add_expr(slot_param)
+    yield ctx.add_expr(slot_param)
 
 
 def construct_styles(ctx: BuildContext, tag: StyleNode) -> RuleReturnType:
@@ -169,7 +169,7 @@ def construct_component(ctx: BuildContext, tag: ComponentNode) -> RuleReturnType
         keywords=keywords,
         kwargs=ast_utils.Name(KWARGS_VAR),
     )
-    yield ctx.create_add_expr(func_call)
+    yield ctx.add_expr(func_call)
 
 
 T = t.TypeVar("T", bound=Node, infer_variance=True)
@@ -191,4 +191,3 @@ default_rules: t.List[Rule] = [
     (BlockNode, construct_block),
     (StyleNode, construct_styles),
 ]
-a = default_rules[0]

@@ -268,14 +268,6 @@ def Attribute(value: ast.expr, attr: str):
     )
 
 
-def ArrayJoin(array: ast.expr) -> ast.Call:
-    return ast.Call(
-        func=ast.Attribute(value=ast.Constant(value=""), attr="join"),
-        args=[array],
-        keywords=[],
-    )
-
-
 def Comprehension(
     loop_var: t.Union[str, ast.Name],
     iterable: ast.expr,

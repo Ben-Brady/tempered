@@ -30,9 +30,6 @@ class BuildContext:
         return self.template.is_layout
 
     def add_expr(self, expr: ast.expr):
-        self.body.append(self.output_variable.create_add(expr))
-
-    def create_add_expr(self, expr: ast.expr):
         return self.output_variable.create_add(expr)
 
     def ensure_output_assigned(self):

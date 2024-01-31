@@ -1,5 +1,4 @@
 import ast
-import pickle
 import string
 import typing_extensions as t
 from . import constants
