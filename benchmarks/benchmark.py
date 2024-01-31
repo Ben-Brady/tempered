@@ -25,7 +25,10 @@ def benchmark_render(
             renders += 1
 
         per_second = int(renders / duration)
-        print(f" {name:>10}: {per_second:,}/s")
+        per_second_str = f"{per_second:,}/s"
+
+        ms_per_render = 1000 / per_second
+        print(f" {name:>10}: {per_second_str:>10} | {ms_per_render:.3f}ms ")
         runs[name] = per_second
 
     print(name.title())
@@ -57,20 +60,20 @@ def benchmark_build():
 
 os.chdir(Path(__file__).parent)
 benchmark_build()
-# benchmark_render(
-#     name="Full Page Application",
-#     context={"user": user},
-#     entry_point="page.html",
-#     folder="./real_world",
-# )
-# benchmark_render(
-#     name="Partials",
-#     context={"profile": user},
-#     entry_point="page.html",
-#     folder="./partials",
-# )
-# benchmark_render(
-#     name="Static Pages",
-#     entry_point="page.html",
-#     folder="./static",
-# )
+benchmark_render(
+    name="Full Page Application",
+    context={"user": user},
+    entry_point="page.html",
+    folder="./real_world",
+)
+benchmark_render(
+    name="Partials",
+    context={"profile": user},
+    entry_point="page.html",
+    folder="./partials",
+)
+benchmark_render(
+    name="Static Pages",
+    entry_point="page.html",
+    folder="./static",
+)

@@ -38,7 +38,5 @@ def setup_jinja2(folder: str, template: str, context: dict) -> Callable[[], str]
 def setup_tempered(folder: str, template: str, context: dict) -> Callable[[], str]:
     from tempered import Tempered
 
-    env = Tempered(folder).build_enviroment(generate_types=False)
-    tempered_template = env.get_template(template)
-
-    return lambda: tempered_template.render(**context)
+    env = Tempered(folder)
+    return lambda: env.render_template(template, **context)
