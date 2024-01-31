@@ -33,7 +33,6 @@ class Tempered:
         if static_folder:
             self.static_folder = Path(static_folder)
 
-
     def add_global(self, name: str, value: t.Any):
         self._module.register_global(name, value)
 

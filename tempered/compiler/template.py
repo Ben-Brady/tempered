@@ -2,9 +2,9 @@ import ast
 import typing_extensions as t
 from .. import ast_utils
 from ..parser import LayoutTemplate, Template, TemplateParameter
+from . import constants
 from .accumulators import Variable
 from .builder import BuildContext
-from . import constants
 from .calls import (
     component_func_name,
     create_layout_call,

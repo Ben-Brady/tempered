@@ -1,5 +1,4 @@
 import ast
-from types import ModuleType
 import typing_extensions as t
 from .. import ast_utils, parser
 from . import constants, preprocess, validate

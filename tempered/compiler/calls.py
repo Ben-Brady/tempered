@@ -1,8 +1,8 @@
 import ast
 import string
 import typing_extensions as t
-from . import constants
 from .. import ast_utils
+from . import constants
 
 
 def create_escape_call(value: ast.expr) -> ast.expr:
@@ -80,4 +80,3 @@ def create_layout_call(
         keywords=kw_args,
         kwargs=ast_utils.Name(constants.KWARGS_VAR),
     )
-

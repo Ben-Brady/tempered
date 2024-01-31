@@ -1,4 +1,5 @@
 import warnings
+from importlib.util import find_spec
 import bs4
 from bs4 import MarkupResemblesLocatorWarning
 import typing_extensions as t
@@ -8,11 +9,10 @@ from . import sass, scoped
 warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 
 
-try:
-    import lxml as _
-
+lxml_installed = find_spec("lxml") is not None
+if lxml_installed:
     html_parser = "lxml"
-except ImportError:
+else:
     html_parser = "html.parser"
 
 

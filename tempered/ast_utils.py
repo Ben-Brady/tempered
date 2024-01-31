@@ -2,7 +2,7 @@ import ast
 import sys
 import textwrap
 import typing_extensions as t
-from typing_extensions import Any, Iterable, Sequence
+from typing_extensions import Iterable, Sequence
 
 NoneType = type(None)
 

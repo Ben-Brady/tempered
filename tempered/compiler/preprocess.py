@@ -1,6 +1,6 @@
 from typing import Sequence
 import typing_extensions as t
-from .. css import finalise_css
+from ..css import finalise_css
 from ..parser import Template
 
 

@@ -3,30 +3,21 @@ import ast
 import typing_extensions as t
 from .. import ast_utils
 from ..parser.template_ast import (
-    Node,
-    HtmlNode,
-    ExprNode,
-    ComponentNode,
-    RawExprNode,
     AssignmentNode,
-    ImportNode,
-    IfNode,
-    ForNode,
-    SlotNode,
     BlockNode,
+    ComponentNode,
+    ExprNode,
+    ForNode,
+    HtmlNode,
+    IfNode,
+    ImportNode,
+    Node,
+    RawExprNode,
+    SlotNode,
     StyleNode,
 )
-from .constants import (
-    CSS_VARIABLE,
-    KWARGS_VAR,
-    NAME_LOOKUP_VAR,
-    WITH_STYLES,
-)
-from .calls import (
-    create_escape_call,
-    slot_parameter,
-    slot_variable_name,
-)
+from .calls import create_escape_call, slot_parameter, slot_variable_name
+from .constants import CSS_VARIABLE, KWARGS_VAR, NAME_LOOKUP_VAR, WITH_STYLES
 
 if t.TYPE_CHECKING:
     from .builder import BuildContext

@@ -2,7 +2,6 @@ import ast
 import builtins
 from functools import lru_cache
 import typing_extensions as t
-from .. import ast_utils
 from . import constants
 from .calls import create_resolve_call
 
