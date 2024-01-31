@@ -10,10 +10,11 @@ tempered = Tempered(
     template_folder="./templates",
 ) # Initial Creationg
 
-tempered.add_template("./templates/comment.html")
 tempered.add_template_folder("./templates")
-tempered.add_template_from_string("TEMPLATE_NAME", """
-    TEMPLATE_CONTENTS
+tempered.add_template("./templates/comment.html")
+tempered.add_template_from_string("comment.html", """
+    {% param text: str %}
+    <span>{{ text }}</span>
 """)
 ```
 
@@ -90,9 +91,22 @@ If you want to use sass, you can declare it on a style tag with `lang="scss"` or
 
 ## Template Tags
 
+### Expressions
+
+Use `{{ VALUE }}` for expressions, these are escaped in HTML and parameters
+
+```html
+{% param src: str %}
+{% param text: str %}
+
+<a src="{{src}}">
+    {{ text }}
+</a>
+```
+
 ### Parameters
 
-Use `{%param %}` for parameters
+Use `{% param %}` for parameters
 
 ```html
 {% param a %}            <!-- Parameter -->
@@ -106,7 +120,7 @@ Use `{%param %}` for parameters
 
 ### Style Placement
 
-Use `{%styles}` for styles, this is where styles are placed
+Use `{% styles %}` for styles, this is where styles are placed
 
 ```html
 <head>
@@ -119,7 +133,7 @@ If omitted, styles are placed at the end of the component
 ### Style Include
 
 ```html
-{%include "post.html" %}
+{% include "post.html" %}
 
 <head>
     {% styles %}
@@ -130,18 +144,6 @@ Manually add a component styles to the HTML, should be placed at the top of the 
 
 This is useful for when you need to include the CSS for components that aren't inside the template, such as with HTMX
 
-### Expressions
-
-Use `{{ VALUE }}` for expressions, these are escaped for parameters and HTML
-
-```html
-{% param src: str %}
-{% param text: str %}
-
-<a src="{{src}}">
-    {{ text }}
-</a>
-```
 
 > Important: Ensure you surround attributes in \"\" to prevent XSS, e.g. `<a href="{{src}}"/>` vs `<a href={{src}}/>`
 
@@ -179,19 +181,16 @@ You have to import components using the import syntax. You can specify any targe
 Use `{% set  %}` to set a variable
 
 ```html
-{% param post %}
 <div>
     {% set title = post.title.lower() %}
 </div>
 ```
 
-This can also be paired with control flow
-
 ## Control Flow
 
 ### If
 
-Use `{%if %}` and `{% endif %}` for control flow, there are two control flow structures
+Use `{% if %}` and `{% endif %}` for control flow, there are two control flow structures
 
 ```html
 {% param link: str | None = None %}
@@ -206,7 +205,7 @@ Use `{%if %}` and `{% endif %}` for control flow, there are two control flow str
 You can also have an else block
 
 ```html
-{% param src: str|None = None %}
+{% param src: str | None = None %}
 
 {% if src %}
     <img src="{{src}}" alt=""/>
@@ -235,7 +234,7 @@ As well as elif blocks
 
 ### For
 
-Use `{%for %}`
+Use `{% for %}`
 
 ```html
 {% param commments: list[str] %}
