@@ -30,8 +30,6 @@ It can be disabled by adding `generate_types=False` to the Tempered constructor.
 Tempered(generate_types=False)
 ```
 
-
-
 ## Templates
 
 ### Styles
@@ -292,6 +290,11 @@ Use `{% for %}`
     .row.odd { background: #DADDD8; }
 </style>
 ```
+## Performance
+
+### Build Performance
+
+If you want to increase performance, install "lxml". This is not included by default at it's difficult to install on different platforms. Installing this allows the HTML to be parsed much faster, giving you around a 10-30% increase to build time
 
 ## Formal Grammar
 
