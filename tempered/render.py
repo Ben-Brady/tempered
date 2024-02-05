@@ -32,26 +32,29 @@ def build_types(templates: t.List[parser.Template]) -> None:
         create_render_template_overload(template) for template in templates
     ]
 
-    default_render_template = ast_utils.create_stmt(
-        """
-        @t.overload
-        def render_template(self, template_name: str, **context: t.Any) -> str:
-            ...
-        """,
-        ast.FunctionDef,
-    )
+    # Insert render overloads, only if there are any
+    if len(render_template_overloads) != 0:
+        default_render_template = ast_utils.create_stmt(
+            """
+            @t.overload
+            def render_template(self, template_name: str, **context: t.Any) -> str:
+                ...
+            """,
+            ast.FunctionDef,
+        )
+        render_template_overloads.append(default_render_template)
+        index = 0
+        for index, node in enumerate(body):
+            if isinstance(node, ast.FunctionDef) and node.name == "render_template":
+                break
 
-    render_template_overloads.append(default_render_template)
-    render_template_overloads.append(ast_utils.copy(default_render_template))
+        for overload in render_template_overloads:
+            body.insert(index, overload)
+            index += 1
 
-    index = 0
-    for index, node in enumerate(body):
-        if isinstance(node, ast.FunctionDef) and node.name == "render_template":
-            break
-
-    for overload in render_template_overloads:
-        body.insert(index, overload)
-        index += 1
+    for node in body:
+        if isinstance(node, ast.FunctionDef):
+            node.body = [ast_utils.create_stmt("...", ast.Expr)]
 
     source = ast_utils.unparse(ast_utils.Module(body))
     TYPES_FILE.write_text(source)
