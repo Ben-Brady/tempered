@@ -36,6 +36,11 @@ class Tempered:
     def add_global(self, name: str, value: t.Any):
         self._module.register_global(name, value)
 
+    TFunc = t.TypeVar("TFunc", bound=t.Callable)
+    def global_func(self, func: TFunc) -> TFunc:
+        self._module.register_global(func.__name__, func)
+        return func
+
     def add_template_folder(self, folder: t.Union[Path, str]):
         folder = Path(folder)
         FOLDER_PREFIX = f"{folder}/"
