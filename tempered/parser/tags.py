@@ -104,8 +104,6 @@ def _next_tag(scanner: TokenScanner) -> Tag:
         return next_statement_tag(scanner)
     elif scanner.is_next(lexer.ExprStartToken):
         return _next_expr_tag(scanner)
-    elif scanner.is_next(lexer.ComponentStartToken):
-        return _next_component_tag(scanner)
 
     token = scanner.pop()
     if isinstance(token, lexer.HtmlToken):
@@ -119,25 +117,6 @@ def _next_expr_tag(scanner: TokenScanner) -> Tag:
     expr = take_python_expr(scanner)
     scanner.expect(lexer.ExprEndToken)
     return template_ast.ExprNode(expr)
-
-
-def _next_component_tag(scanner: TokenScanner) -> Tag:
-    scanner.expect(lexer.ComponentStartToken)
-    call = take_python_expr(scanner, ast.Call)
-    scanner.expect(lexer.ComponentEndToken)
-
-    if not isinstance(call.func, ast.Name):
-        raise ValueError("Component call must be a name")
-
-    keywords = {
-        keyword.arg: keyword.value
-        for keyword in call.keywords
-        if keyword.arg is not None
-    }
-    return template_ast.ComponentNode(
-        component_name=call.func.id,
-        keywords=keywords,
-    )
 
 
 def next_statement_tag(scanner: TokenScanner) -> Tag:
@@ -162,10 +141,27 @@ def next_statement_tag(scanner: TokenScanner) -> Tag:
         "include": lambda _: IncludeTag(take_string_token(scanner)),
         "import": _next_import_tag,
         "param": _next_param_tag,
+        "component": _next_component_tag,
     }
     tag = statement_funcs[keyword](scanner)
     scanner.expect(lexer.StatementEndToken)
     return tag
+
+
+def _next_component_tag(scanner: TokenScanner) -> Tag:
+    call = take_python_expr(scanner, ast.Call)
+    if not isinstance(call.func, ast.Name):
+        raise ValueError("Component call must be a name")
+
+    keywords = {
+        keyword.arg: keyword.value
+        for keyword in call.keywords
+        if keyword.arg is not None
+    }
+    return template_ast.ComponentNode(
+        component_name=call.func.id,
+        keywords=keywords,
+    )
 
 
 def _next_assign_tag(scanner: TokenScanner) -> Tag:

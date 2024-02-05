@@ -1,6 +1,4 @@
 import bs4
-import pytest
-import tempered
 from . import build_templates
 
 

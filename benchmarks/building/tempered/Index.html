@@ -6,7 +6,7 @@
 {% block title %}Home{% endblock %}
 
 <div id="scroll">
-    {<VideoScroll(videos=videos)>}
+    {% component VideoScroll(videos=videos) %}
 </div>
 
 <style>

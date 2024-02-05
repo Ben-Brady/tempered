@@ -27,7 +27,7 @@ def _assert_single_parameter(
         assert ast_utils.unparse(param.type) == type
 
     if isinstance(default, Unset):
-        assert param.default == None
+        assert param.default is None
     else:
         assert param.default is not None
         assert ast.literal_eval(param.default) == default

@@ -1,7 +1,5 @@
 from tempered import Tempered
-from datetime import datetime
-import bs4
-import components
+
 try:
     from flask import Flask
 except:
@@ -11,20 +9,21 @@ except:
 
 app = Flask(__name__)
 tempered = Tempered("./templates")
-tempered.build_to(components)
+
 
 @app.get("/")
 def index():
-    return components.Index()
+    return tempered.render_template("index.html")
+
 
 @app.get("/about")
 def about():
-    return components.About()
+    return tempered.render_template("about.html")
 
 
 @app.get("/contact")
 def contact():
-    return components.Contact()
+    return tempered.render_template("contact.html")
 
 
 if __name__ == "__main__":

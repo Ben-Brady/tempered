@@ -7,7 +7,7 @@ def test_importing_components():
     render = build_templates(
         """
         {% import Foo from "foo" %}
-        {<Foo()/>}
+        {% component Foo() %}
     """,
         ("foo", """Hello World"""),
     )
@@ -19,7 +19,7 @@ def test_importing_components_with_non_ident_names():
     render = build_templates(
         """
         {% import Foo from "components/foo.html" %}
-        {<Foo()/>}
+        {% component Foo() %}
     """,
         ("components/foo.html", """Hello World"""),
     )
@@ -33,7 +33,7 @@ def test_raise_error_on_invalid_import():
         build_templates(
             """
             {% import Foo from "foo" %}
-            {<Foo/>}
+            {% component Foo() %}
         """,
             ("bar", "Hello World"),
         )

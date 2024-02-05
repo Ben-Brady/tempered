@@ -1,5 +1,4 @@
 import bs4
-import pytest
 from . import build_template
 
 
@@ -43,8 +42,8 @@ def test_template_places_styles():
 
 def test_empty_styles_arent_created():
     func = build_template(
-        f"""
-        {{% styles %}}
+        """
+        {% styles %}
         <style>
         </style>
     """

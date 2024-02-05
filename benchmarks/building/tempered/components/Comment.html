@@ -6,7 +6,7 @@
 <div class="comment" hx-target="closest .comment" hx-swap="outerHTML">
     <div class="left">
         <div class="icon">
-            {<UserIcon(user=comment.author)>}
+            {% component UserIcon(user=comment.author) %}
         </div>
     </div>
     <form class="body">
@@ -19,50 +19,27 @@
             </small>
 
             {% if comment.editted_at is not None %}
-                <small>
-                    (Edited {{format_time_since(comment.editted_at)}})
-                </small>
+            <small>
+                (Edited {{format_time_since(comment.editted_at)}})
+            </small>
             {% endif %}
             {% if editting %}
-                <img
-                    class="button"
-                    src="/static/Cancel.svg"
-                    alt="Delete"
-                    hx-post="/comment/edit/cancel/{{comment.id}}"
-                >
-                <img
-                    class="button"
-                    src="/static/Edit.svg"
-                    alt="Edit"
-                    hx-post="/comment/edit/submit/{{comment.id}}"
-                >
+            <img class="button" src="/static/Cancel.svg" alt="Delete" hx-post="/comment/edit/cancel/{{comment.id}}">
+            <img class="button" src="/static/Edit.svg" alt="Edit" hx-post="/comment/edit/submit/{{comment.id}}">
             {% elif account and comment.author.id == account.id %}
-                <img
-                    class="button"
-                    src="/static/Edit.svg"
-                    alt="Edit"
-                    hx-post="/comment/edit/start/{{comment.id}}"
-                >
-                <img
-                    class="button"
-                    src="/static/Trash.svg"
-                    alt="Delete"
-                    hx-post="/comment/delete/{{comment.id}}"
-                >
+            <img class="button" src="/static/Edit.svg" alt="Edit" hx-post="/comment/edit/start/{{comment.id}}">
+            <img class="button" src="/static/Trash.svg" alt="Delete" hx-post="/comment/delete/{{comment.id}}">
             {% endif %}
 
         </div>
         <div class="seperator"></div>
         {% if editting %}
-            <textarea
-                name="text"
-                data-type="primary"
-            >{{ comment.text }}</textarea>
-            <div class="error"></div>
+        <textarea name="text" data-type="primary">{{ comment.text }}</textarea>
+        <div class="error"></div>
         {% else %}
-            <span>
-                {{ comment.text }}
-            </span>
+        <span>
+            {{ comment.text }}
+        </span>
         {% endif %}
     </form>
 </div>

@@ -375,7 +375,7 @@ def If(
 TStmt = t.TypeVar("TStmt", bound=ast.stmt)
 
 
-def create_stmt(code: str, type: t.Type[TStmt]) -> TStmt:
+def create_stmt(code: str, type: t.Type[TStmt] = ast.stmt) -> TStmt:
     code = textwrap.dedent(code)
     module = ast.parse(code)
     if len(module.body) != 1:

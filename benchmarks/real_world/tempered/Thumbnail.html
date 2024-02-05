@@ -3,26 +3,21 @@
 
 <div class="thumbnail">
     <a href="/video/{{video.id}}" class="image">
-        <img
-
-        src="https://placehold.co/{{video.thumbnail.width}}x{{video.thumbnail.height}}"
-        width="{{video.thumbnail.width}}"
-        height="{{video.thumbnail.height}}"
-        alt="{{video.title}}"
-        />
+        <img src="https://placehold.co/{{video.thumbnail.width}}x{{video.thumbnail.height}}"
+            width="{{video.thumbnail.width}}" height="{{video.thumbnail.height}}" alt="{{video.title}}" />
     </a>
     <div class="metadata">
         <div class="account">
-        {<UserIcon(profile=video.uploader)>}
+            {% component UserIcon(profile=video.uploader) %}
         </div>
         <a href="/video/{{video.id}}" class="text">
-        <span class="title">
-            {{ video.title }}
-        </span>
-        <div class="info">
-            <small>Milky</small>
-            <small>{{ video.views }} views</small>
-        </div>
+            <span class="title">
+                {{ video.title }}
+            </span>
+            <div class="info">
+                <small>Milky</small>
+                <small>{{ video.views }} views</small>
+            </div>
         </a>
     </div>
 </div>
@@ -38,6 +33,7 @@
         align-items: center;
         gap: 0.5rem;
     }
+
     a:link,
     a:visited {
         text-decoration: inherit;

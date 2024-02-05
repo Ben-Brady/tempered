@@ -1,5 +1,3 @@
-import bs4
-import pytest
 from . import build_template, build_templates
 
 
@@ -35,7 +33,10 @@ def test_kwargs_passed_to_layout():
 
 def test_kwargs_passed_to_component():
     func = build_templates(
-        '{% import Child from "child" %}' "{<Child()>}",
+        """
+        {% import Child from "child" %}
+        {% component Child() %}
+        """,
         ("child", "{{ foo }}"),
     )
 

@@ -9,16 +9,9 @@
 {% block title%}{{video.title}}{%endblock%}
 
 <div id="video">
-    <video
-        controls
-        height={{video.file.height}}
-        width={{video.file.width}}
-        poster="/media/{{video.thumbnail.filename}}"
-    >
-        <source
-            src="/media/{{video.file.filename}}"
-            type="{{video.file.mimetype}}"
-        />
+    <video controls height={{video.file.height}} width={{video.file.width}}
+        poster="/media/{{video.thumbnail.filename}}">
+        <source src="/media/{{video.file.filename}}" type="{{video.file.mimetype}}" />
     </video>
 </div>
 
@@ -33,7 +26,7 @@
                 {{ video.uploader.username }}
             </h5>
             <div id="uploader-icon">
-                {<UserIcon(user=video.uploader)>}
+                {% component UserIcon(user=video.uploader) %}
             </div>
         </div>
     </div>
@@ -51,10 +44,10 @@
         {{video.description}}
     </div>
     <div id="bottom">
-        {<CommentSection(video=video, logged_in=bool(account))>}
+        {% component CommentSection(video=video, logged_in=bool(account)) %}
         <div id="recommendations">
             {% for video in recommendations %}
-                {<Thumbnail(video=video)>}
+            {% component Thumbnail(video=video) %}
             {% endfor %}
         </div>
     </div>
@@ -150,4 +143,3 @@
         gap: 1rem;
     }
 </style>
-

@@ -160,13 +160,13 @@ Use `{% html %}` to include literal html without escaping
 
 ### Component / Import
 
-Use `{<Component()>}` for a component, call this like:
+Use `{% component Component() %}` for a component, call this like:
 
 ```html
 {% import Post from "post.html" %}
 
 <div>
-    {<Post(title="Lorum Ipsum")>}
+    {% component Post(title="Lorum Ipsum") %}
 </div>
 ```
 

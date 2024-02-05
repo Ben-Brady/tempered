@@ -4,16 +4,12 @@
 
 <div class="thumbnail">
   <a href="/video/{{video.id}}" class="image">
-    <img
-      src="/media/{{video.thumbnail.filename}}"
-      width="{{video.thumbnail.width}}"
-      height="{{video.thumbnail.height}}"
-      alt="{{video.title}}"
-    />
+    <img src="/media/{{video.thumbnail.filename}}" width="{{video.thumbnail.width}}" height="{{video.thumbnail.height}}"
+      alt="{{video.title}}" />
   </a>
   <div class="metadata">
     <div class="account">
-      {<UserIcon(user=video.uploader)>}
+      {% component UserIcon(user=video.uploader) %}
     </div>
     <a href="/video/{{video.id}}" class="text">
       <span class="title">
@@ -28,7 +24,6 @@
 </div>
 
 <style>
-
   .thumbnail {
     width: 18rem;
     height: fit-content;
@@ -39,6 +34,7 @@
     align-items: center;
     gap: 0.5rem;
   }
+
   a:link,
   a:visited {
     text-decoration: inherit;

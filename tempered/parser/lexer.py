@@ -9,9 +9,6 @@ EXPR_START = "{{"
 EXPR_END = "}}"
 STATEMENT_START = "{%"
 STATEMENT_END = "%}"
-COMPONENT_START = "{<"
-COMPONENT_END = ">}"
-COMPONENT_END_ALTERNATIVE = "/>}"
 IDENT_LETTERS = (
     "abcdefghijklmnopqrstuvwxyz" "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789" "_"
 )
@@ -36,16 +33,6 @@ class StatementEndToken(Token):
 
 @dataclass
 class ExprStartToken(Token):
-    pass
-
-
-@dataclass
-class ComponentStartToken(Token):
-    pass
-
-
-@dataclass
-class ComponentEndToken(Token):
     pass
 
 
@@ -98,8 +85,6 @@ def next_token(scanner: TextScanner) -> t.Iterable[Token]:
         yield from next_statement_token(scanner)
     elif scanner.startswith(EXPR_START):
         yield from next_expr_token(scanner)
-    elif scanner.startswith(COMPONENT_START):
-        yield from next_component_token(scanner)
     else:
         yield from next_html_token(scanner)
 
@@ -111,19 +96,11 @@ def next_expr_token(scanner: TextScanner) -> t.Iterable[Token]:
     yield take_token(scanner, EXPR_END, ExprEndToken)
 
 
-def next_component_token(scanner: TextScanner) -> t.Iterable[Token]:
-    yield take_token(scanner, [COMPONENT_START], ComponentStartToken)
-    yield take_python_expr(scanner, COMPONENT_END, COMPONENT_END_ALTERNATIVE)
-    yield take_token(
-        scanner, [COMPONENT_END, COMPONENT_END_ALTERNATIVE], ComponentEndToken
-    )
-
-
 def next_html_token(scanner: TextScanner) -> t.Iterable[Token]:
     body = ""
     while scanner.has_text:
         if scanner.startswith("{") and scanner.startswith_many(
-            EXPR_START, STATEMENT_START, COMPONENT_START
+            EXPR_START, STATEMENT_START
         ):
             break
 
@@ -157,6 +134,8 @@ def next_statement_token(scanner: TextScanner) -> t.Iterable[Token]:
         yield take_python_expr(scanner, STATEMENT_END)
     elif keyword == "param":  # {% param expr %}
         yield take_python_stmt(scanner, STATEMENT_END)
+    elif keyword == "component":  # {% component Comp() %}
+        yield take_python_expr(scanner, STATEMENT_END)
     elif keyword == "layout":  # {% layout string %}
         yield take_string_token(scanner)
     elif keyword == "include":  # {% include string %}

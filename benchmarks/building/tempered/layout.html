@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
@@ -11,12 +12,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
     {% styles %}
 </head>
+
 <body>
-    {<Navbar()>}
+    {% component Navbar() %}
     <main hx-ext="remove-me">
         {% slot %}
     </main>
 </body>
+
 </html>
 
 <style global>
@@ -74,6 +77,7 @@
         overflow-x: hidden;
         overflow-y: auto;
     }
+
     /* Fonts */
     * {
         font-family: 'Open Sans';
@@ -82,20 +86,44 @@
         word-wrap: break-word;
     }
 
-    h1, h2, h3, h4, h5 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
         font-weight: 700;
         padding: 0;
         margin: 0;
         appearance: none;
     }
 
-    *     {font-size: var(--font-size);}
-    small {font-size: calc(var(--font-size) / var(--font-ratio));}
-    h5    {font-size: calc(var(--font-size) * pow(var(--font-ratio), 1));}
-    h4    {font-size: calc(var(--font-size) * pow(var(--font-ratio), 2));}
-    h3    {font-size: calc(var(--font-size) * pow(var(--font-ratio), 3));}
-    h2    {font-size: calc(var(--font-size) * pow(var(--font-ratio), 4));}
-    h1    {font-size: calc(var(--font-size) * pow(var(--font-ratio), 5));}
+    * {
+        font-size: var(--font-size);
+    }
+
+    small {
+        font-size: calc(var(--font-size) / var(--font-ratio));
+    }
+
+    h5 {
+        font-size: calc(var(--font-size) * pow(var(--font-ratio), 1));
+    }
+
+    h4 {
+        font-size: calc(var(--font-size) * pow(var(--font-ratio), 2));
+    }
+
+    h3 {
+        font-size: calc(var(--font-size) * pow(var(--font-ratio), 3));
+    }
+
+    h2 {
+        font-size: calc(var(--font-size) * pow(var(--font-ratio), 4));
+    }
+
+    h1 {
+        font-size: calc(var(--font-size) * pow(var(--font-ratio), 5));
+    }
 
 
     /* Components */
@@ -119,21 +147,25 @@
         justify-content: center;
         align-items: center;
     }
+
     button[data-type="primary"] {
         background: var(--primary);
         border-color: var(--primary);
     }
+
     button[data-type="secondary"] {
         background: var(--secondary);
         border-color: var(--secondary);
     }
+
     button[data-type="primary"][disabled],
     button[data-type="secondary"][disabled] {
         cursor: none;
         opacity: 0.5;
     }
 
-    input:not([type]), input[type="password"] {
+    input:not([type]),
+    input[type="password"] {
         box-sizing: border-box;
         width: 100%;
         height: fit-content;
@@ -147,6 +179,7 @@
         appearance: none;
         outline: none;
     }
+
     input:not([type])[disabled],
     input[type="password"][disabled] {
         opacity: 0.5;
@@ -170,6 +203,7 @@
         appearance: none;
         outline: none;
     }
+
     textarea[data-type="primary"][disabled] {
         opacity: 0.5;
     }

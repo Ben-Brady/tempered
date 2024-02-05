@@ -19,14 +19,14 @@ def test_checks_detect_invalid_layout():
 @pytest.mark.skip
 def test_checks_detect_missing_components():
     with pytest.raises(tempered.errors.InvalidTemplate):
-        build_template("{<Invalid()>}")
+        build_template("{% component Invalid() %}")
 
 
 @pytest.mark.skip
 def test_checks_detect_missing_components_parameters():
     with pytest.raises(tempered.errors.InvalidTemplate):
         build_templates(
-            "{<invalid()>}",
+            "{% component invalid() %}",
             ("invalid", "{% param a %}"),
         )
 

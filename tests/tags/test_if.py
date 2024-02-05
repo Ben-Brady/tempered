@@ -1,5 +1,3 @@
-import bs4
-import pytest
 from . import build_template
 
 

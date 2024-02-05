@@ -21,8 +21,8 @@
             <h3 style="width: 100%; text-align: center;">Videos</h3>
             <div id="videos">
                 {% for video in user.videos %}
-                {<Thumbnail(video=video)>}
-                    {% endfor %}
+                {% component Thumbnail(video=video) %}
+                {% endfor %}
             </div>
         </div>
     </div>
