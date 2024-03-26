@@ -1,15 +1,14 @@
 import ast
 import typing_extensions as t
 from .. import ast_utils
-from ..parser import LayoutTemplate, Template, TemplateParameter
+from ..parser import (
+    LayoutTemplate, Template, TemplateParameter,
+)
 from . import constants
 from .accumulators import Variable
 from .builder import BuildContext
 from .calls import (
-    component_func_name,
-    create_layout_call,
-    layout_func_name,
-    slot_parameter,
+    component_func_name, create_layout_call, layout_func_name, slot_parameter,
 )
 from .resolve import create_resolve_for_unknown_variables
 from .rules import default_rules

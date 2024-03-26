@@ -1,7 +1,9 @@
 from zlib import crc32
 import bs4
 import tinycss2
-from tinycss2.ast import HashToken, IdentToken, LiteralToken, QualifiedRule
+from tinycss2.ast import (
+    HashToken, IdentToken, LiteralToken, QualifiedRule,
+)
 import typing_extensions as t
 
 # QualifiedRule = #a .b {}
