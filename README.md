@@ -3,7 +3,7 @@
 
 A modern html templating library for python
 
-| [Documentation](https://github.com/Ben-Brady/tempered/blob/main/docs/index.md) | [PyPi](https://pypi.org/project/tempered) | [Github](https://github.com/Ben-Brady/tempered)|
+| [Documentation](https://ben-brady.github.io/tempered/) | [PyPi](https://pypi.org/project/tempered) | [Github](https://github.com/Ben-Brady/tempered)|
 | - | - | - |
 
 ```python
