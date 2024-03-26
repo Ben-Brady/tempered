@@ -23,7 +23,7 @@ pip install tempered
 
 Tempered is templating library designed around HTML and type safety.
 
-- **Fast**: Sub-millisecond render times. Roughly 5x faster than jinja, 50x faster than django
+- **Fast**: Sub-millisecond render times.
 - **Scoped and Bundled CSS**: CSS is scoped per file and then bundled together into a single stylesheet per page
 - **Native Preprocesser Support**: Native support for Sass
 - **Component Based**: Each template is a components and can call other components
@@ -34,7 +34,7 @@ Tempered is templating library designed around HTML and type safety.
 ## Lightning Fast
 
 - Templates are optimised and compiled into Python leading to microsecond long render times.
-- 5x faster than Jinja, 50x faster the djanog
+- 5x faster than Jinja, 50x faster the django
 
 <a href="https://github.com/Ben-Brady/tempered/tree/main/benchmarks">
 <picture align="center">
