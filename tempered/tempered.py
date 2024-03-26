@@ -2,7 +2,9 @@ from __future__ import annotations
 import zlib
 from pathlib import Path
 import typing_extensions as t
-from . import module, parser, render
+from . import (
+    module, parser, render,
+)
 
 
 class Tempered:
@@ -37,6 +39,7 @@ class Tempered:
         self._module.register_global(name, value)
 
     TFunc = t.TypeVar("TFunc", bound=t.Callable)
+
     def global_func(self, func: TFunc) -> TFunc:
         self._module.register_global(func.__name__, func)
         return func
@@ -82,14 +85,14 @@ class Tempered:
     def render_from_string(self, html: str, **context: t.Any) -> str:
         if html in self._from_string_cache:
             func = self._from_string_cache[html]
-            return func(**context)
+        else:
+            string_hash = hex(zlib.crc32(html.encode()))[2:]
+            name = f"string_{string_hash}>"
+            parsed_template = parser.parse_template(name, html)
+            self._module.build_templates([parsed_template])
+            func = self._module.get_template_func(name)
+            self._from_string_cache[html] = func
 
-        string_hash = hex(zlib.crc32(html.encode()))[2:]
-        name = f"annonomous_{string_hash}>"
-        parsed_template = parser.parse_template(name, html)
-        self._module.build_templates([parsed_template])
-        func = self._module.get_template_func(name)
-        self._from_string_cache[html] = func
         return func(**context)
 
     def _render_template(self, name: str, **context: t.Any) -> str:
