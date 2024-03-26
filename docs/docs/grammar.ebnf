@@ -1,8 +1,5 @@
 <template> ::= (<tag> | <html>)*
 
-<statements> ::= <if_statement> | <for_statement>
-<for_statement> ::= <for_tag> <html> <endfor_tag>
-
 <tag> ::= (
     <if_tag> | <elif_tag> | <else_tag> | <endif_tag> |
     <for_tag> | <endfor_tag> | <set_tag> | <param_tag> |
@@ -16,9 +13,9 @@
 <expr_end>                  ::= "}}"
 <statement_start>           ::= "{%"
 <statement_end>             ::= "%}"
-<component_start>           ::= "{<"
-<component_end>             ::= ">}"
-<component_end_alternative> ::= "/>}"
+
+<statements> ::= <if_statement> | <for_statement>
+<for_statement> ::= <for_tag> <html> <endfor_tag>
 
 <if_statement> ::= <if_tag> <html> (<elif_tag> <html>)* (<else_tag> <html>)? <endif_tag>
 <if_tag> ::= (
@@ -74,7 +71,7 @@
     <expr_start> <python> <expr_end>
 )
 <component_tag> ::= (
-    <component_start> <whitespace> <python> (<component_end> | <component_end_alternative>)
+    <statement_start> <whitespace> "component" <python> <statement_end>
 )
 <html> ::= (<unicode> | <control_escape>)*
 

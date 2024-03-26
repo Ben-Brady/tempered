@@ -1,0 +1,26 @@
+# site_url: https://example.com/
+docs_dir: docs
+
+site_name: Tempered
+site_description: Tempered
+site_author: Ben Brady
+repo_name: Tempered
+repo_url: https://github.com/Ben-Brady/tempered
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Templating: templating.md
+  - Examples: examples.md
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

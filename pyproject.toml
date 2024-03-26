@@ -29,6 +29,10 @@ dev = [
     "isort",
     "autoflake",
 ]
+docs = [
+    "mkdocs",
+    "mkdocs-material",
+]
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]
