@@ -2,7 +2,7 @@
 docs_dir: docs
 
 site_name: Tempered
-site_description: Tempered
+site_description: A modern html templating library for python
 site_author: Ben Brady
 repo_name: Tempered
 repo_url: https://github.com/Ben-Brady/tempered
@@ -17,14 +17,14 @@ theme:
   palette:
   - media: '(prefers-color-scheme: light)'
     scheme: default
-    primary: teal
+    primary: blue grey
     accent: amber
     toggle:
       icon: material/lightbulb
       name: Switch to dark mode
   - media: '(prefers-color-scheme: dark)'
     scheme: slate
-    primary: teal
+    primary: blue grey
     accent: amber
     toggle:
       icon: material/lightbulb-outline
@@ -52,7 +52,7 @@ plugins:
           unwrap_annotated: true
           filters:
             - '!^_'
-          merge_init_into_class: true
+          merge_init_into_class: false
           docstring_section_style: spacy
           signature_crossrefs: true
           show_symbol_type_heading: true

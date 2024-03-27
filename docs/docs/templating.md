@@ -10,9 +10,21 @@ Tempered templates are based on Jinja with several modifications.
 </div>
 ```
 
-## Template Tags
+## Layouts
 
-## Expression
+## Slots and Blocks
+
+A slot is a hole, and a block is a plug to fill that hole.
+
+```html
+<!-- layout.html -->
+<title>
+    Tempered /
+    {% block title %}Default Title{% endblock %}
+</title>
+```
+
+## Expressions
 
 Use `{{ EXPR }}` for expressions,
 
