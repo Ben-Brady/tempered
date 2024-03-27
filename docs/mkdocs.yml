@@ -7,12 +7,19 @@ site_author: Ben Brady
 repo_name: Tempered
 repo_url: https://github.com/Ben-Brady/tempered
 
+nav:
+- Home: home.md
+- Quickstart: quickstart.md
+- Templating: templating.md
+- Reference: reference/tempered.md
+- Examples: examples.md
+
 theme:
   name: material
+  favicon: assets/favicon.png
   locale: en
   features:
     - content.code.copy
-  logo: favicon.ico
 
   palette:
   - media: '(prefers-color-scheme: light)'
@@ -30,13 +37,6 @@ theme:
       icon: material/lightbulb-outline
       name: Switch to light mode
 
-nav:
-- Introduction: readme.md
-- Home: index.md
-- Quickstart: quickstart.md
-- Templating: templating.md
-- Reference: reference/tempered.md
-- Examples: examples.md
 
 plugins:
   mkdocstrings:

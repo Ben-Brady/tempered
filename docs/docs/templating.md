@@ -24,13 +24,16 @@ A slot is a hole, and a block is a plug to fill that hole.
 </title>
 ```
 
-## Expressions
+## Tags
+
+### `{{ expr }}`
 
 Use `{{ EXPR }}` for expressions,
 
 ```html
 <span>{{ text }}</span>
 ```
+
 These are escaped in HTML and tag parameters, so they are protected against XSS
 
 ```html
@@ -38,13 +41,12 @@ These are escaped in HTML and tag parameters, so they are protected against XSS
     {{ text }}  <!-- And so is this -->
 </a>
 ```
+
 > Important: Ensure you surround attributes in quotes `"` to prevent XSS
-
 > `<a href="{{src}}"/>` is safe
-
 > `<a href={{src}}/>` is unsafe
 
-## `{% if %}`
+### `{% if %}`
 
 Use `{% if %}` and `{% endif %}` for control flow, there are two control flow structures
 
@@ -88,9 +90,7 @@ As well as elif blocks
 </span>
 ```
 
-## `{% for %}`
-
-Use `{% for %}`
+### `{% for %}`
 
 ```html
 {% param commments: list[str] %}
@@ -111,7 +111,8 @@ Use `{% for %}`
 {% endfor %}
 </ul>
 ```
-## `{% html %}`
+
+### `{% html %}`
 
 Use `{% html %}` to include literal html without escaping
 
@@ -122,7 +123,7 @@ Use `{% html %}` to include literal html without escaping
 </div>
 ```
 
-## `{% param %}`
+### `{% param %}`
 
 Use `{% param %}` for parameters
 
@@ -135,7 +136,7 @@ Use `{% param %}` for parameters
 ```
 > Note: typing_extensions is imported as t and can be used in parameters
 
-## `{% component %}`
+### `{% component %}`
 
 Use `{% component Component() %}` for a component, call this like:
 
@@ -147,7 +148,7 @@ Use `{% component Component() %}` for a component, call this like:
 </div>
 ```
 
-## `{% import %}`
+### `{% import %}`
 
 You have to import components using the import syntax. You can specify any target name.
 
@@ -155,7 +156,7 @@ You have to import components using the import syntax. You can specify any targe
 {% import ANY_NAME from "template_name.html" %}
 ```
 
-## `{% set %}`
+### `{% set %}`
 
 Use `{% set %}` to set a variable
 
@@ -166,7 +167,7 @@ Use `{% set %}` to set a variable
 ```
 
 
-## `{% styles %}`
+### `{% styles %}`
 
 Use `{% styles %}` for styles, this is where styles are placed
 
@@ -178,7 +179,7 @@ Use `{% styles %}` for styles, this is where styles are placed
 
 If omitted, styles are placed at the end of the component
 
-## `{% include %}`
+### `{% include %}`
 
 You can manually include a seperate components styles using `include`, should be placed at the top of the component. This treats the target component as a depedency.
 
