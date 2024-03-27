@@ -14,10 +14,10 @@
       
       
       
-        <link rel="next" href="..">
+        <link rel="next" href="../quickstart/">
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../assets/favicon.png">
       <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.15">
     
     
@@ -94,7 +94,8 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Tempered" class="md-header__button md-logo" aria-label="Tempered" data-md-component="logo">
       
-  <img src="../favicon.ico" alt="logo">
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -189,7 +190,8 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Tempered" class="md-nav__button md-logo" aria-label="Tempered" data-md-component="logo">
       
-  <img src="../favicon.ico" alt="logo">
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
 
     </a>
     Tempered
@@ -293,30 +295,37 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#type-generating" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Generating
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grammar" class="md-nav__link">
+    <span class="md-ellipsis">
+      Grammar
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Home
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -461,6 +470,33 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#type-generating" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Generating
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grammar" class="md-nav__link">
+    <span class="md-ellipsis">
+      Grammar
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -483,8 +519,8 @@
 
 <p align="center">
     <img
-        height=128
-        src="https://github.com/Ben-Brady/tempered/assets/64110708/c30f75f4-ab69-48a8-b595-fec5ad9baa38"
+        height=184
+        src="https://github.com/Ben-Brady/tempered/assets/64110708/83979e4d-1b70-42f5-a814-b9c63f2e222d"
         alt="Tempered Banner"
     >
 </p>
@@ -584,6 +620,17 @@
 </span></code></pre></div>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Example Post&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/example.png&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">image-83dc</span><span class="p">&gt;&lt;</span><span class="nt">style</span><span class="p">&gt;</span><span class="nt">img</span><span class="p">.</span><span class="nc">image-83dc</span><span class="p">{</span><span class="k">width</span><span class="p">:</span><span class="mi">100</span><span class="kt">px</span><span class="p">;</span><span class="k">height</span><span class="p">:</span><span class="mi">100</span><span class="kt">px</span><span class="p">}&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
 </span></code></pre></div>
+<h2 id="type-generating">Type Generating</h2>
+<p>By default, tempered will create a dynamic type stubs file alongside the libraries files. This is dynamically updated to fit the currently encoded templates. It enabled IDEs to provide autocomplete on templates names as well as.</p>
+<p>However, this may not play well with some IDEs. Additionally, it increases build times and uses IO to write the stubs file, it's recommended to disabled in production.</p>
+<p>It can be disabled by adding <code>generate_types=False</code> to the Tempered constructor.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Tempered</span><span class="p">(</span><span class="n">generate_types</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="performance">Performance</h2>
+<p>If you want to increase build performance: install <code>lxml</code>.</p>
+<p>This allows the HTML to parsed much faster and increases build times by 10-30%. However it requires C build tools and is not available on all platforms. If <code>lxml</code> installed, Tempered will use it by default.</p>
+<h2 id="grammar">Grammar</h2>
+<p>The formal grammar specified in Extended Backus-Naur Form and can be found <a href="https://github.com/Ben-Brady/tempered/blob/main/docs/grammar.ebnf">here</a>.</p>
 
 
 
