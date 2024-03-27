@@ -1,6 +1,6 @@
 <p align="center">
     <img
-        src="https://github.com/Ben-Brady/tempered/assets/64110708/0531d817-974c-482f-8bd8-c0e894c8097f"
+        src="https://github.com/Ben-Brady/tempered/assets/64110708/e2cd3ecf-0d01-47e1-a914-ff4976358739"
         alt="Tempered Banner"
     >
 </p>
