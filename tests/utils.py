@@ -22,5 +22,5 @@ def build_templates(template: str, *other_templates: t.Tuple[str, str]) -> Calla
 
     templates = {name: body for (name, body) in other_templates}
     templates["main"] = template
-    env.add_templates_from_string(templates)
+    env.add_templates_from_mapping(templates)
     return partial(env.render_template, "main")
