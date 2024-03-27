@@ -1,9 +1,7 @@
 import ast
 import typing_extensions as t
 from .. import ast_utils, parser
-from . import (
-    constants, preprocess, validate,
-)
+from . import constants, preprocess, validate
 from .template import create_template_function
 
 

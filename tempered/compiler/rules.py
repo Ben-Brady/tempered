@@ -6,12 +6,8 @@ from ..parser.template_ast import (
     AssignmentNode, BlockNode, ComponentNode, ExprNode, ForNode, HtmlNode, IfNode,
     ImportNode, Node, RawExprNode, SlotNode, StyleNode,
 )
-from .calls import (
-    create_escape_call, slot_parameter, slot_variable_name,
-)
-from .constants import (
-    CSS_VARIABLE, KWARGS_VAR, NAME_LOOKUP_VAR, WITH_STYLES,
-)
+from .calls import create_escape_call, slot_parameter, slot_variable_name
+from .constants import CSS_VARIABLE, KWARGS_VAR, NAME_LOOKUP_VAR, WITH_STYLES
 
 if t.TYPE_CHECKING:
     from .builder import BuildContext

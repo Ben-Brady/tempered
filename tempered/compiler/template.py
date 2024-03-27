@@ -1,9 +1,7 @@
 import ast
 import typing_extensions as t
 from .. import ast_utils
-from ..parser import (
-    LayoutTemplate, Template, TemplateParameter,
-)
+from ..parser import LayoutTemplate, Template, TemplateParameter
 from . import constants
 from .accumulators import Variable
 from .builder import BuildContext
