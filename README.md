@@ -1,6 +1,5 @@
 <p align="center">
     <img
-        height=184
         src="https://github.com/Ben-Brady/tempered/assets/64110708/83979e4d-1b70-42f5-a814-b9c63f2e222d"
         alt="Tempered Banner"
     >
@@ -10,11 +9,28 @@
     <em>A modern html templating library for python</em>
 </p>
 
+
+<p align="center">
+  <a
+    href="https://github.com/Ben-Brady/tempered/actions?query=workflow%3Atesting+event%3Apush+branch%3Amaster"
+    target="_blank"
+  >
+      <img src="https://github.com/Ben-Brady/tempered/actions/workflows/testing.yml/badge.svg" alt="Test">
+  </a>
+  <a href="https://pypi.org/project/fastapi" target="_blank">
+      <img src="https://img.shields.io/pypi/v/tempered?color=%2334D058&label=pypi%20package" alt="Package version">
+  </a>
+  <a href="https://pypi.org/project/fastapi" target="_blank">
+      <img src="https://img.shields.io/pypi/pyversions/tempered.svg?color=%2334D058" alt="Supported Python versions">
+  </a>
+</p>
+
+
 ---
 
-Documentation: https://github.com/Ben-Brady/tempered/blob/main/docs/index.md
+Documentation: [https://github.com/Ben-Brady/tempered/blob/main/docs/index.md](https://ben-brady.github.io/tempered/)
 
-Source Code: https://github.com/Ben-Brady/tempered
+Source Code: [https://github.com/Ben-Brady/tempered](https://github.com/Ben-Brady/tempered)
 
 
 ```python
