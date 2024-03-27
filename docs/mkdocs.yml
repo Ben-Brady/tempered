@@ -8,7 +8,7 @@ repo_name: Tempered
 repo_url: https://github.com/Ben-Brady/tempered
 
 nav:
-- Home: home.md
+- Home: index.md
 - Quickstart: quickstart.md
 - Templating: templating.md
 - Reference: reference/tempered.md
