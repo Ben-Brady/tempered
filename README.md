@@ -28,7 +28,7 @@
 
 ---
 
-Documentation: [https://github.com/Ben-Brady/tempered/blob/main/docs/index.md](https://ben-brady.github.io/tempered/)
+Documentation: [https://Ben-Brady.github.io/tempered/](https://ben-brady.github.io/tempered/)
 
 Source Code: [https://github.com/Ben-Brady/tempered](https://github.com/Ben-Brady/tempered)
 
