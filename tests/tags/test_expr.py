@@ -1,19 +1,22 @@
 import sys
 import bs4
-from . import build_template
+from tests import build_template, test
 
 
-def test_simple_expr_works():
+@test("Numeric expressions work")
+def _():
     component = build_template("{{ 123 }}")
     assert "123" in component()
 
 
-def test_html_tags_are_escaped():
+@test("HTML tags are escaped")
+def _():
     component = build_template("{{ '<script>' }}")
     assert "<script>" not in component()
 
 
-def test_string_literals_arent_transformed():
+@test("String literals aren't transformed")
+def _():
     component = build_template(
         """
         <a href='{{ "/test" }}'>click</a>
@@ -22,7 +25,8 @@ def test_string_literals_arent_transformed():
     assert "/test" in component()
 
 
-def test_expr_block_escapes_param():
+@test("Expression blocks are escaped in attributes")
+def _():
     link = "/test' onerror='alert(1)"
     component = build_template(
         """
@@ -36,7 +40,8 @@ def test_expr_block_escapes_param():
     assert list(a_tag.attrs.keys()) == ["href"], "Expression isn't escaped"
 
 
-def test_multiple_expr_chained():
+@test("Multiple expressions ccombined")
+def _():
     component = build_template(
         """
         1{{"a"}}2{{"b"}}3{{"c"}}
@@ -45,7 +50,8 @@ def test_multiple_expr_chained():
     assert "1a2b3c" in component()
 
 
-def test_many_expr_chained():
+@test("Expressions aren't limited by recursion limit")
+def _():
     depth = sys.getrecursionlimit() + 10
     component = build_template("{{ 'a' }}" * depth)
     assert "a" in component()

@@ -1,5 +1,5 @@
 import bs4
-from . import build_template
+from tests import build_template
 
 
 def test_component_uses_with_styles():

@@ -1,4 +1,4 @@
-from . import build_template, build_templates
+from tests import build_template, build_templates
 
 
 def test_variables_are_converted_to_kwargs():

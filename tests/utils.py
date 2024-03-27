@@ -4,6 +4,13 @@ import typing_extensions as t
 from typing_extensions import Callable
 
 
+def test(name: str):
+    def wrapper(func: t.Callable):
+        func.__globals__[" " + name] = func
+
+    return wrapper
+
+
 def build_template(template: str) -> Callable:
     env = tempered.Tempered()
     env.add_template_from_string("main", template)

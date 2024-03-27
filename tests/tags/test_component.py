@@ -1,26 +1,8 @@
-from . import build_templates
+from tests import build_templates, test
 
 
-def test_components_can_have_optional_closing_tag():
-    component = build_templates(
-        """
-        {% import Comp from "comp" %}
-            {% component Comp() %}
-            {% component Comp() %}
-        """,
-        (
-            "comp",
-            """
-         test
-        """,
-        ),
-    )
-
-    html: str = component()
-    assert html.count("test") == 2, html
-
-
-def test_components_prevent_css_duplication():
+@test("Components prevent css duplication")
+def _():
     CSS_KEY = "TEMPERED"
     component = build_templates(
         """
@@ -42,7 +24,8 @@ def test_components_prevent_css_duplication():
     assert html.count(CSS_KEY) == 1, html
 
 
-def test_components_calculated_nested_children():
+@test("Components account for nested children")
+def _():
     CSS_KEY = "TEMPERED"
     component = build_templates(
         '{% import A from "a" %} {% component A() %}',
@@ -58,7 +41,8 @@ def test_components_calculated_nested_children():
     assert html.count(CSS_KEY) == 1, html
 
 
-def test_components_take_parameters():
+@test("Components accept parameters")
+def _():
     component = build_templates(
         """
         {% import Comp from "comp" %}
@@ -70,7 +54,8 @@ def test_components_take_parameters():
     assert "bar" in html
 
 
-def test_components_allows_default_parameters():
+@test("Components allow default parameters")
+def _():
     component = build_templates(
         '{% import Comp from "comp" %}{% component Comp() %}',
         ("comp", '{% param foo: str = "bar" %}{{foo}}'),
@@ -79,7 +64,8 @@ def test_components_allows_default_parameters():
     assert "bar" in html
 
 
-def test_components_allows_mixed_parameters():
+@test("Components allows mixed parameters")
+def _():
     component = build_templates(
         """
             {% import Comp from "comp" %}

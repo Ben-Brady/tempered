@@ -1,16 +1,8 @@
-from . import build_template
+from tests import build_template, test
 
 
-def test_empty_for_loop():
-    component = build_template(
-        """
-        {% for x in range(5) %}{% endfor %}
-    """
-    )
-    component()
-
-
-def test_for_range_loop():
+@test("Range loops are valid")
+def _():
     component = build_template(
         """
         {% for x in range(5) %}{{ x }}{% endfor %}
@@ -21,19 +13,9 @@ def test_for_range_loop():
         assert str(i) in html
 
 
-def test_for_loop_multiple_targets_loop():
-    component = build_template(
-        """
-        {% for key, value in foo.items() %}
-            {{ key }}={{ value}}
-        {% endfor %}
-    """
-    )
-    html = component(foo={"a": 1})
-    assert "a=1" in html
 
-
-def test_for_each_loop():
+@test("For each loops are valid")
+def _():
     component = build_template(
         """
         {% for item in items %}{{ item }}{% endfor %}
@@ -45,7 +27,32 @@ def test_for_each_loop():
         assert item in html
 
 
-def test_for_range_loop_with_unroll():
+@test("For loops with multiple targets")
+def _():
+    component = build_template(
+        """
+        {% for key, value in foo.items() %}
+            {{ key }}={{ value}}
+        {% endfor %}
+    """
+    )
+    html = component(foo={"a": 1})
+    assert "a=1" in html
+
+
+
+@test("Empty for loops are valid")
+def _():
+    component = build_template(
+        """
+        {% for x in range(5) %}{% endfor %}
+    """
+    )
+    component()
+
+
+@test("Optimisable loops are valid")
+def _():
     component = build_template(
         """
         {% for x in range(5) %}
@@ -58,7 +65,8 @@ def test_for_range_loop_with_unroll():
         assert str(i) in html
 
 
-def test_for_loop_with_set():
+@test("Setting variables inside a for loop is valid")
+def _():
     component = build_template(
         """
         {% for x in range(5) %}
@@ -72,7 +80,8 @@ def test_for_loop_with_set():
         assert str(i * i) in html
 
 
-def test_nested_for_loop():
+@test("Nested loops are valid")
+def _():
     component = build_template(
         """
         {% for x in range(2) %}
@@ -89,7 +98,8 @@ def test_nested_for_loop():
             assert f"({x},{y})" in html
 
 
-def test_nested_for_loop_with_same_name():
+@test("Nested loops with identical names act correctly")
+def _():
     component = build_template(
         """
         {% for x in range(5) %}
@@ -103,3 +113,16 @@ def test_nested_for_loop_with_same_name():
 
     for x in range(5):
         assert html.count(str(x)) == 5
+
+
+@test("Multiple loops with identical names act correctly")
+def _():
+    component = build_template(
+        """
+        {% for x in range(5) %}{{x}}{% endfor %}
+        {% for x in range(5) %}{{x}}{% endfor %}
+    """
+    )
+    html = component()
+
+    assert html.count("01234") == 2, html

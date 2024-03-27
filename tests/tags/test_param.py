@@ -1,6 +1,6 @@
 import pytest
 import tempered
-from . import build_template
+from tests import build_template
 
 
 def test_param_using_typing_extensions():

@@ -1,4 +1,4 @@
-from . import build_template
+from tests import build_template
 
 
 def test_if_block():

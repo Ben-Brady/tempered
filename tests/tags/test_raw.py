@@ -1,4 +1,4 @@
-from . import build_template
+from tests import build_template
 
 
 def test_text_isnt_escaped():

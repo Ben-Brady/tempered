@@ -1,5 +1,5 @@
 import bs4
-from . import build_templates
+from tests import build_templates
 
 
 def test_layout_extend_with_default_slot():
