@@ -1,6 +1,6 @@
 <p align="center">
     <img
-        src="https://github.com/Ben-Brady/tempered/assets/64110708/83979e4d-1b70-42f5-a814-b9c63f2e222d"
+        src="https://github.com/Ben-Brady/tempered/assets/64110708/e2cd3ecf-0d01-47e1-a914-ff4976358739"
         alt="Tempered Banner"
     >
 </p>
@@ -28,7 +28,7 @@
 
 ---
 
-Documentation: [https://github.com/Ben-Brady/tempered/blob/main/docs/index.md](https://ben-brady.github.io/tempered/)
+Documentation: [https://Ben-Brady.github.io/tempered/](https://ben-brady.github.io/tempered/)
 
 Source Code: [https://github.com/Ben-Brady/tempered](https://github.com/Ben-Brady/tempered)
 
