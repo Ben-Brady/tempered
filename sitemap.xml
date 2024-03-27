@@ -11,12 +11,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://ben-brady.github.io/tempered/quickstart/</loc>
+         <loc>https://ben-brady.github.io/tempered/templating/</loc>
          <lastmod>2024-03-27</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://ben-brady.github.io/tempered/templating/</loc>
+         <loc>https://ben-brady.github.io/tempered/quickstart/basic/</loc>
+         <lastmod>2024-03-27</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://ben-brady.github.io/tempered/quickstart/flask/</loc>
          <lastmod>2024-03-27</lastmod>
          <changefreq>daily</changefreq>
     </url>
