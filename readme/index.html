@@ -269,18 +269,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-css-support" class="md-nav__link">
+  <a href="#native-css" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced CSS Support
+      Native CSS
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-hinting" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Hinting
+      
     </span>
   </a>
   
@@ -444,18 +444,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-css-support" class="md-nav__link">
+  <a href="#native-css" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced CSS Support
+      Native CSS
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-hinting" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Hinting
+      
     </span>
   </a>
   
@@ -519,7 +519,6 @@
 
 <p align="center">
     <img
-        height=184
         src="https://github.com/Ben-Brady/tempered/assets/64110708/83979e4d-1b70-42f5-a814-b9c63f2e222d"
         alt="Tempered Banner"
     >
@@ -529,8 +528,23 @@
     <em>A modern html templating library for python</em>
 </p>
 
+<p align="center">
+  <a
+    href="https://github.com/Ben-Brady/tempered/actions?query=workflow%3Atesting+event%3Apush+branch%3Amaster"
+    target="_blank"
+  >
+      <img src="https://github.com/Ben-Brady/tempered/actions/workflows/testing.yml/badge.svg" alt="Test">
+  </a>
+  <a href="https://pypi.org/project/fastapi" target="_blank">
+      <img src="https://img.shields.io/pypi/v/tempered?color=%2334D058&label=pypi%20package" alt="Package version">
+  </a>
+  <a href="https://pypi.org/project/fastapi" target="_blank">
+      <img src="https://img.shields.io/pypi/pyversions/tempered.svg?color=%2334D058" alt="Supported Python versions">
+  </a>
+</p>
+
 <hr />
-<p>Documentation: <a href="https://github.com/Ben-Brady/tempered/blob/main/docs/index.md">https://github.com/Ben-Brady/tempered/blob/main/docs/index.md</a></p>
+<p>Documentation: <a href="https://ben-brady.github.io/tempered/">https://github.com/Ben-Brady/tempered/blob/main/docs/index.md</a></p>
 <p>Source Code: <a href="https://github.com/Ben-Brady/tempered">https://github.com/Ben-Brady/tempered</a></p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">pip</span> <span class="n">install</span> <span class="n">tempered</span>
 </span></code></pre></div>
@@ -560,71 +574,61 @@
 </picture>
 </a></p>
 <hr />
-<h2 id="advanced-css-support">Advanced CSS Support</h2>
-<p>CSS is scoped per template and bundled together into a single stylesheet.</p>
-<p>Additionally, sass and scss support is built in.</p>
+<h2 id="native-css">Native CSS</h2>
+<p>CSS is scoped per componenet and bundled together into a single stylesheet.</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/example.png&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Example Post&quot;</span><span class="p">&gt;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  <span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://picsum.photos/320/180&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Example Post&quot;</span><span class="p">&gt;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">&lt;</span><span class="nt">style</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;sass&quot;</span><span class="p">&gt;</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">div</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="nt">border-radius</span><span class="o">:</span><span class="w"> </span><span class="nt">1rem</span><span class="o">;</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="nt">img</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">        </span><span class="nt">height</span><span class="o">:</span><span class="w"> </span><span class="nt">auto</span><span class="o">;</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">        </span><span class="nt">width</span><span class="o">:</span><span class="w"> </span><span class="nt">2rem</span><span class="o">;</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">        </span><span class="nt">border-radius</span><span class="o">:</span><span class="w"> </span><span class="nt">1rem</span><span class="o">;</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">div</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="k">box-sizing</span><span class="p">:</span><span class="w"> </span><span class="kc">content-box</span><span class="p">;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="n">fit-content</span><span class="p">;</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="k">overflow</span><span class="p">:</span><span class="w"> </span><span class="kc">hidden</span><span class="p">;</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mf">.15</span><span class="kt">rem</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="kc">black</span><span class="p">;</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="err">img</span><span class="w"> </span><span class="err">{</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">      </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">      </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="kt">rem</span><span class="p">;</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">  </span><span class="err">}</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<hr />
-<h2 id="type-hinting">Type Hinting</h2>
-<p>Type declarations are generated for templates so that IDEs can provide type suggestions on templates.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">tempered</span> <span class="o">=</span> <span class="n">Tempered</span><span class="p">()</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">tempered</span><span class="o">.</span><span class="n">add_template_from_string</span><span class="p">(</span><span class="s2">&quot;title.html&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;&quot;</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s2">    {% param title: str %}</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s2">    &lt;h1&gt;</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s2">        {{ title }}</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s2">    &lt;/h1&gt;</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">tempered</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="s2">&quot;title.html&quot;</span><span class="p">,</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">title</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># Warning: Argument of type &quot;str&quot; cannot be assigned to parameter &quot;bar&quot; of type &quot;str&quot; in function &quot;foo&quot;</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">)</span>
-</span></code></pre></div>
+<p>--</p>
+<h2 id="_1"></h2>
 <hr />
 <h2 id="example">Example</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">tempered</span> <span class="kn">import</span> <span class="n">Tempered</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">tempered</span> <span class="o">=</span> <span class="n">Tempered</span><span class="p">(</span><span class="s2">&quot;./templates&quot;</span><span class="p">)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">html</span> <span class="o">=</span> <span class="n">tempered</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;image.html&quot;</span><span class="p">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">src</span><span class="o">=</span><span class="s2">&quot;/example.png&quot;</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">alt</span><span class="o">=</span><span class="s2">&quot;Example Post&quot;</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">tempered</span> <span class="kn">import</span> <span class="n">Tempered</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">tempered</span> <span class="o">=</span> <span class="n">Tempered</span><span class="p">(</span><span class="s2">&quot;./templates&quot;</span><span class="p">)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">html</span> <span class="o">=</span> <span class="n">tempered</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;image.html&quot;</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">src</span><span class="o">=</span><span class="s2">&quot;/example.png&quot;</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">alt</span><span class="o">=</span><span class="s2">&quot;Example Post&quot;</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="cm">&lt;!-- templates/Image.html --&gt;</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>{% param src: str %}
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>{% param alt: str = &quot;&quot; %}
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;{{src}}&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;{{alt}}&quot;</span><span class="p">&gt;</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nt">img</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">        </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">px</span><span class="p">;</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">        </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">px</span><span class="p">;</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="cm">&lt;!-- templates/Image.html --&gt;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>{% param src: str %}
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>{% param alt: str = &quot;&quot; %}
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;{{src}}&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;{{alt}}&quot;</span><span class="p">&gt;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nt">img</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">        </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">px</span><span class="p">;</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">        </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">px</span><span class="p">;</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Example Post&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/example.png&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">image-83dc</span><span class="p">&gt;&lt;</span><span class="nt">style</span><span class="p">&gt;</span><span class="nt">img</span><span class="p">.</span><span class="nc">image-83dc</span><span class="p">{</span><span class="k">width</span><span class="p">:</span><span class="mi">100</span><span class="kt">px</span><span class="p">;</span><span class="k">height</span><span class="p">:</span><span class="mi">100</span><span class="kt">px</span><span class="p">}&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">&lt;</span><span class="nt">img</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Example Post&quot;</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/example.png&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">image-83dc</span><span class="p">&gt;&lt;</span><span class="nt">style</span><span class="p">&gt;</span><span class="nt">img</span><span class="p">.</span><span class="nc">image-83dc</span><span class="p">{</span><span class="k">width</span><span class="p">:</span><span class="mi">100</span><span class="kt">px</span><span class="p">;</span><span class="k">height</span><span class="p">:</span><span class="mi">100</span><span class="kt">px</span><span class="p">}&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <h2 id="type-generating">Type Generating</h2>
 <p>By default, tempered will create a dynamic type stubs file alongside the libraries files. This is dynamically updated to fit the currently encoded templates. It enabled IDEs to provide autocomplete on templates names as well as.</p>
 <p>However, this may not play well with some IDEs. Additionally, it increases build times and uses IO to write the stubs file, it's recommended to disabled in production.</p>
 <p>It can be disabled by adding <code>generate_types=False</code> to the Tempered constructor.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Tempered</span><span class="p">(</span><span class="n">generate_types</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Tempered</span><span class="p">(</span><span class="n">generate_types</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="performance">Performance</h2>
 <p>If you want to increase build performance: install <code>lxml</code>.</p>
