@@ -1,7 +1,7 @@
 <p align="center">
     <img
-        height=128
-        src="https://github.com/Ben-Brady/tempered/assets/64110708/c30f75f4-ab69-48a8-b595-fec5ad9baa38"
+        height=184
+        src="https://github.com/Ben-Brady/tempered/assets/64110708/83979e4d-1b70-42f5-a814-b9c63f2e222d"
         alt="Tempered Banner"
     >
 </p>
