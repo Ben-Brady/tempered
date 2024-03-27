@@ -126,15 +126,13 @@ class TemperedInterface(Tempered):
     ```
     """
 
-    static_folder: t.Optional[Path]
-    "The static folder, if any"
-
     def __init__(
         self,
         *,
         template_folder: t.Union[str, Path, None] = None,
         static_folder: t.Union[str, Path, None] = None,
         generate_types: bool = True,
+        **context,
     ):
         """
         Args:
@@ -152,13 +150,13 @@ class TemperedInterface(Tempered):
     def add_template_from_file(self, file: t.Union[Path, str]):
         """Add a template from a file.
 
-        **Example**
-        ```python
-        tempered.add_template("index.html")
-        ```
-
         Args:
             file: The file to import as the template, the path will be used as it's name.
+
+        **Example**
+        ```python
+        tempered.add_template_from_file("index.html")
+        ```
         """
         Tempered.add_template_from_file(self, file)
 
@@ -171,11 +169,21 @@ class TemperedInterface(Tempered):
 
         Args:
             folder: Imports all files form this folder recursively, the name of the templatse are the filepath without the folder suffix
+
+        **Example**
+        ```python
+        tempered.add_templates_from_folder("./additional_templates")
+        ```
         """
         Tempered.add_templates_from_folder(self, folder)
 
     def add_template_from_string(self, name: str, html: str):
-        """Create a template from a string, specifying the name and contents.
+        """
+        Create a template from a string, specifying the name and contents.
+
+        Args:
+            name: The name the templates should have
+            html: The template content
 
         **Example**
         ```python
@@ -187,9 +195,6 @@ class TemperedInterface(Tempered):
         \""")
         ```
 
-        Args:
-            name: The name the templates hould have
-            html: The template content
         """
         Tempered.add_template_from_string(self, name, html)
 
@@ -206,6 +211,10 @@ class TemperedInterface(Tempered):
     def render_template(self, name: str, **context: t.Any) -> str:
         """Renders a template using the given parameters
 
+        Args:
+            name: The name of the template to render
+            context: The parameters to pass to the template
+
         **Example**
         ```python
         html = tempered.render_template(
@@ -213,10 +222,6 @@ class TemperedInterface(Tempered):
             name="Ben Brady",
         )
         ```
-
-        Args:
-            name: The name of the template to render
-            context: The parameters to pass to the template
         """
         return Tempered.render_template(self, name, **context)
 
@@ -224,11 +229,20 @@ class TemperedInterface(Tempered):
         """
         Render a template from a string, useful for one-off templates.
 
-        **String templates are cached**
-
         Args:
             html: The html of the template to render
             context: The paramemters to pass to the template
+
+        > Note: String template compiles are cached, so it's as fast a regular template
+
+        **Example**
+
+        ```python
+        tempered.render_template_from_string(
+            "<h1> User - {{ name }} </h1>",
+            name="Ben Brady",
+        )
+        ```
         """
         return Tempered.render_template_from_string(self, html, **context)
 
@@ -236,15 +250,15 @@ class TemperedInterface(Tempered):
         """
         Add a global variable to the template context
 
+        Args:
+            name: The name the global is assigned to
+            value: The value of the global variable
+
         **Example**
 
         ```python
         tempered.add_global("DOMAIN", "example.com")
         ```
-
-        Args:
-            name: The name the global is assigned to
-            value: The value of the global variable
         """
         Tempered.add_global(self, name, value)
 
