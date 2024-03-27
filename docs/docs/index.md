@@ -1,23 +1,5 @@
 # Tempered
 
-## Adding templates
-
-```python
-import components
-from tempered import Tempered
-
-tempered = Tempered(
-    template_folder="./templates",
-) # Initial Creationg
-
-tempered.add_template_folder("./templates")
-tempered.add_template("./templates/comment.html")
-tempered.add_template_from_string("comment.html", """
-    {% param text: str %}
-    <span>{{ text }}</span>
-""")
-```
-
 ## Type Generating
 
 By default, tempered will create a dynamic type stubs file alongside the libraries files. This is dynamically updated to fit the currently encoded templates. It enabled IDEs to provide autocomplete on templates names as well as.

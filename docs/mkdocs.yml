@@ -9,13 +9,55 @@ repo_url: https://github.com/Ben-Brady/tempered
 
 theme:
   name: material
+  locale: en
   features:
     - content.code.copy
+  logo: favicon.ico
+
+  palette:
+  - media: '(prefers-color-scheme: light)'
+    scheme: default
+    primary: teal
+    accent: amber
+    toggle:
+      icon: material/lightbulb
+      name: Switch to dark mode
+  - media: '(prefers-color-scheme: dark)'
+    scheme: slate
+    primary: teal
+    accent: amber
+    toggle:
+      icon: material/lightbulb-outline
+      name: Switch to light mode
 
 nav:
-  - Home: index.md
-  - Templating: templating.md
-  - Examples: examples.md
+- Introduction: readme.md
+- Home: index.md
+- Quickstart: quickstart.md
+- Reference:
+  - reference/tempered.md
+- Templating: templating.md
+- Examples: examples.md
+
+plugins:
+  mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_heading: true
+          show_if_no_docstring: true
+          inherited_members: true
+          members_order: source
+          separate_signature: true
+          unwrap_annotated: true
+          filters:
+            - '!^_'
+          merge_init_into_class: true
+          docstring_section_style: spacy
+          signature_crossrefs: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
