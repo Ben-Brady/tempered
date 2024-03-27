@@ -6,6 +6,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://ben-brady.github.io/tempered/configuration/</loc>
+         <lastmod>2024-03-27</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://ben-brady.github.io/tempered/examples/</loc>
          <lastmod>2024-03-27</lastmod>
          <changefreq>daily</changefreq>
