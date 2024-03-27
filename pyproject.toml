@@ -18,6 +18,10 @@ dependencies = [
 requires-python = ">=3.7"
 
 [project.optional-dependencies]
+all = [
+    "libsass",
+    "lxml",
+]
 sass = ["libsass"]
 test = [
     "pytest",
