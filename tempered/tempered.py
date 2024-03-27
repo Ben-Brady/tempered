@@ -26,11 +26,11 @@ class Tempered:
 
         self._generate_types = generate_types
         if template_folder:
-            self.add_template_folder(template_folder)
+            self.add_templates_from_folder(template_folder)
         if static_folder:
             self.static_folder = Path(static_folder)
 
-    def add_template(self, file: t.Union[Path, str]):
+    def add_template_from_file(self, file: t.Union[Path, str]):
         file = Path(file)
         self.template_files.append(file)
 
@@ -40,7 +40,7 @@ class Tempered:
         self._module.build_templates([template])
         self._reconstruct_types()
 
-    def add_template_folder(self, folder: t.Union[Path, str]):
+    def add_templates_from_folder(self, folder: t.Union[Path, str]):
         folder = Path(folder)
         FOLDER_PREFIX = f"{folder}/"
         templates = []
@@ -60,7 +60,7 @@ class Tempered:
         self._module.build_templates([template])
         self._reconstruct_types()
 
-    def add_templates_from_string(self, templates: t.Mapping[str, str]):
+    def add_templates_from_mapping(self, templates: t.Mapping[str, str]):
         template_objs = [
             parser.parse_template(name, html, file=None)
             for name, html in templates.items()
@@ -68,7 +68,7 @@ class Tempered:
         self._module.build_templates(template_objs)
         self._reconstruct_types()
 
-    def render_from_string(self, html: str, **context: t.Any) -> str:
+    def render_template_from_string(self, html: str, **context: t.Any) -> str:
         if html in self._from_string_cache:
             func = self._from_string_cache[html]
         else:
@@ -149,7 +149,7 @@ class TemperedInterface(Tempered):
             generate_types=generate_types,
         )
 
-    def add_template(self, file: t.Union[Path, str]):
+    def add_template_from_file(self, file: t.Union[Path, str]):
         """Add a template from a file.
 
         **Example**
@@ -160,9 +160,9 @@ class TemperedInterface(Tempered):
         Args:
             file: The file to import as the template, the path will be used as it's name.
         """
-        Tempered.add_template(self, file)
+        Tempered.add_template_from_file(self, file)
 
-    def add_template_folder(self, folder: t.Union[Path, str]):
+    def add_templates_from_folder(self, folder: t.Union[Path, str]):
         """Imports templates from a folder
 
         Transforms all files in a folder into templates, using the file name as the template name.
@@ -172,7 +172,7 @@ class TemperedInterface(Tempered):
         Args:
             folder: Imports all files form this folder recursively, the name of the templatse are the filepath without the folder suffix
         """
-        Tempered.add_template_folder(self, folder)
+        Tempered.add_templates_from_folder(self, folder)
 
     def add_template_from_string(self, name: str, html: str):
         """Create a template from a string, specifying the name and contents.
@@ -193,7 +193,7 @@ class TemperedInterface(Tempered):
         """
         Tempered.add_template_from_string(self, name, html)
 
-    def add_templates_from_string(self, templates: t.Mapping[str, str]):
+    def add_templates_from_mapping(self, templates: t.Mapping[str, str]):
         """Add
 
         Useful for adding templates that depend on each other
@@ -201,7 +201,7 @@ class TemperedInterface(Tempered):
         Args:
             templates: A dictionary of template names and their content
         """
-        Tempered.add_templates_from_string(self, templates)
+        Tempered.add_templates_from_mapping(self, templates)
 
     def render_template(self, name: str, **context: t.Any) -> str:
         """Renders a template using the given parameters
@@ -220,7 +220,7 @@ class TemperedInterface(Tempered):
         """
         return Tempered.render_template(self, name, **context)
 
-    def render_from_string(self, html: str, **context: t.Any) -> str:
+    def render_template_from_string(self, html: str, **context: t.Any) -> str:
         """
         Render a template from a string, useful for one-off templates.
 
@@ -230,7 +230,7 @@ class TemperedInterface(Tempered):
             html: The html of the template to render
             context: The paramemters to pass to the template
         """
-        return Tempered.render_from_string(self, html, **context)
+        return Tempered.render_template_from_string(self, html, **context)
 
     def add_global(self, name: str, value: t.Any):
         """

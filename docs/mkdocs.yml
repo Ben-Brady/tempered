@@ -34,9 +34,8 @@ nav:
 - Introduction: readme.md
 - Home: index.md
 - Quickstart: quickstart.md
-- Reference:
-  - reference/tempered.md
 - Templating: templating.md
+- Reference: reference/tempered.md
 - Examples: examples.md
 
 plugins:
@@ -52,7 +51,7 @@ plugins:
           unwrap_annotated: true
           filters:
             - '!^_'
-          merge_init_into_class: false
+          merge_init_into_class: true
           docstring_section_style: spacy
           signature_crossrefs: true
           show_symbol_type_heading: true
