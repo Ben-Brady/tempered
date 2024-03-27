@@ -50,6 +50,38 @@ Tempered is templating library designed around HTML and type safety.
 
 ---
 
+## Native CSS
+
+CSS is scoped per componenet and bundled together into a single stylesheet.
+
+```html
+<div>
+  <img src="https://picsum.photos/320/180" alt="Example Post">
+</div>
+
+<style lang="sass">
+  div {
+    box-sizing: content-box;
+    width: fit-content;
+    overflow: hidden;
+
+    border-radius: 1rem;
+    border: .15rem solid black;
+
+    img {
+      height: auto;
+      width: 10rem;
+    }
+  }
+</style>
+```
+
+--
+
+##
+
+---
+
 ## Example
 
 ```python
