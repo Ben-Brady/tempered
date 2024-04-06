@@ -46,6 +46,7 @@ Tempered is templating library designed around HTML and type safety.
 - **Layouts**: Templates can use layouts, based on jinja2's implementation
 - **Dynamically Typed**: Optional dynamic type information can be built with components for better intelisense.
 
+---
 
 ## Lightning Fast
 
@@ -91,10 +92,6 @@ CSS is scoped per componenet and bundled together into a single stylesheet.
   }
 </style>
 ```
-
---
-
-##
 
 ---
 
