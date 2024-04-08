@@ -1,4 +1,4 @@
-# site_url: https://example.com/
+site_url: https://ben-brady.github.io/tempered/
 docs_dir: docs
 
 site_name: Tempered
@@ -8,19 +8,30 @@ repo_name: Tempered
 repo_url: https://github.com/Ben-Brady/tempered
 
 nav:
-- Home: index.md
-- Quickstart: quickstart.md
-- Templating: templating.md
-- Reference: reference/tempered.md
-- Examples: examples.md
+- Introduction:
+  - Home: index.md
+  - Quickstart: introduction/quickstart.md
+- Documentation:
+  - Templating: documentation/templating.md
+  - Reference: documentation/reference.md
+  - Configuration: documentation/configuration.md
 
 theme:
   name: material
-  favicon: assets/favicon.png
-  locale: en
+  favicon: assets/logo-monochrome.svg
+  logo: assets/logo.svg
   features:
-    - content.code.copy
-
+    - content.code.copy # Add the copy to clipboard button to code blocks
+    - search # Add the search bar
+    - search.suggest # Add suggestions to search
+    - navigation.top
+    - navigation.tabs # Page tabs at the top
+    - navigation.instant # Preload pages
+    - navigation.tracking # Add anchor tag to url
+  extra:
+    social:
+      - icon: fontawesome/brands/github
+        link: https://github.com/Ben-Brady/tempered
   palette:
   - media: '(prefers-color-scheme: light)'
     scheme: default
@@ -39,6 +50,8 @@ theme:
 
 
 plugins:
+  search: # Add the search bar
+  offline:
   mkdocstrings:
     handlers:
       python:

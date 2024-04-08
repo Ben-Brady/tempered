@@ -1,6 +1,6 @@
 <p align="center">
     <img
-        src="https://github.com/Ben-Brady/tempered/assets/64110708/83979e4d-1b70-42f5-a814-b9c63f2e222d"
+        src="https://github.com/Ben-Brady/tempered/assets/64110708/e2cd3ecf-0d01-47e1-a914-ff4976358739"
         alt="Tempered Banner"
     >
 </p>
@@ -8,6 +8,7 @@
 <p align="center">
     <em>A modern html templating library for python</em>
 </p>
+
 
 <p align="center">
   <a
@@ -24,11 +25,13 @@
   </a>
 </p>
 
+
 ---
 
-Documentation: [https://github.com/Ben-Brady/tempered/blob/main/docs/index.md](https://ben-brady.github.io/tempered/)
+Documentation: [https://Ben-Brady.github.io/tempered/](https://ben-brady.github.io/tempered/)
 
 Source Code: [https://github.com/Ben-Brady/tempered](https://github.com/Ben-Brady/tempered)
+
 
 ```python
 pip install tempered
@@ -42,6 +45,8 @@ Tempered is templating library designed around HTML and type safety.
 - **Component Based**: Each template is a components and can call other components
 - **Layouts**: Templates can use layouts, based on jinja2's implementation
 - **Dynamically Typed**: Optional dynamic type information can be built with components for better intelisense.
+
+---
 
 ## Lightning Fast
 
@@ -90,10 +95,6 @@ CSS is scoped per componenet and bundled together into a single stylesheet.
 
 ---
 
-##
-
----
-
 ## Example
 
 ```python
@@ -125,25 +126,3 @@ print(html)
 ```html
 <img alt="Example Post" src="/example.png" class=image-83dc><style>img.image-83dc{width:100px;height:100px}</style>
 ```
-
-## Type Generating
-
-By default, tempered will create a dynamic type stubs file alongside the libraries files. This is dynamically updated to fit the currently encoded templates. It enabled IDEs to provide autocomplete on templates names as well as.
-
-However, this may not play well with some IDEs. Additionally, it increases build times and uses IO to write the stubs file, it's recommended to disabled in production.
-
-It can be disabled by adding `generate_types=False` to the Tempered constructor.
-
-```python
-Tempered(generate_types=False)
-```
-
-## Performance
-
-If you want to increase build performance: install `lxml`.
-
-This allows the HTML to parsed much faster and increases build times by 10-30%. However it requires C build tools and is not available on all platforms. If `lxml` installed, Tempered will use it by default.
-
-## Grammar
-
-The formal grammar specified in Extended Backus-Naur Form and can be found [here](https://github.com/Ben-Brady/tempered/blob/main/docs/grammar.ebnf).
