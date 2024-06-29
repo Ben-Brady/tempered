@@ -20,8 +20,8 @@ class TemperedModule:
         self.module = module
 
     def register_global(self, name: str, value: t.Any):
-        register_global = self.module.__dict__[constants.REGISTER_GLOBAL_FUNC]
-        register_global(name, value)
+        module_register_global = self.module.__dict__[constants.REGISTER_GLOBAL_FUNC]
+        module_register_global(name, value)
 
     def get_templates(self) -> t.List[parser.Template]:
         return self.module.__dict__[constants.TEMPLATE_LIST_VAR]
