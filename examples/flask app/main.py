@@ -13,17 +13,17 @@ tempered = Tempered("./templates")
 
 @app.get("/")
 def index():
-    return tempered.render_template("index.html")
+    return tempered.render("index.html")
 
 
 @app.get("/about")
 def about():
-    return tempered.render_template("about.html")
+    return tempered.render("about.html")
 
 
 @app.get("/contact")
 def contact():
-    return tempered.render_template("contact.html")
+    return tempered.render("contact.html")
 
 
 if __name__ == "__main__":
