@@ -2,7 +2,7 @@ from __future__ import annotations
 import zlib
 from pathlib import Path
 import typing_extensions as t
-from . import module, parser, render
+from . import module, parser, types
 
 
 class Tempered:
@@ -26,22 +26,23 @@ class Tempered:
 
         self._generate_types = generate_types
         if template_folder:
-            self.add_templates_from_folder(template_folder)
+            self.add_from_folder(template_folder)
         if static_folder:
             self.static_folder = Path(static_folder)
 
-    def add_template_from_file(self, file: t.Union[Path, str]):
+    def add_from_file(self, file: t.Union[Path, str]):
         file = Path(file)
-        self.template_files.append(file)
 
+        self.template_files.append(file)
         name = str(file)
         html = file.read_text()
         template = parser.parse_template(name, html, file)
         self._module.build_templates([template])
         self._reconstruct_types()
 
-    def add_templates_from_folder(self, folder: t.Union[Path, str]):
+    def add_from_folder(self, folder: t.Union[Path, str]):
         folder = Path(folder)
+
         FOLDER_PREFIX = f"{folder}/"
         templates = []
         for file in folder.glob("**/*.*"):
@@ -55,12 +56,12 @@ class Tempered:
         self._module.build_templates(templates)
         self._reconstruct_types()
 
-    def add_template_from_string(self, name: str, html: str):
+    def add_from_string(self, name: str, html: str):
         template = parser.parse_template(name, html, file=None)
         self._module.build_templates([template])
         self._reconstruct_types()
 
-    def add_templates_from_mapping(self, templates: t.Mapping[str, str]):
+    def add_mapping(self, templates: t.Mapping[str, str]):
         template_objs = [
             parser.parse_template(name, html, file=None)
             for name, html in templates.items()
@@ -68,7 +69,7 @@ class Tempered:
         self._module.build_templates(template_objs)
         self._reconstruct_types()
 
-    def render_template_from_string(self, html: str, **context: t.Any) -> str:
+    def render_string(self, html: str, **context: t.Any) -> str:
         if html in self._from_string_cache:
             func = self._from_string_cache[html]
         else:
@@ -81,29 +82,22 @@ class Tempered:
 
         return func(**context)
 
-    def render_template(self, name: str, **context: t.Any) -> str:
+    def render(self, name: str, **context: t.Any) -> str:
         func = self._module.get_template_func(name)
         return func(**context)
 
     def add_global(self, name: str, value: t.Any):
         self._module.register_global(name, value)
 
-    TFunc = t.TypeVar("TFunc", bound=t.Callable)
-
-    def global_func(self, func: TFunc) -> TFunc:
-        self._module.register_global(func.__name__, func)
-        return func
-
-    _are_typed_deleted = False
+    _has_cleared_types = False
 
     def _reconstruct_types(self):
-        if not self._generate_types:
-            if not self._are_typed_deleted:
-                self._are_typed_deleted = True
-                render.clear_types()
-        else:
+        if self._generate_types:
             templates = self._module.get_templates()
-            render.build_types(templates)
+            types.build_types(templates)
+        elif not self._has_cleared_types:
+            self._has_cleared_types = True
+            types.clear_types()
 
 
 class TemperedInterface(Tempered):
@@ -147,7 +141,7 @@ class TemperedInterface(Tempered):
             generate_types=generate_types,
         )
 
-    def add_template_from_file(self, file: t.Union[Path, str]):
+    def add_from_file(self, file: t.Union[Path, str]):
         """Add a template from a file.
 
         Args:
@@ -155,12 +149,12 @@ class TemperedInterface(Tempered):
 
         **Example**
         ```python
-        tempered.add_template_from_file("index.html")
+        tempered.add_file("index.html")
         ```
         """
-        Tempered.add_template_from_file(self, file)
+        Tempered.add_from_file(self, file)
 
-    def add_templates_from_folder(self, folder: t.Union[Path, str]):
+    def add_from_folder(self, folder: t.Union[Path, str]):
         """Imports templates from a folder
 
         Transforms all files in a folder into templates, using the file name as the template name.
@@ -172,12 +166,12 @@ class TemperedInterface(Tempered):
 
         **Example**
         ```python
-        tempered.add_templates_from_folder("./additional_templates")
+        tempered.add_folder("./additional_templates")
         ```
         """
-        Tempered.add_templates_from_folder(self, folder)
+        Tempered.add_from_folder(self, folder)
 
-    def add_template_from_string(self, name: str, html: str):
+    def add_from_string(self, name: str, html: str):
         """
         Create a template from a string, specifying the name and contents.
 
@@ -187,7 +181,7 @@ class TemperedInterface(Tempered):
 
         **Example**
         ```python
-        tempered.add_template_from_string("title.html", \"""
+        tempered.add_string("title.html", \"""
             {% param title: str %}
             <h1>
                 {{ title }}
@@ -196,19 +190,28 @@ class TemperedInterface(Tempered):
         ```
 
         """
-        Tempered.add_template_from_string(self, name, html)
+        Tempered.add_from_string(self, name, html)
 
-    def add_templates_from_mapping(self, templates: t.Mapping[str, str]):
-        """Add
+    def add_mapping(self, templates: t.Mapping[str, str]):
+        """Add mult
 
         Useful for adding templates that depend on each other
 
         Args:
             templates: A dictionary of template names and their content
-        """
-        Tempered.add_templates_from_mapping(self, templates)
 
-    def render_template(self, name: str, **context: t.Any) -> str:
+        **Example**
+        ```python
+        tempered.add_template_from_string("title.html", \"""
+            {% param title: str %}
+            <h1>
+                {{ title }}
+            </h1>
+        \""")
+        """
+        Tempered.add_mapping(self, templates)
+
+    def render(self, name: str, **context: t.Any) -> str:
         """Renders a template using the given parameters
 
         Args:
@@ -217,15 +220,15 @@ class TemperedInterface(Tempered):
 
         **Example**
         ```python
-        html = tempered.render_template(
+        html = tempered.render(
             "user.html",
             name="Ben Brady",
         )
         ```
         """
-        return Tempered.render_template(self, name, **context)
+        return Tempered.render(self, name, **context)
 
-    def render_template_from_string(self, html: str, **context: t.Any) -> str:
+    def render_string(self, html: str, **context: t.Any) -> str:
         """
         Render a template from a string, useful for one-off templates.
 
@@ -238,13 +241,13 @@ class TemperedInterface(Tempered):
         **Example**
 
         ```python
-        tempered.render_template_from_string(
+        tempered.render_string(
             "<h1> User - {{ name }} </h1>",
             name="Ben Brady",
         )
         ```
         """
-        return Tempered.render_template_from_string(self, html, **context)
+        return Tempered.render_string(self, html, **context)
 
     def add_global(self, name: str, value: t.Any):
         """
@@ -261,25 +264,3 @@ class TemperedInterface(Tempered):
         ```
         """
         Tempered.add_global(self, name, value)
-
-
-    TFunc = t.TypeVar("TFunc", bound=t.Callable)
-    def global_func(self, func: TFunc) -> TFunc:
-        """A decorator to insert a function into the templating context
-
-        **Example**
-
-        ```python
-        @tempered.global_func
-        def format_as_ddmmyyyy(date: datetime):
-            return date.strftime("%d/%m/%Y")
-        ```
-
-        ```html
-        <span>
-            {{ format_as_ddmmyyyy(user.created_at) }}
-        </span>
-        ```
-        """
-        return Tempered.global_func(self, func)
-
