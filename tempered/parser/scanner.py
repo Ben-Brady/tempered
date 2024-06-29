@@ -46,7 +46,7 @@ class Scanner(t.Generic[TToken]):
 
 class TextScanner:
     original: str
-    position: int = 0
+    pointer: int = 0
     file: t.Union[Path, None]
     text: str
 
@@ -57,19 +57,18 @@ class TextScanner:
 
     @property
     def has_text(self) -> bool:
-        return len(self.text) != 0
+        return self.pointer < len(self.text)
 
     def pop(self) -> str:
-        char = self.text[0]
-        self.text = self.text[1:]
+        char = self.text[self.pointer]
+        self.pointer += 1
         return char
 
     def accept(self, text: str) -> bool:
         if not self.startswith(text):
             return False
 
-        self.text = self.text[len(text) :]
-        self.position += len(text)
+        self.pointer += len(text)
         return True
 
     def expect(self, *text: str):
@@ -81,7 +80,7 @@ class TextScanner:
         raise self.error(f"Expected {match!r}")
 
     def startswith(self, text: str) -> bool:
-        prefix = self.text[: len(text)]
+        prefix = self.text[self.pointer : self.pointer + len(text)]
         return prefix == text
 
     def startswith_many(self, *text: str) -> bool:
@@ -99,7 +98,6 @@ class TextScanner:
         for _ in range(length):
             popped_text += self.pop()
 
-        self.position += length
         return popped_text
 
     def take_optional(self, *text: str) -> t.Union[str, None]:
@@ -147,5 +145,5 @@ class TextScanner:
             msg=msg,
             file=self.file,
             source=self.original,
-            position=self.position,
+            position=self.pointer,
         )
