@@ -33,27 +33,27 @@ def extract_css_from_html(body: str, prefix: str = "tempered") -> t.Tuple[html, 
     scoped.apply_scope_to_soup(soup, scope_id)
     for tag in style_tags:
         try:
-            styles = tag.text
-            is_global = tag.has_attr("global")
-            lang = tag.get("lang", None)
-            if isinstance(lang, list):
-                lang = lang[0]
-            styles = transform_style_tag(styles, scope_id, is_global, lang)
-        except Exception:
-            warnings.warn(message="Failed to parse CSS", category=errors.ParsingWarning)
-            styles = ""
+            css += transform_style_tag(tag, scope_id)
+        except Exception as e:
+            warnings.warn(
+                message="Failed to parse CSS",
+                category=errors.ParsingWarning,
+            )
 
-        css += styles
         tag.decompose()
 
     html = soup.decode()
     return html, css
 
 
-def transform_style_tag(
-    css: str, scope: str, is_global: bool, lang: t.Union[str, None]
-) -> str:
-    if lang == "scss" or lang == "sass":
+def transform_style_tag(tag: bs4.Tag, scope: str) -> str:
+    css = tag.text
+    is_global = tag.has_attr("global")
+    lang = tag.get("lang", None)
+    if isinstance(lang, list):
+        lang = lang[0]
+
+    if lang in ("sass", "scss"):
         css = sass.transform_sass(css, lang)
 
     if is_global:
