@@ -12,19 +12,17 @@ except ImportError:
 def transform_sass(css: str, lang: t.Literal["sass", "scss"]) -> str:
     if sass is None:
         warnings.warn(
-            message="sass support not installed, run `pip install tempered[sass]`",
+            message='sass support not installed, run "pip install tempered[sass]"',
             category=errors.ParsingWarning,
         )
         return ""
 
-    if lang == "sass":
+    is_indented = lang == "sass"
+    if is_indented:
         css = textwrap.dedent(css)
-        indented = True
-    else:
-        indented = False
 
     return sass.compile(
         string=css,
-        indented=indented,  # sass/css rules
+        indented=is_indented,  # sass/css rules
         output_style="compressed",
     )
