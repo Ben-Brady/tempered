@@ -23,6 +23,7 @@ LiteralType: t.TypeAlias = t.Union[
 
 def Constant(value: LiteralType) -> ast.expr:
     CONSTANT_TYPES = (NoneType, str, bytes, bool, int, float, complex)
+
     if isinstance(value, list):
         return List(value)
     elif isinstance(value, set):
@@ -138,19 +139,26 @@ def Arguments(
     )
 
 
+def Starred(value: ast.expr):
+    return ast.Starred(
+        value=value,
+        ctx=ast.Load(),
+    )
+
+
 def Function(
     name: str,
     args: ast.arguments,
-    body: Sequence[ast.AST],
+    body: Sequence[ast.stmt],
     returns: t.Union[ast.expr, None] = None,
     decorators: Sequence[ast.expr] = [],
 ) -> ast.FunctionDef:
     return ast.FunctionDef(
         name=name,
         args=args,
-        body=body,
+        body=list(body),
         returns=returns,
-        decorator_list=decorators,
+        decorator_list=list(decorators),
         type_params=[],
     )
 
@@ -412,6 +420,7 @@ def parse(code: str) -> t.List[ast.stmt]:
 
 def unparse(node: ast.AST):
     if sys.version_info >= (3, 9):
+        ast.fix_missing_locations(node)
         return ast.unparse(node)
     else:
         import astor
