@@ -8,11 +8,11 @@ def build_template(
     globals: t.Dict[str, t.Any],
 ) -> t.Callable[..., str]:
     tempered = Tempered()
-    tempered.add_template_from_string("test", template)
+    tempered.add_from_string("test", template)
     for name, value in globals.items():
         tempered.add_global(name, value)
 
-    return partial(tempered.render_template, "test")
+    return partial(tempered.render, "test")
 
 
 def test_globals_are_accessble_in_templates():

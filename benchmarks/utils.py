@@ -39,4 +39,4 @@ def setup_tempered(folder: str, template: str, context: dict) -> Callable[[], st
     from tempered import Tempered
 
     env = Tempered(template_folder=folder, generate_types=False)
-    return lambda: env.render_template(template, **context)
+    return lambda: env.render(template, **context)

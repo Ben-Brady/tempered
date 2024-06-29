@@ -13,8 +13,8 @@ def test(name: str):
 
 def build_template(template: str) -> Callable:
     env = tempered.Tempered()
-    env.add_template_from_string("main", template)
-    return partial(env.render_template, "main")
+    env.add_from_string("main", template)
+    return partial(env.render, "main")
 
 
 def build_templates(template: str, *other_templates: t.Tuple[str, str]) -> Callable:
@@ -22,5 +22,5 @@ def build_templates(template: str, *other_templates: t.Tuple[str, str]) -> Calla
 
     templates = {name: body for (name, body) in other_templates}
     templates["main"] = template
-    env.add_templates_from_mapping(templates)
-    return partial(env.render_template, "main")
+    env.add_mapping(templates)
+    return partial(env.render, "main")
