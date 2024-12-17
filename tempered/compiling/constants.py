@@ -14,7 +14,8 @@ KWARGS_VAR = "context"
 
 FILE_HEADER = f"""
 from __future__ import annotations as _
-from tempered._internals import escape as {ESCAPE_FUNC}, Template as __Template
+from tempered._internals import escape as {ESCAPE_FUNC}
+from tempered.parsing import Template as __Template
 import typing_extensions as t
 
 {GLOBALS_VAR} = {{}}

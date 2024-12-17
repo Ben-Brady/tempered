@@ -2,12 +2,13 @@ from __future__ import annotations
 import zlib
 from pathlib import Path
 import typing_extensions as t
-from .template.template import parse_template
+from .template import parse_template
 from . import module, types
 
 
 class TemperedBase:
     template_files: t.List[Path]
+    static_folder: t.Optional[Path]
 
     _module: module.TemperedModule
     _from_string_cache: t.Dict[str, t.Callable[..., str]]
@@ -17,6 +18,7 @@ class TemperedBase:
         self,
         *,
         template_folder: t.Union[str, Path, None] = None,
+        static_folder: t.Union[str, Path, None] = None,
         generate_types: bool = True,
     ):
         self._from_string_cache = {}
@@ -26,6 +28,8 @@ class TemperedBase:
         self._generate_types = generate_types
         if template_folder:
             self.add_from_folder(template_folder)
+        if static_folder:
+            self.static_folder = Path(static_folder)
 
     def add_from_file(self, file: t.Union[Path, str]):
         file = Path(file)
@@ -58,7 +62,7 @@ class TemperedBase:
         self._module.build_templates([template])
         self._reconstruct_types()
 
-    def add_from_mapping(self, templates: t.Mapping[str, str]):
+    def add_mapping(self, templates: t.Mapping[str, str]):
         template_objs = [
             parse_template(name, html, file=None)
             for name, html in templates.items()
@@ -121,17 +125,20 @@ class Tempered(TemperedBase):
         self,
         *,
         template_folder: t.Union[str, Path, None] = None,
+        static_folder: t.Union[str, Path, None] = None,
         generate_types: bool = True,
-        **kwargs,
+        **context,
     ):
         """
         Args:
             template_folder: The folder to import templates from, searches recursively
+            static_folder: The folder to import static assets from, searches recursively
             generate_types: Should type declarations be created for templates? This improves developer experience, however requires IO and can be disabled in production for a small build-time performance boost.
         """
         TemperedBase.__init__(
             self,
             template_folder=template_folder,
+            static_folder=static_folder,
             generate_types=generate_types,
         )
 
@@ -186,7 +193,7 @@ class Tempered(TemperedBase):
         """
         TemperedBase.add_from_string(self, name, html)
 
-    def add_from_mapping(self, templates: t.Mapping[str, str]):
+    def add_mapping(self, templates: t.Mapping[str, str]):
         """Add mult
 
         Useful for adding templates that depend on each other
@@ -203,7 +210,7 @@ class Tempered(TemperedBase):
             </h1>
         \""")
         """
-        TemperedBase.add_from_mapping(self, templates)
+        TemperedBase.add_mapping(self, templates)
 
     def render(self, name: str, **context: t.Any) -> str:
         """Renders a template using the given parameters

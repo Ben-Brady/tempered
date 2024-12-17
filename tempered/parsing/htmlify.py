@@ -2,7 +2,7 @@ import random
 import typing_extensions as t
 
 from ..tagbuilding import tags
-from ..parsing import nodes
+from . import nodes
 from ..utils.scanner import TextScanner
 
 TOKEN_LENGTH = 16

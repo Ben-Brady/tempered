@@ -1,7 +1,7 @@
 import ast
 import string
 import typing_extensions as t
-from ..utils import ast_utils
+from .. import ast_utils
 from . import constants
 
 

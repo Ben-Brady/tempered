@@ -7,7 +7,7 @@ from .tags import (
     BlockStartTag, BlockEndTag, LayoutTag, IncludeTag, ParameterTag
 )
 from ..lexing import lexer
-from ..utils import ast_utils
+from .. import ast_utils
 from ..parsing import nodes
 from ..utils.scanner import Scanner
 
