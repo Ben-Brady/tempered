@@ -3,10 +3,10 @@ import zlib
 from pathlib import Path
 import typing_extensions as t
 from .template import parse_template
-from . import module, parsing, types
+from . import module, types
 
 
-class Tempered:
+class TemperedBase:
     template_files: t.List[Path]
     static_folder: t.Optional[Path]
 
@@ -73,14 +73,14 @@ class Tempered:
     def render_string(self, html: str, **context: t.Any) -> str:
         if html in self._from_string_cache:
             func = self._from_string_cache[html]
-        else:
-            string_hash = hex(zlib.crc32(html.encode()))[2:]
-            name = f"string_{string_hash}>"
-            parsed_template = parse_template(name, html)
-            self._module.build_templates([parsed_template])
-            func = self._module.get_template_func(name)
-            self._from_string_cache[html] = func
+            return func(**context)
 
+        string_hash = hex(zlib.crc32(html.encode()))[2:]
+        name = f"string_{string_hash}>"
+        parsed_template = parse_template(name, html)
+        self._module.build_templates([parsed_template])
+        func = self._module.get_template_func(name)
+        self._from_string_cache[html] = func
         return func(**context)
 
     def render(self, name: str, **context: t.Any) -> str:
@@ -101,7 +101,7 @@ class Tempered:
             types.clear_types()
 
 
-class TemperedInterface(Tempered):
+class Tempered(TemperedBase):
     template_files: t.List[Path]
     """
     A readonly list of the any files used in templates.
@@ -135,7 +135,7 @@ class TemperedInterface(Tempered):
             static_folder: The folder to import static assets from, searches recursively
             generate_types: Should type declarations be created for templates? This improves developer experience, however requires IO and can be disabled in production for a small build-time performance boost.
         """
-        Tempered.__init__(
+        TemperedBase.__init__(
             self,
             template_folder=template_folder,
             static_folder=static_folder,
@@ -153,7 +153,7 @@ class TemperedInterface(Tempered):
         tempered.add_file("index.html")
         ```
         """
-        Tempered.add_from_file(self, file)
+        TemperedBase.add_from_file(self, file)
 
     def add_from_folder(self, folder: t.Union[Path, str]):
         """Imports templates from a folder
@@ -170,7 +170,7 @@ class TemperedInterface(Tempered):
         tempered.add_folder("./additional_templates")
         ```
         """
-        Tempered.add_from_folder(self, folder)
+        TemperedBase.add_from_folder(self, folder)
 
     def add_from_string(self, name: str, html: str):
         """
@@ -191,7 +191,7 @@ class TemperedInterface(Tempered):
         ```
 
         """
-        Tempered.add_from_string(self, name, html)
+        TemperedBase.add_from_string(self, name, html)
 
     def add_mapping(self, templates: t.Mapping[str, str]):
         """Add mult
@@ -210,7 +210,7 @@ class TemperedInterface(Tempered):
             </h1>
         \""")
         """
-        Tempered.add_mapping(self, templates)
+        TemperedBase.add_mapping(self, templates)
 
     def render(self, name: str, **context: t.Any) -> str:
         """Renders a template using the given parameters
@@ -227,7 +227,7 @@ class TemperedInterface(Tempered):
         )
         ```
         """
-        return Tempered.render(self, name, **context)
+        return TemperedBase.render(self, name, **context)
 
     def render_string(self, html: str, **context: t.Any) -> str:
         """
@@ -248,7 +248,7 @@ class TemperedInterface(Tempered):
         )
         ```
         """
-        return Tempered.render_string(self, html, **context)
+        return TemperedBase.render_string(self, html, **context)
 
     def add_global(self, name: str, value: t.Any):
         """
@@ -264,4 +264,4 @@ class TemperedInterface(Tempered):
         tempered.add_global("DOMAIN", "example.com")
         ```
         """
-        Tempered.add_global(self, name, value)
+        TemperedBase.add_global(self, name, value)
