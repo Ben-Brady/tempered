@@ -1,8 +1,8 @@
 [project]
 name = "tempered"
-authors = [{name = "Ben Brady", email = "benbrady04.bb@gmail.com"}]
+authors = [{ name = "Ben Brady", email = "benbrady04.bb@gmail.com" }]
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 classifiers = ["License :: OSI Approved :: MIT License"]
 description = "A fast, strongly typed html templating library for python"
 dynamic = ["version"]
@@ -18,26 +18,11 @@ dependencies = [
 requires-python = ">=3.7"
 
 [project.optional-dependencies]
-all = [
-    "libsass",
-    "lxml",
-]
+all = ["libsass", "lxml"]
 sass = ["libsass"]
-test = [
-    "pytest",
-    "pytest-asyncio",
-    "mypy",
-]
-dev = [
-    "black",
-    "isort",
-    "autoflake",
-]
-docs = [
-    "mkdocs",
-    "mkdocs-material",
-    "mkdocstrings[crystal,python]",
-]
+test = ["pytest", "pytest-asyncio", "mypy"]
+dev = ["black", "isort", "autoflake", "Flake8-pyproject"]
+docs = ["black", "mkdocs", "mkdocs-material", "mkdocstrings[crystal,python]"]
 
 [build-system]
 requires = ["flit_core >=3.2,<4"]
@@ -48,6 +33,12 @@ exclude = ["tests/", "benchmarks/", "examples/", ".github/"]
 
 [tool.black]
 target-version = ["py37", "py38", "py39", "py310", "py311"]
+
+[tool.flake8]
+ignore = ['E231', 'E241', "F403"]
+per-file-ignores = ['__init__.py:F401']
+max-line-length = 100
+count = true
 
 [tool.isort]
 profile = "black"
