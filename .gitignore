@@ -180,3 +180,4 @@ examples/build_to/components.py
 tempered/render.pyi
 
 docs/site
+tempered/tempered.pyi
