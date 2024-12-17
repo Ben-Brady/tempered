@@ -5,7 +5,7 @@ import typing_extensions as t
 from .template import parse_template
 from . import module, parsing, types
 
-class Tempered:
+class TemperedBase:
     template_files: t.List[Path]
     static_folder: t.Optional[Path]
     _module: module.TemperedModule
@@ -40,7 +40,7 @@ class Tempered:
     def _reconstruct_types(self):
         ...
 
-class TemperedInterface(Tempered):
+class Tempered(TemperedBase):
     template_files: t.List[Path]
     '\n    A readonly list of the any files used in templates.\n\n    This is useful for watchdog and code refreshing tools.\n\n    **Example in Flask**\n\n    ```python\n    app = Flask()\n\n    if __name__ == "__main__":\n        app.run(\n            extra_files=tempered.template_files,\n            # Flask now reloads when a template changes\n        )\n    ```\n    '
 

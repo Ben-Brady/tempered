@@ -41,7 +41,7 @@ def insert_render_overloads(
     class_def = find(
         module.body,
         type=ast.ClassDef,
-        condition=lambda node: node.name == "TemperedInterface"
+        condition=lambda node: node.name == "Tempered"
     )
     render_func = find(
         class_def.body,

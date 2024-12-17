@@ -10,7 +10,7 @@ from .introspection import introspecter
 from .utils.minify import minify_html
 from .css.extract import extract_css_from_html
 from .parsing import htmlify, nodes, postprocess
-from .tagbuilding.tags import parse_tokens_to_tags
+from .tagbuilding.builder import parse_tokens_to_tags
 
 
 def parse_template(
