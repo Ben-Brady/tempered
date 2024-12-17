@@ -49,6 +49,10 @@ def build_types(templates: t.List[parsing.Template]) -> None:
         finally:
             file_lock.release()
 
+    thread = Thread(target=inner)
+    thread.daemon = True
+    thread.start()
+
 
 def insert_render_overloads(
     module: ast.Module,
