@@ -1,6 +1,6 @@
 import pytest
 import tempered
-from tempered.template import parse_template
+from tempered.src.template.template import parse_template
 
 
 def test_invalid_end_block():

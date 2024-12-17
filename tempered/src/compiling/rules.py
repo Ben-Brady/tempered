@@ -1,7 +1,7 @@
 from __future__ import annotations
 import ast
 import typing_extensions as t
-from .. import ast_utils
+from ..utils import ast_utils
 from ..parsing.nodes import (
     AssignmentNode, BlockNode, ComponentNode, ExprNode, ForNode, HtmlNode, IfNode,
     ImportNode, Node, RawExprNode, SlotNode, StyleNode,

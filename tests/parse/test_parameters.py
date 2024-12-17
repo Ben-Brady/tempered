@@ -2,9 +2,9 @@ import ast
 import sys
 import pytest
 import typing_extensions as t
-from tempered import ast_utils
-from tempered.template import parse_template
-from tempered.parsing import nodes
+from tempered.src.utils import ast_utils
+from tempered.src.template.template import parse_template
+from tempered.src.parsing import nodes
 
 
 class Unset:

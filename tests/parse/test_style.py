@@ -1,6 +1,6 @@
 import bs4
-from tempered.css.extract import extract_css_from_html
-from tempered.css.postprocess import minify_css
+from tempered.src.css.extract import extract_css_from_html
+from tempered.src.css.postprocess import minify_css
 
 
 def test_preprocess_extracts_style_tags():
