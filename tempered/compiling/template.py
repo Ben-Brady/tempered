@@ -99,8 +99,8 @@ def construct_arguments(arguments: t.List[TemplateParameter]) -> ast.arguments:
     )
 
 
-def construct_body(ctx: BuildContext) -> t.Sequence[ast.AST]:
-    statements: t.List[ast.AST] = []
+def construct_body(ctx: BuildContext) -> t.Sequence[ast.stmt]:
+    statements: t.List[ast.stmt] = []
     if ctx.is_layout or ctx.uses_layout:
         statements.extend(create_style_contant(ctx))
 
