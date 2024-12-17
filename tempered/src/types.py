@@ -2,42 +2,61 @@
 import ast
 from pathlib import Path
 import typing_extensions as t
-from . import ast_utils, parsing
+from threading import Thread, Lock
+
+from .utils import ast_utils
+from . import parsing
+from .utils.find import find
 
 ORIGINAL_FILE = Path(__file__).parent.joinpath("tempered.py")
 TYPES_FILE = ORIGINAL_FILE.with_suffix(".pyi")
+file_lock = Lock()
 
 
 def clear_types() -> None:
-    try:
-        TYPES_FILE.unlink()
-    except Exception:
-        pass
+    def inner():
+        file_lock.acquire(blocking=True)
+        try:
+            TYPES_FILE.unlink()
+        except Exception:
+            pass
+        finally:
+            file_lock.release()
+
+    thread = Thread(target=inner)
+    thread.daemon = True
+    thread.start()
 
 
 def build_types(templates: t.List[parsing.Template]) -> None:
-    source = ORIGINAL_FILE.read_text()
-    body = ast_utils.parse(source)
-    module = ast_utils.Module(body)
+    def inner():
+        source = ORIGINAL_FILE.read_text()
+        body = ast_utils.parse(source)
+        module = ast_utils.Module(body)
 
-    render_func_overloads = [
-        create_render_func_overload(template)
-        for template in templates
-    ]
-    insert_render_overloads(module, render_func_overloads)
-    remove_function_bodys(module)
+        render_func_overloads = [
+            create_render_func_overload(template)
+            for template in templates
+        ]
+        insert_render_overloads(module, render_func_overloads)
+        remove_function_bodys(module)
 
-    source = ast_utils.unparse(module)
-    TYPES_FILE.write_text(source)
+        source = ast_utils.unparse(module)
+
+        file_lock.acquire(blocking=True)
+        try:
+            TYPES_FILE.write_text(source)
+        finally:
+            file_lock.release()
+
 
 def insert_render_overloads(
     module: ast.Module,
     render_func_overloads: "list[ast.FunctionDef]",
-    ):
+):
     if len(render_func_overloads) == 0:
         return
 
-    index = 0
     class_def = find(
         module.body,
         type=ast.ClassDef,
@@ -57,13 +76,9 @@ def insert_render_overloads(
         index = class_def.body.index(render_func)
         class_def.body.insert(index, overload)
 
-T = t.TypeVar("T", infer_variance=True)
-def find(array: t.Iterable[t.Any], type: t.Type[T], condition: t.Callable[[T], bool]) -> T:
-    for item in array:
-        if isinstance(item, type) and condition(item):
-            return item
+    index = class_def.body.index(render_func)
+    class_def.body.insert(index, default_render_func)
 
-    raise ValueError("Item not found")
 
 def create_render_func_overload(template: parsing.Template) -> ast.FunctionDef:
     def create_t_literal(value: str) -> ast.expr:

@@ -1,15 +1,11 @@
-from . import nodes
+from ..parsing import nodes
 from ..introspection.introspecter import TemplateInfo
-from .nodes import TemplateBlock
-
-
-def postprocess(body: TemplateBlock, info: TemplateInfo, css: str) -> TemplateBlock:
-    body = place_default_style_node(body, info, css)
-    return body
-
+from ..parsing.nodes import TemplateBlock
 
 def place_default_style_node(
-    body: TemplateBlock, info: TemplateInfo, css: str
+    body: TemplateBlock,
+    info: TemplateInfo,
+    css: str
 ) -> TemplateBlock:
     if info.styles_set:
         return body

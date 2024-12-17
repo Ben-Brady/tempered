@@ -1,5 +1,5 @@
-from tempered.template import parse_template
-from tempered.parsing import nodes
+from tempered.src.template.template import parse_template
+from tempered.src.parsing import nodes
 
 
 def test_parse_if_block():
