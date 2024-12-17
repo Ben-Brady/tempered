@@ -80,7 +80,7 @@ class TextScanner:
         raise self.error(f"Expected {match!r}")
 
     def startswith(self, text: str) -> bool:
-        prefix = self.text[self.pointer : self.pointer + len(text)]
+        prefix = self.text[self.pointer: self.pointer + len(text)]
         return prefix == text
 
     def startswith_many(self, *text: str) -> bool:
