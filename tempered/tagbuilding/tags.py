@@ -3,9 +3,11 @@ import ast
 from abc import ABC
 from dataclasses import dataclass
 import typing_extensions as t
+
+from ..lexing import lexer
 from .. import ast_utils
-from . import lexer, template_ast
-from .scanner import Scanner
+from ..parsing import nodes
+from ..utils.scanner import Scanner
 
 
 class CompositeTag(ABC):
@@ -85,7 +87,7 @@ class ParameterTag(PragmaTag):
     default: t.Union[ast.expr, None] = None
 
 
-Tag: t.TypeAlias = t.Union[CompositeTag, PragmaTag, template_ast.SingleTagNode]
+Tag: t.TypeAlias = t.Union[CompositeTag, PragmaTag, nodes.SingleTagNode]
 TokenScanner: t.TypeAlias = Scanner[lexer.Token]
 
 
@@ -107,7 +109,7 @@ def _next_tag(scanner: TokenScanner) -> Tag:
 
     token = scanner.pop()
     if isinstance(token, lexer.HtmlToken):
-        return template_ast.HtmlNode(token.html)
+        return nodes.HtmlNode(token.html)
     else:
         raise ValueError(f"Unknown token {token}")
 
@@ -116,7 +118,7 @@ def _next_expr_tag(scanner: TokenScanner) -> Tag:
     scanner.expect(lexer.ExprStartToken)
     expr = take_python_expr(scanner)
     scanner.expect(lexer.ExprEndToken)
-    return template_ast.ExprNode(expr)
+    return nodes.ExprNode(expr)
 
 
 def next_statement_tag(scanner: TokenScanner) -> Tag:
@@ -134,10 +136,10 @@ def next_statement_tag(scanner: TokenScanner) -> Tag:
         "endslot": lambda _: SlotEndTag(),
         "block": lambda _: BlockStartTag(take_ident_token(scanner)),
         "endblock": lambda _: BlockEndTag(),
-        "html": lambda _: template_ast.RawExprNode(take_python_expr(scanner)),
+        "html": lambda _: nodes.RawExprNode(take_python_expr(scanner)),
         "set": _next_assign_tag,
         "layout": lambda _: LayoutTag(take_string_token(scanner)),
-        "styles": lambda _: template_ast.StyleNode(),
+        "styles": lambda _: nodes.StyleNode(),
         "include": lambda _: IncludeTag(take_string_token(scanner)),
         "import": _next_import_tag,
         "param": _next_param_tag,
@@ -158,7 +160,7 @@ def _next_component_tag(scanner: TokenScanner) -> Tag:
         for keyword in call.keywords
         if keyword.arg is not None
     }
-    return template_ast.ComponentNode(
+    return nodes.ComponentNode(
         component_name=call.func.id,
         keywords=keywords,
     )
@@ -168,7 +170,7 @@ def _next_assign_tag(scanner: TokenScanner) -> Tag:
     target = scanner.expect(lexer.IdentToken).name
     expect_keyword(scanner, "=")
     expr = take_python_expr(scanner)
-    return template_ast.AssignmentNode(
+    return nodes.AssignmentNode(
         target=ast_utils.Name(target),
         value=expr,
     )
@@ -178,7 +180,7 @@ def _next_import_tag(scanner: TokenScanner) -> Tag:
     target = scanner.expect(lexer.IdentToken).name
     expect_keyword(scanner, "from")
     name = take_string_token(scanner)
-    return template_ast.ImportNode(
+    return nodes.ImportNode(
         target=target,
         name=name,
     )

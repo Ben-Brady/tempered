@@ -3,8 +3,10 @@ from typing import Any
 
 SAFE_CONVERSIONS = (int, float)
 
+# Deferent verions have more performant versions
 if sys.version_info <= (3, 9):
     from markupsafe import escape_silent
+    #
 
     def escape(value: Any) -> str:
         if type(value) in SAFE_CONVERSIONS:

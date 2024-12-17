@@ -1,74 +1,21 @@
 import string
-from dataclasses import dataclass
 from pathlib import Path
 import typing_extensions as t
-from .scanner import TextScanner
+from ..utils.scanner import TextScanner
+from .tokens import (
+    Token, StatementStartToken, StatementEndToken, ExprStartToken, ExprEndToken,
+    HtmlToken, PythonExprToken, PythonStmtToken, StringToken, IdentToken, KeywordToken
+)
 
 CONTROL_ESCAPE = r"\{"
 EXPR_START = "{{"
 EXPR_END = "}}"
 STATEMENT_START = "{%"
 STATEMENT_END = "%}"
-IDENT_LETTERS = (
-    "abcdefghijklmnopqrstuvwxyz" "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "0123456789" "_"
-)
+IDENT_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 WHITESPACE = " \t\n\r\v\f"
 IDENT_START = string.ascii_letters + "_"
 IDENT_CONTINUE = IDENT_START + string.digits
-
-
-class Token:
-    pass
-
-
-@dataclass
-class StatementStartToken(Token):
-    pass
-
-
-@dataclass
-class StatementEndToken(Token):
-    pass
-
-
-@dataclass
-class ExprStartToken(Token):
-    pass
-
-
-@dataclass
-class ExprEndToken(Token):
-    pass
-
-
-@dataclass
-class HtmlToken(Token):
-    html: str
-
-
-@dataclass
-class PythonExprToken(Token):
-    expr: str
-
-
-@dataclass
-class PythonStmtToken(Token):
-    stmt: str
-
-
-@dataclass
-class StringToken(Token):
-    string: str
-
-
-@dataclass
-class IdentToken(Token):
-    name: str
-
-
-@dataclass
-class KeywordToken(Token):
-    keyword: str
 
 
 def to_token_stream(html: str, file: t.Union[Path, None] = None) -> t.Sequence[Token]:

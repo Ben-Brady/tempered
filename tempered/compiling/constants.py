@@ -15,7 +15,7 @@ KWARGS_VAR = "context"
 FILE_HEADER = f"""
 from __future__ import annotations as _
 from tempered._internals import escape as {ESCAPE_FUNC}
-from tempered import parser as __parser
+from tempered.parsing import Template as __Template
 import typing_extensions as t
 
 {GLOBALS_VAR} = {{}}
@@ -25,7 +25,7 @@ import typing_extensions as t
 def {REGISTER_GLOBAL_FUNC}(name: str, value: t.Any):
     {GLOBALS_VAR}[name] = value
 
-def {REGISTER_TEMPLATE_FUNC}(template: __parser.Template):
+def {REGISTER_TEMPLATE_FUNC}(template: __Template):
     {TEMPLATE_LIST_VAR}.append(template)
 
 

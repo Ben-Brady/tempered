@@ -4,7 +4,7 @@ from tinycss2.ast import AtRule, Node
 import typing_extensions as t
 
 
-def finalise_css(css: str) -> str:
+def postprocess_css(css: str) -> str:
     css = minify_css(css)
     css = place_font_imports_at_start(css)
     return css

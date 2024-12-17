@@ -49,7 +49,7 @@ def add_scope_to_rule(rule: QualifiedRule, scope: str):
 counter = 0
 
 
-def generate_scope_id(prefix: t.Union[str, None] = None) -> str:
+def generate_scope_id(prefix: t.Union[str, None]) -> str:
     global counter
     counter += 1
     id = str(counter).encode()
@@ -62,7 +62,7 @@ def generate_scope_id(prefix: t.Union[str, None] = None) -> str:
         return f"{prefix}-{hash[:6]}"
 
 
-def apply_scope_to_soup(soup: bs4.BeautifulSoup, scope_id: str):
+def apply_scope_to_soup(soup: bs4.BeautifulSoup, scope_id: str|None):
     for tag in soup.find_all():
         if is_tag_in_head(tag):
             continue

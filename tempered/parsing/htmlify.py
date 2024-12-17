@@ -1,7 +1,9 @@
 import random
 import typing_extensions as t
-from . import tags, template_ast
-from .scanner import TextScanner
+
+from ..tagbuilding import tags
+from . import nodes
+from ..utils.scanner import TextScanner
 
 TOKEN_LENGTH = 16
 
@@ -21,7 +23,7 @@ def convert_tags_to_valid_html(
     html = ""
     token_lookup: t.Dict[str, tags.Tag] = {}
     for tag in _tags:
-        if isinstance(tag, template_ast.HtmlNode):
+        if isinstance(tag, nodes.HtmlNode):
             html += tag.html
         else:
             token_id = generate_token_id()
@@ -42,7 +44,7 @@ def convert_tagged_html_to_tokens(
         known_keys = list(token_lookup.keys())
         text = scanner.take_until(known_keys)
         if len(text) > 0:
-            tokens_.append(template_ast.HtmlNode(text))
+            tokens_.append(nodes.HtmlNode(text))
 
         if not scanner.has_text:
             break

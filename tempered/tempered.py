@@ -2,7 +2,8 @@ from __future__ import annotations
 import zlib
 from pathlib import Path
 import typing_extensions as t
-from . import module, parser, types
+from .template import parse_template
+from . import module, parsing, types
 
 
 class Tempered:
@@ -36,7 +37,7 @@ class Tempered:
         self.template_files.append(file)
         name = str(file)
         html = file.read_text()
-        template = parser.parse_template(name, html, file)
+        template = parse_template(name, html, file)
         self._module.build_templates([template])
         self._reconstruct_types()
 
@@ -50,20 +51,20 @@ class Tempered:
             name = str(file)
             name = name[len(FOLDER_PREFIX) :]
             html = file.read_text()
-            template = parser.parse_template(name, html, file)
+            template = parse_template(name, html, file)
             templates.append(template)
 
         self._module.build_templates(templates)
         self._reconstruct_types()
 
     def add_from_string(self, name: str, html: str):
-        template = parser.parse_template(name, html, file=None)
+        template = parse_template(name, html, file=None)
         self._module.build_templates([template])
         self._reconstruct_types()
 
     def add_mapping(self, templates: t.Mapping[str, str]):
         template_objs = [
-            parser.parse_template(name, html, file=None)
+            parse_template(name, html, file=None)
             for name, html in templates.items()
         ]
         self._module.build_templates(template_objs)
@@ -75,7 +76,7 @@ class Tempered:
         else:
             string_hash = hex(zlib.crc32(html.encode()))[2:]
             name = f"string_{string_hash}>"
-            parsed_template = parser.parse_template(name, html)
+            parsed_template = parse_template(name, html)
             self._module.build_templates([parsed_template])
             func = self._module.get_template_func(name)
             self._from_string_cache[html] = func

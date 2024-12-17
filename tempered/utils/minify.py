@@ -1,5 +1,5 @@
 from string import whitespace
-from minify_html import minify  # type: ignore
+from minify_html import minify
 
 
 def minify_html(html: str) -> str:

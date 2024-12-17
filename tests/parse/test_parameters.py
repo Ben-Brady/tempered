@@ -3,7 +3,8 @@ import sys
 import pytest
 import typing_extensions as t
 from tempered import ast_utils
-from tempered.parser import parse_template, template_ast
+from tempered.template import parse_template
+from tempered.parsing import nodes
 
 
 class Unset:
@@ -36,7 +37,7 @@ def _assert_single_parameter(
 def test_parse_removes_parameters():
     template = parse_template("abc", "{%param a%}" "{%param b%}" "a")
     block = template.body[0]
-    assert isinstance(block, template_ast.HtmlNode)
+    assert isinstance(block, nodes.HtmlNode)
     assert "a" in block.html
 
 

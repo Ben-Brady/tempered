@@ -1,16 +1,23 @@
 from pathlib import Path
 import typing_extensions as t
-from .. import errors
-from ..css import extract_css_from_html
-from . import htmlify, introspection, lexer, postprocess, preprocess, template_ast, tree
-from .tags import parse_tokens_to_tags
+
+
+from . import errors
+from .parsing import parser
+
+from .lexing import lexer
+from .introspection import introspecter
+from .utils.minify import minify_html
+from .css.extract import extract_css_from_html
+from .parsing import htmlify, nodes, postprocess
+from .tagbuilding.tags import parse_tokens_to_tags
 
 
 def parse_template(
     name: str,
     html: str,
     file: t.Union[Path, None] = None,
-) -> template_ast.Template:
+) -> nodes.Template:
     try:
         return _parse_template(
             name=name,
@@ -32,7 +39,7 @@ def _parse_template(
     name: str,
     html: str,
     file: t.Union[Path, None],
-) -> template_ast.Template:
+) -> nodes.Template:
     # Convert tokens into constant character
     # This is to prevent HTML parsing mangling it
     tokens = lexer.to_token_stream(html, file=file)
@@ -41,15 +48,15 @@ def _parse_template(
 
     # Process HTML
     html, css = extract_css_from_html(html, prefix=name)
-    html = preprocess.minify_html(html)
+    html = minify_html(html)
     # Note: CSS in minified later
 
     # Reconvert the HTML back into tokens
     tags = htmlify.convert_tagged_html_to_tokens(html, token_lookup)
-    body = tree.parse_tags_to_template_ast(tags)
+    body = parser.parse_tags_to_template_ast(tags)
 
     # Postprocessing
-    info = introspection.create_template_info(tags, css)
+    info = introspecter.create_template_info(tags, css)
     body = postprocess.place_default_style_node(body, info, css)
 
     # Construct the final object
@@ -59,12 +66,12 @@ def _parse_template(
 def construct_template_obj(
     name: str,
     file: t.Optional[Path],
-    body: template_ast.TemplateBlock,
+    body: nodes.TemplateBlock,
     css: str,
-    info: introspection.TemplateInfo,
-) -> template_ast.Template:
+    info: introspecter.TemplateInfo,
+) -> nodes.Template:
     if not info.is_layout:
-        return template_ast.Template(
+        return nodes.Template(
             name=name,
             file=file,
             body=body,
@@ -77,7 +84,7 @@ def construct_template_obj(
             imports=info.imports,
         )
     else:
-        return template_ast.LayoutTemplate(
+        return nodes.LayoutTemplate(
             name=name,
             file=file,
             body=body,

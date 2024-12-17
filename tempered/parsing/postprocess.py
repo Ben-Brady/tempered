@@ -1,6 +1,6 @@
-from . import template_ast
-from .introspection import TemplateInfo
-from .template_ast import TemplateBlock
+from . import nodes
+from ..introspection.introspecter import TemplateInfo
+from .nodes import TemplateBlock
 
 
 def postprocess(body: TemplateBlock, info: TemplateInfo, css: str) -> TemplateBlock:
@@ -14,11 +14,11 @@ def place_default_style_node(
     if info.styles_set:
         return body
 
-    has_css = (
-        len(css) != 0
-        or len(info.style_includes) != 0
-        or len(info.components_calls) != 0
-    )
+    has_css = any((
+        len(css) != 0,
+        len(info.style_includes) != 0,
+        len(info.components_calls) != 0
+    ))
 
     # If there is no CSS and it's not a layout
     # If there can never be additional css
@@ -26,4 +26,4 @@ def place_default_style_node(
     if not info.is_layout and not has_css:
         return body
 
-    return [*body, template_ast.StyleNode()]
+    return [*body, nodes.StyleNode()]

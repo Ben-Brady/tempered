@@ -1,7 +1,9 @@
 import ast
 import typing_extensions as t
-from .. import ast_utils, parser
-from . import constants, preprocess, validate
+from .. import ast_utils
+from ..parsing.nodes import Template, LayoutTemplate
+from . import constants, validate
+from .css import generate_template_css
 from .template import create_template_function
 
 
@@ -10,8 +12,8 @@ def default_module_code() -> str:
 
 
 def create_template_functions_code(
-    templates: t.List[parser.Template],
-    existing_templates: t.List[parser.Template],
+    templates: t.List[Template],
+    existing_templates: t.List[Template],
 ) -> str:
     all_templates = [*templates, *existing_templates]
 
@@ -20,7 +22,7 @@ def create_template_functions_code(
     layout_lookup = {
         template.name: template
         for template in all_templates
-        if isinstance(template, parser.LayoutTemplate)
+        if isinstance(template, LayoutTemplate)
     }
 
     functions: t.List[ast.FunctionDef] = []
@@ -30,7 +32,7 @@ def create_template_functions_code(
         else:
             layout = layout_lookup[template.layout]
 
-        css = preprocess.generate_css(template, lookup)
+        css = generate_template_css(template, lookup)
         func = create_template_function(template, layout, css)
         functions.append(func)
 

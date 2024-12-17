@@ -2,7 +2,7 @@
 import ast
 from pathlib import Path
 import typing_extensions as t
-from . import ast_utils, parser
+from . import ast_utils, parsing
 
 ORIGINAL_FILE = Path(__file__).parent.joinpath("tempered.py")
 TYPES_FILE = ORIGINAL_FILE.with_suffix(".pyi")
@@ -15,7 +15,7 @@ def clear_types() -> None:
         pass
 
 
-def build_types(templates: t.List[parser.Template]) -> None:
+def build_types(templates: t.List[parsing.Template]) -> None:
     source = ORIGINAL_FILE.read_text()
     body = ast_utils.parse(source)
     module = ast_utils.Module(body)
@@ -65,7 +65,7 @@ def find(array: t.Iterable[t.Any], type: t.Type[T], condition: t.Callable[[T], b
 
     raise ValueError("Item not found")
 
-def create_render_func_overload(template: parser.Template) -> ast.FunctionDef:
+def create_render_func_overload(template: parsing.Template) -> ast.FunctionDef:
     def create_t_literal(value: str) -> ast.expr:
         return ast_utils.Index(
             ast_utils.create_expr("t.Literal"),
