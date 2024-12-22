@@ -5,8 +5,14 @@ from tests import build_template, test
 
 @test("Numeric expressions work")
 def _():
-    component = build_template("{{ 123 }}")
-    assert "123" in component()
+    component = build_template("{{ 2 + 3 }}")
+    assert "5" in component()
+
+
+@test("String expressions work")
+def _():
+    component = build_template("{{ 'a' + 'b@ }}")
+    assert "ab" in component()
 
 
 @test("HTML tags are escaped")
@@ -23,6 +29,21 @@ def _():
     """
     )
     assert "/test" in component()
+
+
+@test("Expression blocks allowed in attributes")
+def _():
+    link = "foo"
+    component = build_template(
+        """
+        <a href='/bar/{{link}}'></a>
+    """
+    )
+    html = component(link=link)
+    a_tag = bs4.BeautifulSoup(html, "html.parser").find("a")
+    assert isinstance(a_tag, bs4.Tag)
+    assert "href" in a_tag.attrs
+    assert a_tag.attrs["href"] == "/bar/foo"
 
 
 @test("Expression blocks are escaped in attributes")

@@ -1,24 +1,24 @@
-{%param refresh_url: str %}
-{%param percentage: float = 0.0%}
+<script type="tempered/metadata">
+parameters:
+    refresh_url: str
+    percentage:
+        type: float
+        default: 0.0
+</script>
 
 <div id="progress-bar">
-    {% if percentage < 100 %}
+    <t:if condition="percentage < 100">
         <div id="percentage-text">
             {{percentage}}%
         </div>
-        <div
-            id="completion"
-            style="width: {{ percentage }}%"
-            hx-get="{{refresh_url}}"
-            hx-trigger="every 1s"
-            hx-swap="outerHTML"
-            hx-target="#progress-bar"
-        >
+        <div id="completion" style="width: {{percentage}}%" hx-get="{{refresh_url}}" hx-trigger="every 1s"
+            hx-swap="outerHTML" hx-target="#progress-bar">
         </div>
-    {% else %}
+    </t:if>
+    <t:else>
         <div id="completion" style="width: 100%;">
         </div>
-    {% endif %}
+    </t:else>
 </div>
 
 <style>
@@ -42,6 +42,5 @@
 
     #percentage-text {
         position: absolute
-
     }
 </style>

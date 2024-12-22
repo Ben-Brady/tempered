@@ -176,10 +176,7 @@ class Tempered(TemperedBase):
         **Example**
         ```python
         tempered.add_string("title.html", \"""
-            {% param title: str %}
-            <h1>
-                {{ title }}
-            </h1>
+            <h1>{{ title }}</h1>
         \""")
         ```
 
@@ -197,7 +194,6 @@ class Tempered(TemperedBase):
         **Example**
         ```python
         tempered.add_template_from_string("title.html", \"""
-            {% param title: str %}
             <h1>
                 {{ title }}
             </h1>

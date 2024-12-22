@@ -15,22 +15,16 @@ warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 class CssOptions:
     is_global: bool
     scope_id: str
-    lang: str | None
+    lang: t.Union[str, None]
 
 
-class ExtractResult(t.NamedTuple):
-    html: str
-    css: str
-
-
-def extract_css_from_html(body: str, prefix: str | None = None) -> ExtractResult:
-    soup = HtmlSoup(body)
+def extract_css_from_soup(soup: bs4.BeautifulSoup, prefix: t.Union[str, None] = None) -> str:
     css = ""
 
     style_tags = t.cast(t.List[bs4.Tag], soup.find_all("style"))
     has_styles = len(style_tags) != 0
     if not has_styles:
-        return ExtractResult(body, css="")
+        return ""
 
     scope_id = scoped.generate_scope_id(prefix)
     scoped.apply_scope_to_soup(soup, scope_id)
@@ -51,8 +45,7 @@ def extract_css_from_html(body: str, prefix: str | None = None) -> ExtractResult
 
         tag.decompose()
 
-    html = soup.decode()
-    return ExtractResult(html, css)
+    return css
 
 
 def transform_styles(css: str, options: CssOptions) -> str:
@@ -65,7 +58,7 @@ def transform_styles(css: str, options: CssOptions) -> str:
     return css
 
 
-def get_bs4_attr(tag: bs4.Tag, attr: str) -> str | None:
+def get_bs4_attr(tag: bs4.Tag, attr: str) -> t.Union[str, None]:
     value = tag.get(attr, None)
     if isinstance(value, list):
         value = value[0]

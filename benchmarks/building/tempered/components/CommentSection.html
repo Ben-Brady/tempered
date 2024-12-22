@@ -5,23 +5,26 @@
 
 <div id="comment-section">
     <div>
-        {% if logged_in %}
-        <form hx-post="/comment/create/{{video.id}}" hx-target="#comments" hx-swap="afterbegin"
-            hx-on::after-request="this.reset()">
-            <textarea data-type="primary" name="body" id="comment-input" placeholder="Write a Comment"></textarea>
-            <div>
-                <button data-type="secondary">
-                    Create Comment
-                </button>
-                <span id="comment-error"></span>
+        <t:if condition="logged_in">
+
+            <form hx-post="/comment/create/{{video.id}}" hx-target="#comments" hx-swap="afterbegin"
+                hx-on::after-request="this.reset()">
+                <textarea data-type="primary" name="body" id="comment-input" placeholder="Write a Comment"></textarea>
+                <div>
+                    <button data-type="secondary">
+                        Create Comment
+                    </button>
+                    <span id="comment-error"></span>
+                </div>
+            </form>
+        </t:if>
+        <t:elif>
+            <div id="comments">
+                <t:for target="comment" in="video.comments">
+                    <t:Comment comment="comment" />
+                </t:for>
             </div>
-        </form>
-        {% endif %}
-        <div id="comments">
-            {% for comment in video.comments %}
-            {% component Comment(comment=comment) %}
-            {% endfor %}
-        </div>
+        </t:elif>
     </div>
 </div>
 

@@ -51,17 +51,14 @@ def construct_if(ctx: BuildContext, tag: IfNode) -> RuleReturnType:
     ctx.ensure_output_assigned()
     EMPTY_BODY = [ast_utils.create_stmt("...", ast.Expr)]
 
-    # {% if %}
     if_body = ctx.create_block(tag.if_block) or EMPTY_BODY
 
-    # {% elif %}
     elif_blocks: t.List[t.Tuple[ast.expr, t.Sequence[ast.stmt]]] = []
     for condition, elif_block in tag.elif_blocks:
         elif_body = ctx.create_block(elif_block)
         if len(elif_body) != 0:
             elif_blocks.append((condition, elif_body))
 
-    # {% else %}
     if tag.else_block:
         else_body = ctx.create_block(tag.else_block) or EMPTY_BODY
     else:

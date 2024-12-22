@@ -1,6 +1,7 @@
 from ..parsing import nodes
-from ..introspection.introspecter import TemplateInfo
+from .introspection import TemplateInfo
 from ..parsing.nodes import TemplateBlock
+
 
 def place_default_style_node(
     body: TemplateBlock,

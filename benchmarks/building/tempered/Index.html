@@ -1,12 +1,15 @@
-{% param videos: list %}
+<script type="tempered/metadata">
+layout: layout.html
+parameters:
+    videos: list
+imports:
+    VideoScroll: "components/VideoScroll.html"
+</script>
 
-{% layout "layout.html" %}
-{% import VideoScroll from "components/VideoScroll.html" %}
-
-{% block title %}Home{% endblock %}
+<t:block name="title">Home</T:block>
 
 <div id="scroll">
-    {% component VideoScroll(videos=videos) %}
+    <c:VideoScroll videos="videos" />
 </div>
 
 <style>

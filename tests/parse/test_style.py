@@ -1,5 +1,5 @@
 import bs4
-from tempered.src.css.extract import extract_css_from_html
+from tempered.src.css.extract import extract_css_from_soup
 from tempered.src.css.postprocess import minify_css
 
 
@@ -12,7 +12,7 @@ def test_preprocess_extracts_style_tags():
         div { color: red;}
     </style>
     """
-    html, css = extract_css_from_html(HTML)
+    html, css = extract_css_from_soup(HTML)
     soup = bs4.BeautifulSoup(html, "html.parser")
     assert len(soup.find_all("style")) == 0
 
@@ -25,7 +25,7 @@ def test_preprocess_extracts_global_css():
         }
     </style>
     """
-    html, css = extract_css_from_html(HTML)
+    html, css = extract_css_from_soup(HTML)
     assert minify_css(css) == "body{background:black}"
 
 
@@ -39,7 +39,7 @@ def test_preprocess_scopes_css():
         }
     </style>
     """
-    html, css = extract_css_from_html(HTML)
+    html, css = extract_css_from_soup(HTML)
     soup = bs4.BeautifulSoup(html, "html.parser")
     div = soup.find("div")
 
@@ -57,7 +57,7 @@ def test_preprocess_doesnt_override_clases():
         div { background: black; }
     </style>
     """
-    html, css = extract_css_from_html(HTML)
+    html, css = extract_css_from_soup(HTML)
     soup = bs4.BeautifulSoup(html, "html.parser")
     div = soup.find("div")
     assert div and isinstance(div, bs4.element.Tag), "div should exist"

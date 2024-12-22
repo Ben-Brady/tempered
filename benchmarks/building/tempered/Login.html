@@ -1,7 +1,8 @@
-{% layout "layout.html" %}
+<script type="tempered/metadata">
+layout: layout.html
+</script>
 
-{% block title %} Login {% endblock %}
-
+<t:block name="title">Login</T:block>
 
 <div id="container">
     <form hx-post="/login" hx-swap="innerHTML" hx-target="#login-error">

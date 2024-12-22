@@ -1,22 +1,29 @@
-{% param user %}
-{% param editting: bool = False %}
+<script type="tempered/metadata">
+parameters:
+    user:
+    editting:
+        type: bool
+        default: Flase
+</script>
 
 <div id="username-edit">
-    {% if not editting %}
+    <t:if condition="not editting">
         <div>
             <h3>
                 {{user.username}}
             </h3>
-            <img src="/static/Edit.svg" alt="Edit" hx-post="/username/edit" hx-target="#username-edit" hx-swap="outerHTML"/>
+            <img src="/static/Edit.svg" alt="Edit" hx-post="/username/edit" hx-target="#username-edit"
+                hx-swap="outerHTML" />
         </div>
-    {% else %}
+    </tc    :if>
+    <t:else>
         <form hx-swap="outerHTML" hx-target="#username-edit">
-            <input type="hidden" name="user_id" value="{{user.id}}"/>
-            <input type="text" name="username" placeholder="Username" value="{{user.username}}"/>
-            <img src="/static/Save.svg" alt="Save" id="save-button" hx-post="/username/save"/>
-            <img src="/static/Cancel.svg" alt="Cancel" hx-post="/username/cancel"/>
+            <input type="hidden" name="user_id" value="{{user.id}}" />
+            <input type="text" name="username" placeholder="Username" value="{{user.username}}" />
+            <img src="/static/Save.svg" alt="Save" id="save-button" hx-post="/username/save" />
+            <img src="/static/Cancel.svg" alt="Cancel" hx-post="/username/cancel" />
         </form>
-    {% endif %}
+    </T:else>
     <div id="username-error"></div>
 </div>
 
@@ -28,7 +35,8 @@
         align-items: center;
         gap: 1rem;
 
-        div, form {
+        div,
+        form {
             width: fit-content;
             display: flex;
             flex-direction: row;

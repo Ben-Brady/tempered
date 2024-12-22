@@ -1,12 +1,18 @@
-{% param video %}
-{% param recommendations: list %}
+<script type="tempered/metadata">
+layout: layout.html
+parameters:
+    video:
+    recommendations: list
+imports:
+    UserIcon: "components/UserIcon.html"
+    Thumbnail: "components/Thumbnail.html"
+    CommentSection: "components/CommentSection.html"
+</script>
 
-{% import UserIcon from "components/UserIcon.html" %}
-{% import Thumbnail from "components/Thumbnail.html" %}
-{% import CommentSection from "components/CommentSection.html" %}
-{% layout "layout.html" %}
 
-{% block title%}{{video.title}}{%endblock%}
+<t:block name="title">
+    {{video.title}}
+</t:block>
 
 <div id="video">
     <video controls height={{video.file.height}} width={{video.file.width}}
@@ -19,21 +25,21 @@
 <div id="desc">
     <div id="header">
         <h3 id="title">
-            {{video.title}}
+            {{ video.title }}
         </h3>
         <div id="uploader">
             <h5 id="uploader-name">
                 {{ video.uploader.username }}
             </h5>
             <div id="uploader-icon">
-                {% component UserIcon(user=video.uploader) %}
+                <t:UserIcon user="video.uploader" />
             </div>
         </div>
     </div>
 
     <div id="metadata">
         <h5>
-            {{video.created_at.strftime("%-d %B %Y").title() }}
+            {{ video.created_at.strftime("%-d %B %Y").title() }}
         </h5>
         <h5>
             {{ format_number(video.views) }} Views
@@ -44,11 +50,11 @@
         {{video.description}}
     </div>
     <div id="bottom">
-        {% component CommentSection(video=video, logged_in=bool(account)) %}
+        <t:CommentSection video="video" logged_in="bool(account)" />
         <div id="recommendations">
-            {% for video in recommendations %}
-            {% component Thumbnail(video=video) %}
-            {% endfor %}
+            <t:for target="video" for="recommendations">
+                <t:Thumbnail video="video" />
+            </t:for>
         </div>
     </div>
 </div>

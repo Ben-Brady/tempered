@@ -8,5 +8,5 @@ else:
     html_parser = "html.parser"
 
 
-def HtmlSoup(markup: str):
-    return bs4.BeautifulSoup(markup, html_parser)
+def HtmlSoup(html: str):
+    return bs4.BeautifulSoup(html, html_parser)

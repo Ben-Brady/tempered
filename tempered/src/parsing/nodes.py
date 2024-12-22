@@ -58,7 +58,7 @@ class ImportNode(SingleTagNode):
 class IfNode(Node):
     condition: ast.expr
     if_block: TemplateBlock
-    else_block: t.Optional[TemplateBlock]
+    else_block: t.Optional[TemplateBlock] = None
     elif_blocks: t.List[t.Tuple[ast.expr, TemplateBlock]] = field(default_factory=list)
 
 

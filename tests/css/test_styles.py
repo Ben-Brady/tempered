@@ -26,7 +26,7 @@ def test_template_places_styles():
     func = build_template(
         f"""
         <head>
-            {{% styles %}}
+            <t:styles />
         </head>
         <style>
             {CSS}
@@ -43,7 +43,7 @@ def test_template_places_styles():
 def test_empty_styles_arent_created():
     func = build_template(
         """
-        {% styles %}
+        <t:styles/>
         <style>
         </style>
     """

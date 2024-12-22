@@ -1,9 +1,7 @@
 from dataclasses import dataclass, field
 import typing_extensions as t
-
-from ..tagbuilding import tags
-
-from ..utils import scanner
+from ..parsing.metadata import Metadata
+from ..utils.ast_utils import create_expr
 from ..parsing import nodes
 
 
@@ -24,29 +22,32 @@ class TemplateInfo:
     blocks: t.Set[str] = field(default_factory=set)
 
 
-TagScanner = scanner.Scanner[tags.Tag]
-T = t.TypeVar("T", bound=tags.Tag)
-ParseRules: t.TypeAlias = t.List[
-    t.Tuple[
-        t.Type[T],
-        t.Callable[[TemplateInfo, T], t.Optional[nodes.Node]],
-    ]
-]
-
-
-def create_template_info(stream: t.Sequence[tags.Tag], css: str) -> TemplateInfo:
-    pragma_rules: ParseRules = [
-        (nodes.ImportNode, import_pragma),
+def create_template_info(
+    stream: t.Sequence[nodes.Node],
+    metadata: Metadata,
+    css: str
+) -> TemplateInfo:
+    pragma_rules = [
         (nodes.StyleNode, style_pragma),
         (nodes.ComponentNode, component_prgama),
-        (tags.IncludeTag, include_pragma),
-        (tags.LayoutTag, layout_pragma),
-        (tags.ParameterTag, parameter_pragma),
-        (tags.SlotStartTag, slot_pragma),
-        (tags.BlockStartTag, block_pragma),
+        (nodes.SlotNode, slot_pragma),
+        (nodes.BlockNode, block_pragma),
     ]
 
     ctx = TemplateInfo(css)
+
+    # TODO: refactor metadata and introspection
+    ctx.layout = metadata.layout
+    ctx.style_includes = set(metadata.style_includes)
+    ctx.imports = [
+        nodes.ImportNode(target=name, name=value) # TODO: Don't need import node
+        for name, value in metadata.imports.items()
+    ]
+    # TODO: Defer create_expr to compiler
+    ctx.parameters = [
+        nodes.TemplateParameter(name=name, type=create_expr(value))
+        for name, value in metadata.parameters.items()
+    ]
 
     for tag in stream:
         for rule_tag, func in pragma_rules:
@@ -56,43 +57,14 @@ def create_template_info(stream: t.Sequence[tags.Tag], css: str) -> TemplateInfo
     return ctx
 
 
-def include_pragma(
-    ctx: TemplateInfo, tag: tags.IncludeTag
-) -> t.Optional[nodes.Node]:
-    ctx.style_includes.add(tag.template)
-
-
 def style_pragma(
-    ctx: TemplateInfo, tag: tags.IncludeTag
+    ctx: TemplateInfo, tag: nodes.StyleNode
 ) -> t.Optional[nodes.Node]:
     if ctx.styles_set:
         raise ValueError("Template cannot have multiple styles tags")
 
     ctx.styles_set = True
     return nodes.StyleNode()
-
-
-def layout_pragma(
-    ctx: TemplateInfo, tag: tags.LayoutTag
-) -> t.Optional[nodes.Node]:
-    if ctx.layout is not None:
-        raise ValueError("Template cannot have multiple layout tags")
-
-    ctx.layout = tag.template
-    return None
-
-
-def parameter_pragma(
-    ctx: TemplateInfo, tag: tags.ParameterTag
-) -> t.Optional[nodes.Node]:
-    ctx.parameters.append(
-        nodes.TemplateParameter(
-            name=tag.name,
-            default=tag.default,
-            type=tag.type,
-        )
-    )
-    return None
 
 
 def component_prgama(
@@ -105,7 +77,7 @@ def component_prgama(
     return call
 
 
-def slot_pragma(ctx: TemplateInfo, token: tags.SlotStartTag) -> None:
+def slot_pragma(ctx: TemplateInfo, token: nodes.SlotNode) -> None:
     ctx.is_layout = True
 
     if token.name is None:
@@ -116,15 +88,12 @@ def slot_pragma(ctx: TemplateInfo, token: tags.SlotStartTag) -> None:
 
     slot = nodes.SlotInfo(
         name=token.name,
-        is_required=token.is_required,
+        is_required=not token.default,
     )
     ctx.slots.append(slot)
 
 
-def block_pragma(ctx: TemplateInfo, token: tags.SlotStartTag) -> None:
+def block_pragma(ctx: TemplateInfo, token: nodes.BlockNode) -> None:
     if token.name is not None:
         ctx.blocks.add(token.name)
 
-
-def import_pragma(ctx: TemplateInfo, token: nodes.ImportNode) -> None:
-    ctx.imports.append(token)

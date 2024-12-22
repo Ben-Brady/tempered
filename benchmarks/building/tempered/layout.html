@@ -5,18 +5,20 @@
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <title>Aqua / {% slot title required%}</title>
+    <title>Aqua /
+        <slot name="title" required />
+    </title>
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/remove-me.js"></script>
     <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans">
-    {% styles %}
+    <t:styles />
 </head>
 
 <body>
-    {% component Navbar() %}
+    <t:Navbar />
     <main hx-ext="remove-me">
-        {% slot %}
+        <t:slot />
     </main>
 </body>
 
