@@ -39,8 +39,12 @@ def create_template_info(
     # TODO: refactor metadata and introspection
     ctx.layout = metadata.layout
     ctx.style_includes = set(metadata.style_includes)
+    # TODO: Don't need import node, atrifact from when they were {% import %}
     ctx.imports = [
-        nodes.ImportNode(target=name, name=value) # TODO: Don't need import node
+        nodes.ImportNode(
+            target=name.lower(),
+            name=value
+        )
         for name, value in metadata.imports.items()
     ]
     # TODO: Defer create_expr to compiler

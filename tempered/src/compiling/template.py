@@ -104,6 +104,10 @@ def construct_body(ctx: BuildContext) -> t.Sequence[ast.stmt]:
     if ctx.is_layout or ctx.uses_layout:
         statements.extend(create_style_contant(ctx))
 
+    # TODO: This shoudn't use tag system, legacy from {% import %}
+    for tag in ctx.template.imports:
+        ctx.construct_tag(tag)
+
     for tag in ctx.template.body:
         ctx.construct_tag(tag)
 

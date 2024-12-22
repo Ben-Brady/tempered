@@ -43,15 +43,14 @@ class ComponentNode(SingleTagNode):
 
 
 @dataclass
-class AssignmentNode(SingleTagNode):
-    target: ast.expr
-    value: ast.expr
-
-
-@dataclass
 class ImportNode(SingleTagNode):
     target: str
     name: str
+
+
+@dataclass
+class CodeNode(Node):
+    body: t.List[ast.stmt]
 
 
 @dataclass

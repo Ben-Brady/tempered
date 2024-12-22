@@ -3,7 +3,7 @@ import ast
 import typing_extensions as t
 from ..utils import ast_utils
 from ..parsing.nodes import (
-    AssignmentNode, BlockNode, ComponentNode, ExprNode, ForNode, HtmlNode, IfNode,
+    CodeNode, BlockNode, ComponentNode, ExprNode, ForNode, HtmlNode, IfNode,
     ImportNode, Node, RawExprNode, SlotNode, StyleNode,
 )
 from .calls import create_escape_call, slot_parameter, slot_variable_name
@@ -29,11 +29,8 @@ def construct_raw_expr(ctx: BuildContext, tag: RawExprNode) -> RuleReturnType:
     yield ctx.add_expr(tag.value)
 
 
-def construct_assign(ctx: BuildContext, tag: AssignmentNode) -> RuleReturnType:
-    yield ast_utils.Assign(
-        target=tag.target,
-        value=tag.value,
-    )
+def construct_code(ctx: BuildContext, tag: CodeNode) -> RuleReturnType:
+    yield from tag.body
 
 
 def construct_import(ctx: BuildContext, tag: ImportNode) -> RuleReturnType:
@@ -161,7 +158,7 @@ default_rules: t.List[Rule] = [
     (ExprNode, construct_expr),
     (ComponentNode, construct_component),
     (RawExprNode, construct_raw_expr),
-    (AssignmentNode, construct_assign),
+    (CodeNode, construct_code),
     (ImportNode, construct_import),
     (IfNode, construct_if),
     (ForNode, construct_for),

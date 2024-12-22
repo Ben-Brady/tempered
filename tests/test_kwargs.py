@@ -51,7 +51,7 @@ def test_kwargs_lets_you_pass_functions():
 def test_kwargs_dont_affect_for_loops():
     func = build_template(
         """
-        <t:for target="x" in="range(3)">
+        <t:for for="x" in="range(3)">
             {{ x }}
         </t:for>
         {{ x }}
@@ -65,7 +65,7 @@ def test_kwargs_dont_affect_for_loops():
 def test_kwargs_loop_variable():
     func = build_template(
         """
-        <t:for target="x" in="items">
+        <t:for for="x" in="items">
             {{ x }}
         </t:for>
     """

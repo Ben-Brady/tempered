@@ -6,8 +6,12 @@ from ..utils import build_templates
 def test_importing_components():
     render = build_templates(
         """
-        {% import Foo from "foo" %}
-        {% component Foo() %}
+        <script type="tempered/metadata">
+        imports:
+            Foo: foo
+        </script>
+
+        <t:Foo />
     """,
         ("foo", """Hello World"""),
     )
@@ -18,8 +22,12 @@ def test_importing_components():
 def test_importing_components_with_non_ident_names():
     render = build_templates(
         """
-        {% import Foo from "components/foo.html" %}
-        {% component Foo() %}
+        <script type="tempered/metadata">
+        imports:
+            Foo: components/foo.html
+        </script>
+
+        <t:Foo />
     """,
         ("components/foo.html", """Hello World"""),
     )
@@ -29,11 +37,15 @@ def test_importing_components_with_non_ident_names():
 
 @pytest.mark.skip
 def test_raise_error_on_invalid_import():
-    with pytest.raises(tempered.errors.InvalidTemplate):
+    with pytest.raises(tempered.InvalidTemplateException):
         build_templates(
             """
-            {% import Foo from "foo" %}
-            {% component Foo() %}
+            <script type="tempered/metadata">
+            imports:
+                Foo: components/foo.html
+            </script>
+
+            <t:Foo />
         """,
             ("bar", "Hello World"),
         )

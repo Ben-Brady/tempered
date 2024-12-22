@@ -1,15 +1,13 @@
 import bs4
+import re
 import typing_extensions as t
-from ..utils.ast_utils import create_expr
+from ..utils import ast_utils
+from ..errors import ParserException
+from textwrap import dedent
 from . import nodes
 
-WHEN_TAG = "t:when"
 IF_TAG = "t:if"
-THEN_TAG = "t:then"
 ELSE_TAG = "t:else"
-SWITCH_TAG = "t:switch"
-CASE_TAG = "t:case"
-DEFAULT_TAG = "t:default"
 FOR_TAG = "t:for"
 STYLES_TAG = "t:styles"
 
@@ -21,33 +19,81 @@ def parse_soup_into_nodes(soup: bs4.Tag) -> t.Sequence[nodes.Node]:
 
 
 def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
-    for child in soup.children:
+    children = list(soup.children)
+    while len(children) > 0:
+        child = children.pop()
+
         if isinstance(child, bs4.NavigableString):
-            yield nodes.HtmlNode(child.text)
+            yield from extract_exprs_from_text(child.text)
             continue
 
         tag = t.cast(bs4.Tag, child)
-        if tag.name.startswith("c:"):
-            name = tag.name.removeprefix("c:")
-            yield nodes.ComponentNode(
-                component_name=name,
-                keywords={
-                    key: create_expr(value)
-                    for key, value in tag.attrs.items()
-                }
+        if tag.name == "script" and get_attr_optional(tag, "type") == "tempered/python":
+            code = dedent(tag.text)
+            yield nodes.CodeNode(body=ast_utils.parse(code))
+            continue
+
+        if not tag.name.startswith("t:"):
+            yield from get_opening_tag(tag)
+            yield from parse_soup_into_nodes(tag)
+            yield get_closing_tag(tag)
+            continue
+
+        name = tag.name.removeprefix("t:")
+        if name == "for":
+            target = ast_utils.create_expr(get_attr(tag, "for"))
+            iterable = ast_utils.create_expr(get_attr(tag, "in"))
+            body = parse_soup_into_nodes(tag)
+            yield nodes.ForNode(
+                target=target,
+                iterable=iterable,
+                loop_block=body
             )
-        elif tag.name == STYLES_TAG:
-            yield nodes.StyleNode()
-        elif tag.name == WHEN_TAG:
-            condition = create_expr(tag.attrs["condition"])
+        elif name == "if":
+            # TODO: elif, else
+            condition = ast_utils.create_expr(get_attr(tag, "condition"))
             yield nodes.IfNode(
                 condition=condition,
                 if_block=list(parse_soup_into_nodes(tag))
             )
+        elif name == "elif":
+            raise ParserException("t:elif must be used with t:if")
+        elif name == "else":
+            raise ParserException("t:else must be used with t:if")
+        elif name == "styles":
+            yield nodes.StyleNode()
+        elif name == "html":
+            value = get_attr(tag, "value")
+            yield nodes.RawExprNode(
+                value=ast_utils.create_expr(value)
+            )
+        elif name == "block":
+            name = get_attr(tag, "name")
+            yield nodes.BlockNode(
+                name=name,
+                body=list(iterate_over_tag(tag))
+            )
+        elif name == "slot":
+            is_required = "required" in tag.attrs
+            name = get_attr_optional(tag, "name")
+
+            if is_required:
+                default = None
+            else:
+                default = list(iterate_over_tag(tag))
+
+            yield nodes.SlotNode(
+                name=name,
+                default=default
+            )
         else:
-            yield nodes.HtmlNode(get_opening_tag(tag))
-            yield from parse_soup_into_nodes(tag)
-            yield nodes.HtmlNode(get_closing_tag(tag))
+            yield nodes.ComponentNode(
+                component_name=name,
+                keywords={
+                    key: ast_utils.create_expr(value)
+                    for key, value in tag.attrs.items()
+                }
+            )
 
 
 def squash_html_nodes(_nodes: t.List[nodes.Node]) -> t.List[nodes.Node]:
@@ -65,21 +111,56 @@ def squash_html_nodes(_nodes: t.List[nodes.Node]) -> t.List[nodes.Node]:
 
             new_nodes.append(node)
 
-
     if html:
         new_nodes.append(nodes.HtmlNode(html))
 
     return new_nodes
 
 
-def get_opening_tag(tag: bs4.Tag) -> str:
-    raw_attrs = {k: v if not isinstance(v, list) else ' '.join(v) for k, v in tag.attrs.items()}
-    attrs = ' '.join((f"{k}=\"{v}\"" for k, v in raw_attrs.items()))
-    if not attrs:
-        return f"<{tag.name}>"
-    else:
-        return f"<{tag.name} {attrs}>"
+def get_opening_tag(tag: bs4.Tag) -> t.Iterable[nodes.Node]:
+    yield nodes.HtmlNode(f"<{tag.name}")
+
+    for name, value in tag.attrs.items():
+        yield nodes.HtmlNode(f' {name}="')
+        if isinstance(value, list):
+            value = ' '.join(value)
+
+        yield from extract_exprs_from_text(value)
+        yield nodes.HtmlNode('"')
+
+    yield nodes.HtmlNode(">")
 
 
-def get_closing_tag(tag: bs4.Tag) -> str:
-    return f"</{tag.name}>"
+def get_closing_tag(tag: bs4.Tag) -> nodes.HtmlNode:
+    return nodes.HtmlNode(f"</{tag.name}>")
+
+
+def extract_exprs_from_text(text: str) -> t.Iterable[nodes.Node]:
+    EXPR_RE = re.compile(r"(?:{{)([\s\S]*?)(?:}})")
+
+    for i, x in enumerate(EXPR_RE.split(text)):
+        is_expr = i % 2 == 1  # Every odd value is an expression
+        if is_expr:
+            expr = str(x).strip()
+            yield nodes.ExprNode(ast_utils.create_expr(expr))
+        else:
+            yield nodes.HtmlNode(x)
+
+
+def get_attr(tag: bs4.Tag, name: str) -> str:
+    value = tag.attrs[name]
+    if isinstance(value, list):
+        value = ' '.join(value)
+
+    return value
+
+
+def get_attr_optional(tag: bs4.Tag, name: str) -> t.Union[str, None]:
+    if name not in tag.attrs:
+        return None
+
+    value = tag.attrs[name]
+    if isinstance(value, list):
+        value = ' '.join(value)
+
+    return value

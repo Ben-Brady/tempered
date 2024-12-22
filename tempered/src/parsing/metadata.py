@@ -1,16 +1,21 @@
 import strictyaml
-from strictyaml import Str, Map, Optional, MapPattern, Seq
+from strictyaml import Str, Map, Optional, MapPattern, Seq, Any
 import bs4
 from dataclasses import dataclass, field
 import typing_extensions as t
 import warnings
 import textwrap
-from ..errors import ParsingWarning
+from ..errors import ParserException
+
+
+class ParameterObject(t.TypedDict):
+    type: t.Optional[str]
+    default: t.Optional[str]
 
 
 @dataclass
 class Metadata:
-    parameters: t.Dict[str, str] = field(default_factory=dict)
+    parameters: t.Dict[str, str | ParameterObject] = field(default_factory=dict)
     style_includes: t.List[str] = field(default_factory=list)
     imports: t.Dict[str, str] = field(default_factory=dict)
     layout: t.Union[str, None] = None
@@ -30,11 +35,9 @@ def extract_metadata_from_soup(soup: bs4.BeautifulSoup) -> Metadata:
     try:
         metadata = parse_metadata_yaml(yaml)
         return metadata
-    except Exception:
-        err = ParsingWarning("Invalid template metadata, falling back to default")
-        warnings.warn(err)
-        raise
-        return Metadata()
+    except Exception as e:
+        err = ParserException("Invalid template metadata")
+        raise err from e
 
 
 def parse_metadata_yaml(text: str) -> Metadata:
@@ -42,7 +45,7 @@ def parse_metadata_yaml(text: str) -> Metadata:
         Optional("layout"): Str(),
         Optional("style_includes"): Seq(Str()),
         Optional("imports"): MapPattern(Str(), Str()),
-        Optional("parameters"): MapPattern(Str(), Str()),
+        Optional("parameters"): MapPattern(Str(), Any()),
     })
     data = strictyaml.load(text, schema).data
     assert isinstance(data, dict) or data is None
@@ -50,9 +53,19 @@ def parse_metadata_yaml(text: str) -> Metadata:
     if data is None:
         return Metadata()
 
+    parameters: t.Dict[str, t.Union[str, ParameterObject]] = {}
+    for key, value in data.get("parameters", {}).items():
+        if isinstance(value, str):
+            parameters[key] = value
+        elif isinstance(value, dict):
+            parameters[key] = {
+                "default": value.get("default", None),
+                "type": value.get("type", None)
+            }
+
     return Metadata(
         imports=data.get("imports", {}),
-        parameters=data.get("parameters", {}),
+        parameters=parameters,
         style_includes=data.get("style_includes", []),
         layout=data.get("layout", None)
     )

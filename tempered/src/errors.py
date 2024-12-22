@@ -4,7 +4,7 @@ from pathlib import Path
 import typing_extensions as t
 
 
-class BuildError(Exception):
+class BuildException(Exception):
     pass
 
 
@@ -12,7 +12,7 @@ class ParsingWarning(Warning):
     pass
 
 
-class InvalidTemplate(BuildError):
+class InvalidTemplateException(BuildException):
     @classmethod
     def create(
         cls,
@@ -26,7 +26,7 @@ class InvalidTemplate(BuildError):
             return cls(f"{msg} in {name}")
 
 
-class ParserException(BuildError):
+class ParserException(BuildException):
     error_info: t.Optional[ErrorInfo] = None
 
     @classmethod

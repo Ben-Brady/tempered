@@ -1,5 +1,6 @@
 from tests import build_templates, test
-
+import pytest
+from tempered import InvalidTemplateException
 
 @test("Components prevent css duplication")
 def _():
@@ -29,6 +30,8 @@ def _():
 
 @test("Components account for nested children")
 def _():
+    CSS_KEY = "TEMPERED"
+
     MAIN_TEMPLATE = """
     <script type="tempered/metadata">
     imports:
@@ -61,9 +64,7 @@ def _():
 
     <t:D/>
     """
-    D_TEMPLATE = "<style>a {{ color: {CSS_KEY}; }}</style>"
-
-    CSS_KEY = "TEMPERED"
+    D_TEMPLATE = f"<style>a {{ color: {CSS_KEY}; }}</style>"
 
     component = build_templates(
         MAIN_TEMPLATE,
@@ -87,7 +88,7 @@ def _():
 
         <t:Computed foo="'bar'" />
         """,
-        ("comp", "{{foo}}{{foo}}"),
+        ("computed", "{{foo}}{{foo}}"),
     )
     html = component()
     assert "t:" not in html
@@ -122,7 +123,7 @@ def _():
 def _():
     component = build_templates(
         """
-                <script type="tempered/metadata">
+        <script type="tempered/metadata">
         imports:
             Computed: computed
         </script>
@@ -145,3 +146,9 @@ def _():
     )
     html = component()
     assert "foo-bar" in html
+
+
+@test("Raised invalid template on unimported component")
+def _():
+    with pytest.raises(InvalidTemplateException):
+        build_templates("""<t:Computed bar="'bar'"/>""")

@@ -5,10 +5,13 @@ from tests import build_templates
 def test_layout_extend_with_default_slot():
     func = build_templates(
         """
-        {% layout "a" %}
+        <script type"tempered/metadata">
+        layout: a
+        </script>
+
         Test
         """,
-        ("a", "<div>{% slot %}</div>"),
+        ("a", "<div><t:slot/></div>"),
     )
 
     soup = bs4.BeautifulSoup(func(), "html.parser")
@@ -22,13 +25,16 @@ def test_layout_migrates_css():
 
     func = build_templates(
         f"""
-        {{% layout "a" %}}
+        <script type"tempered/metadata">
+        layout: a
+        </script>
+
         Test
         <style>
         a {{ content: '{CSS_KEY}'; }}
         </style>
         """,
-        ("a", "{%styles%} {% slot %}"),
+        ("a", "<t:styles/> <t:slot/>"),
     )
     html = func()
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -40,10 +46,13 @@ def test_layout_migrates_css():
 def test_layout_extend_with_named_slots():
     func = build_templates(
         """
-        {% layout "layout" %}
-        {% block title %}Test{% endblock %}
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+
+        <t:block name="title">Test</t:block>
         """,
-        ("layout", "<title>{% slot title required %}</title>"),
+        ("layout", "<title><t:slot name='title' required /></title>"),
     )
     soup = bs4.BeautifulSoup(func(), "html.parser")
     assert soup.find("title")
@@ -53,16 +62,19 @@ def test_layout_extend_with_named_slots():
 def test_layout_extend_with_many_named_slots():
     func = build_templates(
         """
-        {% layout "layout" %}
-        {% block a %}A{% endblock %}
-        {% block b %}B{% endblock %}
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+
+        <t:block name="a">A</t:block>
+        <t:block name="b">B</t:block>
         """,
         (
             "layout",
             """
-                <b>{% slot b required %}</b>
-                <a>{% slot a required %}</a>
-                """,
+                <a><t:slot name="a" required /></a>
+                <b><t:slot name="b" required /></b>
+            """,
         ),
     )
     soup = bs4.BeautifulSoup(func(), "html.parser")
@@ -74,13 +86,15 @@ def test_layout_respects_with_styles():
     CSS_KEY = "TEMPERED"
     func = build_templates(
         """
-        {% layout "layout" %}
+        <script type="tempered/metadata">
+        layout: "layout"
+        </script>
         """,
         (
             "layout",
             f"""
-                {{% styles %}}
-                {{% slot %}}
+                <t:styles />
+                <t:slot />
                 <style>
                     a {{ content: '{CSS_KEY}'; }}
                 </style>
@@ -95,14 +109,17 @@ def test_layout_styles_are_combined():
     CSS_LAYOUT = "TEMPERED_LAYOUT"
     CSS_COMP = "TEMPERED_COMP"
     component = f"""
-        {{% layout "layout" %}}
+        <script type="tempered/metadata">
+        layout: "layout"
+        </script>
+
         <style>
             a {{content: '{CSS_COMP}'; }}
         </style>
     """
     layout = f"""
-        {{% styles %}}
-        {{% slot %}}
+        <t:styles />
+        <t:slot />
         <style>
             a {{ content: '{CSS_LAYOUT}'; }}
         </style>
@@ -122,30 +139,38 @@ def test_nested_layout_styles_are_combined():
     CSS_LAYOUT_1 = "TEMPERED_LAYOUT"
     CSS_LAYOUT_2 = "TEMPERED_LAYOUT"
     CSS_COMP = "TEMPERED_COMP"
-    layout_1 = f"""
-        {{% styles %}}
-        {{% slot %}}
-        <style>
-            a {{ content: '{CSS_LAYOUT_1}'; }}
-        </style>
-    """
-    layout_2 = f"""
-        {{% layout "layout_1" %}}
-        {{% styles %}}
-        {{% slot %}}
-        <style>
-            a {{ content: '{CSS_LAYOUT_2}'; }}
-        </style>
-    """
-    component = f"""
-        {{% layout "layout_2" %}}
+    COMPONENT = f"""
+        <script type="tempered/metadata">
+        layout: "layout_1"
+        </script>
+
         <style>
             a {{content: '{CSS_COMP}'; }}
         </style>
     """
+    layout_1 = f"""
+        <script type="tempered/metadata">
+        layout: "layout_2"
+        </script>
+
+        <t:styles />
+        <t:slot />
+
+        <style>
+            a {{ content: '{CSS_LAYOUT_1}'; }}
+        </style>
+    """
+
+    layout_2 = f"""
+        <t:styles />
+        <t:slot />
+        <style>
+            a {{ content: '{CSS_LAYOUT_2}'; }}
+        </style>
+    """
 
     func = build_templates(
-        component,
+        COMPONENT,
         ("layout_1", layout_1),
         ("layout_2", layout_2),
     )
