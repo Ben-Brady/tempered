@@ -4,10 +4,15 @@ from tests import build_templates
 
 def test_default_slot():
     component = build_templates(
-        "{% layout 'layout' %}B",
+        """
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+        B
+        """,
         (
             "layout",
-            "<title>A{% slot %}C</title>",
+            "<title>A<t:slot />C</title>",
         ),
     )
     html = component()
@@ -19,13 +24,18 @@ def test_default_slot():
 def test_single_named_slot():
     component = build_templates(
         """
-        {% layout "layout" %}
-        {% block title %}replace{%endblock%}
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+
+        <t:block name='title'>
+            replace
+        </t:block>
     """,
         (
             "layout",
             """
-        <title>{% slot title%}{% endslot%}</title>
+        <title><t:slot name='title'/></title>
     """,
         ),
     )
@@ -38,13 +48,16 @@ def test_single_named_slot():
 def test_single_named_required_slot():
     component = build_templates(
         """
-        {% layout "layout" %}
-        {% block title %}replace{%endblock%}
+
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+        <t:block name='title'>replace</t:block>
     """,
         (
             "layout",
             """
-        <title>{% slot title required%}</title>
+        <title><t:slot name='title' required /></title>
     """,
         ),
     )
@@ -55,16 +68,12 @@ def test_single_named_required_slot():
 
 
 def test_single_named_slot_default():
-    component = build_templates(
-        """
-        {% layout "layout" %}
-    """,
-        (
-            "layout",
-            """
-        <title>{% slot title%}default value{% endslot%}</title>
-    """,
-        ),
+    component = build_templates("""
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+        """,
+        ("layout", "<title><t:slot name='title'>default value</t:slot></title>"),
     )
 
     soup = bs4.BeautifulSoup(component(), features="html.parser")
@@ -75,13 +84,16 @@ def test_single_named_slot_default():
 def test_single_named_slot_replaces_default():
     component = build_templates(
         """
-        {% layout "layout" %}
-        {% block title %}replacement value{%endblock%}
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+
+        <t:block name='title'>replacement value</t:block>
     """,
         (
             "layout",
             """
-        <title>{% slot title%}default value{% endslot%}</title>
+        <title><t:slot name='title'>default value</t:slot></title>
     """,
         ),
     )
@@ -94,16 +106,18 @@ def test_single_named_slot_replaces_default():
 def test_many_named_slots_replaces_default():
     component = build_templates(
         """
-        {% layout "layout" %}
-        {% block a %}A{% endblock %}
-        {% block b %}B{% endblock %}
+        <script type="tempered/metadata">
+        layout: layout
+        </script>
+        <t:block name='a'>A</t:block>
+        <t:block name='b'>B</t:block>
     """,
         (
             "layout",
             """
-        <a>{% slot a required %}</a>
-        <b>{% slot b %}B{% endslot %}</b>
-        <c>{% slot c %}C{% endslot %}</c>
+        <a><t:slot name='a' required /></a>
+        <b><t:slot name='b'>B</t:slot></b>
+        <c><t:slot name='c'>C</t:slot></c>
     """,
         ),
     )
