@@ -419,13 +419,8 @@ def parse(code: str) -> t.List[ast.stmt]:
 
 
 def unparse(node: ast.AST):
-    if sys.version_info >= (3, 9):
-        ast.fix_missing_locations(node)
-        return ast.unparse(node)
-    else:
-        import astor
-
-        return astor.to_source(node).strip()
+    ast.fix_missing_locations(node)
+    return ast.unparse(node)
 
 
 T = t.TypeVar("T", bound=ast.AST)
