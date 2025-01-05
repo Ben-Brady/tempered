@@ -27,17 +27,19 @@ def test_if_block_is_dynamic():
         </t:else>
     """
     )
-    assert "True" in component(expr=True) and "False" not in component(expr=True)
-    assert "False" in component(expr=False) and "True" not in component(expr=False)
+    assert "True" in component(expr=True)
+    assert "False" not in component(expr=True)
+    assert "False" in component(expr=False)
+    assert "True" not in component(expr=False)
 
 
 def test_elif_block():
     component = build_template("""
         <t:if condition="expr_a">
-            True
+            a
         </t:if>
         <t:elif condition="expr_b">
-            False
+            b
         </t:elif>
     """)
     assert "a" in component(expr_a=True, expr_b=True)
@@ -46,7 +48,7 @@ def test_elif_block():
 
 
 def test_empty_if_block():
-    component = build_template('<t:if condition="expr_a"></t:if>')
+    component = build_template('<t:if condition="True"></t:if>')
     assert component() == ""
 
 

@@ -21,13 +21,13 @@ def parse_soup_into_nodes(soup: bs4.Tag) -> t.Sequence[nodes.Node]:
 def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
     children = list(soup.children)
     while len(children) > 0:
-        child = children.pop()
+        tag = children.pop(0)
 
-        if isinstance(child, bs4.NavigableString):
-            yield from extract_exprs_from_text(child.text)
+        if isinstance(tag, bs4.NavigableString):
+            yield from extract_exprs_from_text(tag.text)
             continue
 
-        tag = t.cast(bs4.Tag, child)
+        tag = t.cast(bs4.Tag, tag)
         if tag.name == "script" and get_attr_optional(tag, "type") == "tempered/python":
             code = dedent(tag.text)
             yield nodes.CodeNode(body=ast_utils.parse(code))
@@ -50,11 +50,33 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
                 loop_block=body
             )
         elif name == "if":
-            # TODO: elif, else
             condition = ast_utils.create_expr(get_attr(tag, "condition"))
+            if_block = list(parse_soup_into_nodes(tag))
+
+            elif_blocks = []
+            while True:
+                if len(children) <= 0: break
+                elifBlock = children[0]
+                if not isinstance(elifBlock, bs4.Tag): break
+                if elifBlock.name != "t:elif": break
+
+                children.pop(0)
+                condition = ast_utils.create_expr(get_attr(elifBlock, "condition"))
+                elif_block = list(parse_soup_into_nodes(elifBlock))
+                elif_blocks.append((condition, elif_block))
+
+
+            else_block = None
+            if len(children) > 0:
+                elseTag = children[0]
+                if isinstance(elseTag, bs4.Tag) and elseTag.name == "t:else":
+                    children.pop(0)
+                    else_block = list(parse_soup_into_nodes(elseTag))
+
             yield nodes.IfNode(
                 condition=condition,
-                if_block=list(parse_soup_into_nodes(tag))
+                if_block=if_block,
+                else_block=else_block
             )
         elif name == "elif":
             raise ParserException("t:elif must be used with t:if")
