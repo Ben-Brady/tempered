@@ -1,6 +1,6 @@
 from tests import build_templates, test
 import pytest
-from tempered import InvalidTemplateException
+from tempered import Tempered, InvalidTemplateException
 
 @test("Components prevent css duplication")
 def _():
@@ -97,26 +97,26 @@ def _():
 
 @test("Components allow default parameters")
 def _():
-    component = build_templates('''
-        <script type="tempered/metadata">
-        imports:
-            Computed: computed
-        </script>
-
-        <t:Computed />
-        ''',
-        ("computed", '''
+    tempered = Tempered()
+    tempered.add_from_string("computed.html", '''
         <script type="tempered/metadata">
         parameters:
             foo:
                 type: str
-                default: bar
+                default: "'bar'"
         </script>
         {{foo}}{{bar}}
-        '''),
-    )
-    html = component()
-    assert "barbar" in html
+    ''')
+
+    html = tempered.render_string('''
+        <script type="tempered/metadata">
+        imports:
+            Computed: computed.html
+        </script>
+
+        <t:Computed />
+    ''', bar="bar")
+    assert "barbar" in html, html
 
 
 @test("Components allows mixed parameters")
@@ -125,19 +125,19 @@ def _():
         """
         <script type="tempered/metadata">
         imports:
-            Computed: computed
+            Computed: computed.html
         </script>
 
         <t:Computed bar="'bar'"/>
         """,
         (
-            "comp",
+            "computed.html",
             """
             <script type="tempered/metadata">
             parameters:
                 foo:
                     type: str
-                    default: foo
+                    default: "'foo'"
                 bar: str
             </script>
             {{foo}}-{{bar}}

@@ -3,7 +3,20 @@ import tempered
 from tests import build_template
 
 
-def test_param_using_typing_extensions():
+def test_parameters_using_default():
+    func = build_template("""
+    <script type="tempered/metadata">
+    parameters:
+        foo:
+            default: "'abc'"
+    </script>
+    {{ foo }}
+    """)
+    html = func()
+    assert "abc" in html, html
+
+
+def test_parameters_using_typing_extensions():
     build_template("""
     <script type="tempered/metadata">
     parameters:
@@ -14,7 +27,7 @@ def test_param_using_typing_extensions():
     """)
 
 
-def test_param_doesnt_allow_duplicates():
+def test_parameters_doesnt_allow_duplicates():
     with pytest.raises(tempered.ParserException):
         build_template("""
         <script type="tempered/metadata">

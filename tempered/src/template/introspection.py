@@ -47,11 +47,24 @@ def create_template_info(
         )
         for name, value in metadata.imports.items()
     ]
-    # TODO: Defer create_expr to compiler
-    ctx.parameters = [
-        nodes.TemplateParameter(name=name, type=create_expr(value))
-        for name, value in metadata.parameters.items()
-    ]
+
+
+    ctx.parameters = []
+    for name, value in metadata.parameters.items():
+        if isinstance(value, str):
+            type_str = value
+            default_str = value
+        else:
+            type_str = value["type"]
+            default_str = value["default"]
+
+        # TODO: Defer create_expr to compiler
+        parameter = nodes.TemplateParameter(
+            name=name,
+            type=create_expr(type_str) if type_str else None,
+            default=create_expr(default_str) if default_str else None
+        )
+        ctx.parameters.append(parameter)
 
     for tag in stream:
         for rule_tag, func in pragma_rules:
