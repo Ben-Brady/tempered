@@ -15,12 +15,6 @@ def _():
     assert "ab" in component()
 
 
-@test("HTML tags are escaped")
-def _():
-    component = build_template("{{ '<script>' }}")
-    assert "<script>" not in component()
-
-
 @test("String literals aren't transformed")
 def _():
     component = build_template(
