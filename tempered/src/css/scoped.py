@@ -62,7 +62,7 @@ def generate_scope_id(prefix: t.Union[str, None]) -> str:
         return f"{prefix}-{hash[:6]}"
 
 
-def apply_scope_to_soup(soup: bs4.BeautifulSoup, scope_id: str|None):
+def apply_scope_to_soup(soup: bs4.BeautifulSoup, scope_id: t.Optional[str]):
     for tag in soup.find_all():
         if is_tag_in_head(tag):
             continue

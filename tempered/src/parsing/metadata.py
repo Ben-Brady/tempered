@@ -15,7 +15,7 @@ class ParameterObject(t.TypedDict):
 
 @dataclass
 class Metadata:
-    parameters: t.Dict[str, str | ParameterObject] = field(default_factory=dict)
+    parameters: t.Dict[str, t.Union[str, ParameterObject]] = field(default_factory=dict)
     style_includes: t.List[str] = field(default_factory=list)
     imports: t.Dict[str, str] = field(default_factory=dict)
     layout: t.Union[str, None] = None
