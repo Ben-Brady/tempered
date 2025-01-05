@@ -11,7 +11,7 @@ def _():
 
 @test("String expressions work")
 def _():
-    component = build_template("{{ 'a' + 'b@ }}")
+    component = build_template("{{ 'a' + 'b' }}")
     assert "ab" in component()
 
 
