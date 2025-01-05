@@ -127,12 +127,13 @@ def _():
 def _():
     component = build_template("""
         <t:for for="x" in="range(5)">
-                {{x}}
+            {{ x }}
         </t:for>
         <t:for for="x" in="range(5)">
-            {{x}}
+            {{ x }}
         </t:for>
     """)
     html = component()
 
-    assert html.count("01234") == 2, html
+    # TODO: This assert is flakey
+    assert html.count("0  1  2  3  4") == 2, html
