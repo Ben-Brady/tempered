@@ -4,7 +4,7 @@ from tests import build_template
 def test_text_isnt_escaped():
     component = build_template(
         """
-        <t:html html="foo" />
+            <t:html value="foo" />
     """
     )
 
@@ -15,7 +15,7 @@ def test_string_literals_arent_transformed():
     component = build_template(
         """
         <style></style>
-        <t:html html="'<a>'" />
+        <t:html value="'<a>'" />
     """
     )
 
