@@ -72,7 +72,7 @@ class TemperedBase:
             return func(**context)
 
         string_hash = hex(zlib.crc32(html.encode()))[2:]
-        name = f"string_{string_hash}>"
+        name = f"string_<{string_hash}>"
         parsed_template = parse_template(name, html)
         self._module.build_templates([parsed_template])
         func = self._module.get_template_func(name)
