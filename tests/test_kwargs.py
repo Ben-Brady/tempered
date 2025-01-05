@@ -20,20 +20,14 @@ def test_variables_are_converted_to_kwargs():
 
 def test_kwargs_passed_to_layout():
     content = """
-        <script type="metadata/tempered">
+        <script type="tempered/metadata">
         layout: layout.html
         </script>
         """
 
     func = build_templates(
         content,
-        (
-            "layout.html",
-            """
-            <t:slot/>
-         {{ foo }}
-         """,
-        ),
+        ("layout.html", "<t:slot/>{{ foo }}"),
     )
 
     assert "TEMPERED" in func(foo="TEMPERED")

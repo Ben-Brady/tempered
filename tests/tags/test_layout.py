@@ -5,19 +5,20 @@ from tests import build_templates
 def test_layout_extend_with_default_slot():
     func = build_templates(
         """
-        <script type"tempered/metadata">
-        layout: a
+        <script type="tempered/metadata">
+        layout: layout.html
         </script>
 
         Test
         """,
-        ("a", "<div><t:slot/></div>"),
+        ("layout.html", "<div><t:slot/></div>"),
     )
 
-    soup = bs4.BeautifulSoup(func(), "html.parser")
+    html = func()
+    soup = bs4.BeautifulSoup(html, "html.parser")
 
     tag = soup.find("div")
-    assert tag and "Test" in tag.text  # type:ignore
+    assert tag and "Test" in tag.text, html  # type:ignore
 
 
 def test_layout_migrates_css():
@@ -26,7 +27,7 @@ def test_layout_migrates_css():
     func = build_templates(
         f"""
         <script type"tempered/metadata">
-        layout: a
+        layout: layout.html
         </script>
 
         Test
@@ -34,7 +35,7 @@ def test_layout_migrates_css():
         a {{ content: '{CSS_KEY}'; }}
         </style>
         """,
-        ("a", "<t:styles/> <t:slot/>"),
+        ("layout.html", "<t:styles/> <t:slot/>"),
     )
     html = func()
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -47,12 +48,12 @@ def test_layout_extend_with_named_slots():
     func = build_templates(
         """
         <script type="tempered/metadata">
-        layout: layout
+        layout: layout.html
         </script>
 
         <t:block name="title">Test</t:block>
         """,
-        ("layout", "<title><t:slot name='title' required /></title>"),
+        ("layout.html", "<title><t:slot name='title' required /></title>"),
     )
     soup = bs4.BeautifulSoup(func(), "html.parser")
     assert soup.find("title")
@@ -63,14 +64,14 @@ def test_layout_extend_with_many_named_slots():
     func = build_templates(
         """
         <script type="tempered/metadata">
-        layout: layout
+        layout: layout.html
         </script>
 
         <t:block name="a">A</t:block>
         <t:block name="b">B</t:block>
         """,
         (
-            "layout",
+            "layout.html",
             """
                 <a><t:slot name="a" required /></a>
                 <b><t:slot name="b" required /></b>
@@ -87,14 +88,15 @@ def test_layout_respects_with_styles():
     func = build_templates(
         """
         <script type="tempered/metadata">
-        layout: "layout"
+        layout: layout.html
         </script>
         """,
         (
-            "layout",
+            "layout.html",
             f"""
                 <t:styles />
                 <t:slot />
+
                 <style>
                     a {{ content: '{CSS_KEY}'; }}
                 </style>
@@ -110,7 +112,7 @@ def test_layout_styles_are_combined():
     CSS_COMP = "TEMPERED_COMP"
     component = f"""
         <script type="tempered/metadata">
-        layout: "layout"
+        layout: "layout.html"
         </script>
 
         <style>
@@ -127,7 +129,7 @@ def test_layout_styles_are_combined():
 
     func = build_templates(
         component,
-        ("layout", layout),
+        ("layout.html", layout),
     )
     styled_html = func(with_styles=True)
     styled_html = func(with_styles=True)
