@@ -15,7 +15,7 @@ warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 class CssOptions:
     is_global: bool
     scope_id: str
-    lang: str | None
+    lang: t.Optional[str]
 
 
 class ExtractResult(t.NamedTuple):
@@ -23,7 +23,7 @@ class ExtractResult(t.NamedTuple):
     css: str
 
 
-def extract_css_from_html(body: str, prefix: str | None = None) -> ExtractResult:
+def extract_css_from_html(body: str, prefix: t.Optional[str] = None) -> ExtractResult:
     soup = HtmlSoup(body)
     css = ""
 
@@ -65,7 +65,7 @@ def transform_styles(css: str, options: CssOptions) -> str:
     return css
 
 
-def get_bs4_attr(tag: bs4.Tag, attr: str) -> str | None:
+def get_bs4_attr(tag: bs4.Tag, attr: str) -> t.Optional[str]:
     value = tag.get(attr, None)
     if isinstance(value, list):
         value = value[0]
