@@ -115,7 +115,7 @@ def test_many_named_slots_replaces_default():
         (
             "layout",
             """
-        <a><t:slot name='a' required /></a>
+        <a><t:slot name='a' required ></t:slot></a>
         <b><t:slot name='b'>B</t:slot></b>
         <c><t:slot name='c'>C</t:slot></c>
     """,
