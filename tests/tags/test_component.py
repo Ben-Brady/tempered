@@ -11,8 +11,9 @@ def _():
             imports:
                 Child: child
             </script>
-            <t:Child />
-            <t:Child />
+
+            <t:Child></t:Child>
+            <t:Child></t:Child>
         """,
         (
             "child",

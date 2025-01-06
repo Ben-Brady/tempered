@@ -155,8 +155,8 @@ def test_nested_layout_styles_are_combined():
         layout: "layout_2"
         </script>
 
-        <t:styles />
-        <t:slot />
+        <t:styles></t:styles>
+        <t:slot></t:slot>
 
         <style>
             a {{ content: '{CSS_LAYOUT_1}'; }}
@@ -164,8 +164,8 @@ def test_nested_layout_styles_are_combined():
     """
 
     layout_2 = f"""
-        <t:styles />
-        <t:slot />
+        <t:styles></t:styles>
+        <t:slot></t:slot>
         <style>
             a {{ content: '{CSS_LAYOUT_2}'; }}
         </style>

@@ -27,7 +27,7 @@ def test_checks_detect_invalid_layout():
 @pytest.mark.skip
 def test_checks_detect_missing_components():
     with pytest.raises(tempered.InvalidTemplateException):
-        build_template('<t:Invalid()/>')
+        build_template('<t:Invalid()></t:Invalid()>')
 
 
 def test_checks_detect_invalid_blocks():
@@ -42,7 +42,7 @@ def test_checks_detect_invalid_blocks():
                 This is invalid
             </block>
             """,
-            ("layout", "<t:slot name='exists'/>"),
+            ("layout", "<t:slot name='exists'></t:slot>"),
         )
 
 
@@ -58,5 +58,5 @@ def test_checks_detect_missing_blocks():
                 This is invalid
             </block>
             """,
-            ("layout", "<t:slot name='mandatory' required />"),
+            ("layout", "<t:slot name='mandatory' required></t:slot>"),
         )
