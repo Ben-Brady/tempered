@@ -5,32 +5,37 @@ from tempered.src.utils.soup import HtmlSoup
 
 
 def test_preprocess_extracts_style_tags():
-    soup = HtmlSoup("""
+    soup = HtmlSoup(
+        """
     <style global>
         body { background: black; }
     </style>
     <style>
         div { color: red; }
     </style>
-    """)
+    """
+    )
     extract_css_from_soup(soup)
     assert len(soup.find_all("style")) == 0
 
 
 def test_preprocess_extracts_global_css():
-    soup = HtmlSoup("""
+    soup = HtmlSoup(
+        """
     <style global>
         body {
             background: black;
         }
     </style>
-    """)
+    """
+    )
     css = extract_css_from_soup(soup)
     assert minify_css(css) == "body{background:black}"
 
 
 def test_preprocess_scopes_css():
-    soup = HtmlSoup("""
+    soup = HtmlSoup(
+        """
     <div></div>
 
     <style>
@@ -38,7 +43,8 @@ def test_preprocess_scopes_css():
             background: black;
         }
     </style>
-    """)
+    """
+    )
     css = extract_css_from_soup(soup)
     div = soup.find("div")
 
@@ -48,14 +54,16 @@ def test_preprocess_scopes_css():
 
 
 def test_preprocess_doesnt_override_clases():
-    soup = HtmlSoup("""
+    soup = HtmlSoup(
+        """
     <div class="test">
     </div>
 
     <style>
         div { background: black; }
     </style>
-    """)
+    """
+    )
     extract_css_from_soup(soup)
 
     div = soup.find("div")

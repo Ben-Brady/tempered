@@ -1,21 +1,17 @@
 from ..parsing import nodes
-from .introspection import TemplateInfo
 from ..parsing.nodes import TemplateBlock
+from .introspection import TemplateInfo
 
 
 def place_default_style_node(
-    body: TemplateBlock,
-    info: TemplateInfo,
-    css: str
+    body: TemplateBlock, info: TemplateInfo, css: str
 ) -> TemplateBlock:
     if info.styles_set:
         return body
 
-    has_css = any((
-        len(css) != 0,
-        len(info.style_includes) != 0,
-        len(info.components_calls) != 0
-    ))
+    has_css = any(
+        (len(css) != 0, len(info.style_includes) != 0, len(info.components_calls) != 0)
+    )
 
     # If there is no CSS and it's not a layout
     # If there can never be additional css

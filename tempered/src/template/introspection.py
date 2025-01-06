@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
 import typing_extensions as t
+from ..parsing import nodes
 from ..parsing.metadata import Metadata
 from ..utils.ast_utils import create_expr
-from ..parsing import nodes
 
 
 @dataclass
@@ -23,9 +23,7 @@ class TemplateInfo:
 
 
 def create_template_info(
-    stream: t.Sequence[nodes.Node],
-    metadata: Metadata,
-    css: str
+    stream: t.Sequence[nodes.Node], metadata: Metadata, css: str
 ) -> TemplateInfo:
     pragma_rules = [
         (nodes.StyleNode, style_pragma),
@@ -41,13 +39,9 @@ def create_template_info(
     ctx.style_includes = set(metadata.style_includes)
     # TODO: Don't need import node, atrifact from when they were {% import %}
     ctx.imports = [
-        nodes.ImportNode(
-            target=name.lower(),
-            name=value
-        )
+        nodes.ImportNode(target=name.lower(), name=value)
         for name, value in metadata.imports.items()
     ]
-
 
     ctx.parameters = []
     for name, value in metadata.parameters.items():
@@ -62,7 +56,7 @@ def create_template_info(
         parameter = nodes.TemplateParameter(
             name=name,
             type=create_expr(type_str) if type_str else None,
-            default=create_expr(default_str) if default_str else None
+            default=create_expr(default_str) if default_str else None,
         )
         ctx.parameters.append(parameter)
 
@@ -74,9 +68,7 @@ def create_template_info(
     return ctx
 
 
-def style_pragma(
-    ctx: TemplateInfo, tag: nodes.StyleNode
-) -> t.Optional[nodes.Node]:
+def style_pragma(ctx: TemplateInfo, tag: nodes.StyleNode) -> t.Optional[nodes.Node]:
     if ctx.styles_set:
         raise ValueError("Template cannot have multiple styles tags")
 
@@ -87,9 +79,7 @@ def style_pragma(
 def component_prgama(
     ctx: TemplateInfo, tag: nodes.ComponentNode
 ) -> t.Optional[nodes.Node]:
-    call = nodes.ComponentNode(
-        component_name=tag.component_name, keywords=tag.keywords
-    )
+    call = nodes.ComponentNode(component_name=tag.component_name, keywords=tag.keywords)
     ctx.components_calls.append(call)
     return call
 
@@ -113,4 +103,3 @@ def slot_pragma(ctx: TemplateInfo, token: nodes.SlotNode) -> None:
 def block_pragma(ctx: TemplateInfo, token: nodes.BlockNode) -> None:
     if token.name is not None:
         ctx.blocks.add(token.name)
-

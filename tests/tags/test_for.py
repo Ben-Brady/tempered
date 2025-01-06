@@ -13,7 +13,6 @@ def _():
         assert str(i) in html
 
 
-
 @test("For each loops are valid")
 def _():
     component = build_template(
@@ -38,7 +37,7 @@ def _():
 
     """
     )
-    html = component(foo={"a": 1,"b": 2})
+    html = component(foo={"a": 1, "b": 2})
     assert "a=1" in html
     assert "b=2" in html
 
@@ -125,14 +124,16 @@ def _():
 
 @test("Multiple loops with identical names act correctly")
 def _():
-    component = build_template("""
+    component = build_template(
+        """
         <t:for for="x" in="range(5)">
             {{ x }}
         </t:for>
         <t:for for="x" in="range(5)">
             {{ x }}
         </t:for>
-    """)
+    """
+    )
     html = component()
 
     assert html.count("01234") == 2, html

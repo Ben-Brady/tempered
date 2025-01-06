@@ -1,6 +1,6 @@
 import typing_extensions as t
-from ..parsing import Template
 from ..css.postprocess import postprocess_css
+from ..parsing import Template
 from .dependencies import calculate_dependencies
 
 

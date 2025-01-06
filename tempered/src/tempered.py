@@ -2,8 +2,8 @@ from __future__ import annotations
 import zlib
 from pathlib import Path
 import typing_extensions as t
-from .template.template import parse_template
 from . import module, types
+from .template.template import parse_template
 
 
 class TemperedBase:
@@ -60,8 +60,7 @@ class TemperedBase:
 
     def add_from_mapping(self, templates: t.Mapping[str, str]):
         template_objs = [
-            parse_template(name, html, file=None)
-            for name, html in templates.items()
+            parse_template(name, html, file=None) for name, html in templates.items()
         ]
         self._module.build_templates(template_objs)
         self._reconstruct_types()

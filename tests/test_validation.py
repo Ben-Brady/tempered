@@ -5,21 +5,23 @@ from tests import build_template, build_templates
 
 def test_checks_detect_missing_layout():
     with pytest.raises(tempered.InvalidTemplateException):
-        build_template('''
+        build_template(
+            """
         <script type="tempered/metadata">
         layout: missing
         </script>
-        ''')
+        """
+        )
 
 
 def test_checks_detect_invalid_layout():
     with pytest.raises(tempered.InvalidTemplateException):
         build_templates(
-            '''
+            """
             <script type="tempered/metadata">
             layout: non_layout
             </script>
-            ''',
+            """,
             ("non_layout", "This isn't a layout"),
         )
 
@@ -27,7 +29,7 @@ def test_checks_detect_invalid_layout():
 @pytest.mark.skip
 def test_checks_detect_missing_components():
     with pytest.raises(tempered.InvalidTemplateException):
-        build_template('<t:Invalid()></t:Invalid()>')
+        build_template("<t:Invalid()></t:Invalid()>")
 
 
 def test_checks_detect_invalid_blocks():

@@ -24,7 +24,10 @@ def check_for_invalid_imports(template: Template, lookup: t.Dict[str, Template])
                 file=template.file,
             )
 
-def check_for_missing_component_import(template: Template, lookup: t.Dict[str, Template]):
+
+def check_for_missing_component_import(
+    template: Template, lookup: t.Dict[str, Template]
+):
     import_names = [x.target for x in template.imports]
 
     for call in template.components_calls:
@@ -35,6 +38,7 @@ def check_for_missing_component_import(template: Template, lookup: t.Dict[str, T
                 name=template.name,
                 file=template.file,
             )
+
 
 def check_for_missing_layout(template: Template, lookup: t.Dict[str, Template]):
     if template.layout is None:
@@ -61,7 +65,8 @@ def check_for_missing_blocks(template: Template, lookup: t.Dict[str, Template]):
 
     layout = t.cast(LayoutTemplate, lookup[template.layout])
     for slot in layout.slots:
-        if slot.name == None: continue
+        if slot.name == None:
+            continue
 
         slot_used = slot.name in template.blocks
         if slot.is_required and not slot_used:

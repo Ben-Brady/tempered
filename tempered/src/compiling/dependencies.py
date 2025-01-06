@@ -11,9 +11,7 @@ def calculate_dependencies(
 
 
 def _recursively_calculate_dependencies(
-    template: Template,
-    lookup: t.Dict[str, Template],
-    cache: t.Dict[str, t.Set[str]]
+    template: Template, lookup: t.Dict[str, Template], cache: t.Dict[str, t.Set[str]]
 ) -> t.Sequence[str]:
     if template.name in cache:
         return list(cache[template.name])

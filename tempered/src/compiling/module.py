@@ -1,7 +1,7 @@
 import ast
 import typing_extensions as t
+from ..parsing.nodes import LayoutTemplate, Template
 from ..utils import ast_utils
-from ..parsing.nodes import Template, LayoutTemplate
 from . import constants, validate
 from .css import generate_template_css
 from .template import create_template_function

@@ -1,10 +1,9 @@
-import strictyaml
-from strictyaml import Str, Map, Optional, MapPattern, Seq, Any
-import bs4
-from dataclasses import dataclass, field
-import typing_extensions as t
-import warnings
 import textwrap
+from dataclasses import dataclass, field
+import bs4
+import strictyaml
+from strictyaml import Any, Map, MapPattern, Optional, Seq, Str
+import typing_extensions as t
 from ..errors import ParserException
 
 
@@ -41,12 +40,14 @@ def extract_metadata_from_soup(soup: bs4.BeautifulSoup) -> Metadata:
 
 
 def parse_metadata_yaml(text: str) -> Metadata:
-    schema = Map({
-        Optional("layout"): Str(),
-        Optional("style_includes"): Seq(Str()),
-        Optional("imports"): MapPattern(Str(), Str()),
-        Optional("parameters"): MapPattern(Str(), Any()),
-    })
+    schema = Map(
+        {
+            Optional("layout"): Str(),
+            Optional("style_includes"): Seq(Str()),
+            Optional("imports"): MapPattern(Str(), Str()),
+            Optional("parameters"): MapPattern(Str(), Any()),
+        }
+    )
     data = strictyaml.load(text, schema).data
     assert isinstance(data, dict) or data is None
 
@@ -60,14 +61,14 @@ def parse_metadata_yaml(text: str) -> Metadata:
         elif isinstance(value, dict):
             parameters[key] = {
                 "default": value.get("default", None),
-                "type": value.get("type", None)
+                "type": value.get("type", None),
             }
 
     return Metadata(
         imports=data.get("imports", {}),
         parameters=parameters,
         style_includes=data.get("style_includes", []),
-        layout=data.get("layout", None)
+        layout=data.get("layout", None),
     )
 
 

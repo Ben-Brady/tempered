@@ -5,9 +5,7 @@ T = t.TypeVar("T", infer_variance=True)
 
 
 def find(
-    array: t.Iterable[t.Any],
-    type: t.Type[T],
-    condition: t.Callable[[T], bool]
+    array: t.Iterable[t.Any], type: t.Type[T], condition: t.Callable[[T], bool]
 ) -> T:
     for item in array:
         if isinstance(item, type) and condition(item):

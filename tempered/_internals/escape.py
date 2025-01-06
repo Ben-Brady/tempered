@@ -1,7 +1,7 @@
-import sys
 from typing import Any
 
 SAFE_CONVERSIONS = (int, float)
+
 
 def escape(value: Any) -> str:
     if type(value) in SAFE_CONVERSIONS:

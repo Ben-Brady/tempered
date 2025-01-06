@@ -1,9 +1,9 @@
-import bs4
 import re
-import typing_extensions as t
-from ..utils import ast_utils
-from ..errors import ParserException
 from textwrap import dedent
+import bs4
+import typing_extensions as t
+from ..errors import ParserException
+from ..utils import ast_utils
 from . import nodes
 
 IF_TAG = "t:if"
@@ -44,28 +44,27 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
             target = ast_utils.create_expr(get_attr(tag, "for"))
             iterable = ast_utils.create_expr(get_attr(tag, "in"))
             body = parse_soup_into_nodes(tag)
-            yield nodes.ForNode(
-                target=target,
-                iterable=iterable,
-                loop_block=body
-            )
+            yield nodes.ForNode(target=target, iterable=iterable, loop_block=body)
         elif name == "if":
             if_condition = ast_utils.create_expr(get_attr(tag, "condition"))
             if_block = list(parse_soup_into_nodes(tag))
 
-
             elif_blocks = []
             while True:
-                if len(children) <= 0: break
+                if len(children) <= 0:
+                    break
                 elif_block = children[0]
-                if not isinstance(elif_block, bs4.Tag): break
-                if elif_block.name != "t:elif": break
+                if not isinstance(elif_block, bs4.Tag):
+                    break
+                if elif_block.name != "t:elif":
+                    break
 
                 children.pop(0)
-                elif_condition = ast_utils.create_expr(get_attr(elif_block, "condition"))
+                elif_condition = ast_utils.create_expr(
+                    get_attr(elif_block, "condition")
+                )
                 elif_block = list(parse_soup_into_nodes(elif_block))
                 elif_blocks.append((elif_condition, elif_block))
-
 
             else_block = None
             if len(children) > 0:
@@ -78,7 +77,7 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
                 condition=if_condition,
                 if_block=if_block,
                 elif_blocks=elif_blocks,
-                else_block=else_block
+                else_block=else_block,
             )
         elif name == "elif":
             raise ParserException("t:elif must be used with t:if")
@@ -88,15 +87,10 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
             yield nodes.StyleNode()
         elif name == "html":
             value = get_attr(tag, "value")
-            yield nodes.RawExprNode(
-                value=ast_utils.create_expr(value)
-            )
+            yield nodes.RawExprNode(value=ast_utils.create_expr(value))
         elif name == "block":
             name = get_attr(tag, "name")
-            yield nodes.BlockNode(
-                name=name,
-                body=list(iterate_over_tag(tag))
-            )
+            yield nodes.BlockNode(name=name, body=list(iterate_over_tag(tag)))
         elif name == "slot":
             name = get_attr_optional(tag, "name")
             if name is None:
@@ -117,7 +111,7 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
                 keywords={
                     key: ast_utils.create_expr(value)
                     for key, value in tag.attrs.items()
-                }
+                },
             )
 
 
@@ -150,7 +144,7 @@ def get_opening_tag(tag: bs4.Tag) -> t.Iterable[nodes.Node]:
     for name, value in tag.attrs.items():
         yield nodes.HtmlNode(f' {name}="')
         if isinstance(value, list):
-            value = ' '.join(value)
+            value = " ".join(value)
 
         yield from extract_exprs_from_text(value)
         yield nodes.HtmlNode('"')
@@ -177,7 +171,7 @@ def extract_exprs_from_text(text: str) -> t.Iterable[nodes.Node]:
 def get_attr(tag: bs4.Tag, name: str) -> str:
     value = tag.attrs[name]
     if isinstance(value, list):
-        value = ' '.join(value)
+        value = " ".join(value)
 
     return value
 
@@ -188,6 +182,6 @@ def get_attr_optional(tag: bs4.Tag, name: str) -> t.Union[str, None]:
 
     value = tag.attrs[name]
     if isinstance(value, list):
-        value = ' '.join(value)
+        value = " ".join(value)
 
     return value

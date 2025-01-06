@@ -1,15 +1,13 @@
 from pathlib import Path
 import typing_extensions as t
-
-from . import postprocess
 from .. import errors
-from ..parsing.parser import parse_soup_into_nodes
-from ..parsing.metadata import extract_metadata_from_soup
-from ..utils.soup import HtmlSoup
-from . import introspection
-from ..utils.minify import minify_html
 from ..css.extract import extract_css_from_soup
 from ..parsing import nodes
+from ..parsing.metadata import extract_metadata_from_soup
+from ..parsing.parser import parse_soup_into_nodes
+from ..utils.minify import minify_html
+from ..utils.soup import HtmlSoup
+from . import introspection, postprocess
 
 
 def parse_template(

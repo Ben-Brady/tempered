@@ -2,6 +2,7 @@ import bs4
 import pytest
 from tests import build_templates
 
+
 def test_default_slot():
     component = build_templates(
         """
@@ -71,7 +72,8 @@ def test_single_named_required_slot():
 
 
 def test_single_named_slot_default():
-    component = build_templates("""
+    component = build_templates(
+        """
         <script type="tempered/metadata">
         layout: layout
         </script>

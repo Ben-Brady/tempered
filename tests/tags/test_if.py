@@ -34,14 +34,16 @@ def test_if_block_is_dynamic():
 
 
 def test_elif_block():
-    component = build_template("""
+    component = build_template(
+        """
         <t:if condition="expr_a">
             a
         </t:if>
         <t:elif condition="expr_b">
             b
         </t:elif>
-    """)
+    """
+    )
     assert "a" in component(expr_a=True, expr_b=True)
     assert "a" in component(expr_a=True, expr_b=False)
     assert "b" in component(expr_a=False, expr_b=True)
