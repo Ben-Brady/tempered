@@ -1,18 +1,13 @@
 from pathlib import Path
 import typing_extensions as t
-
-from . import htmlify, postprocess
-
-
 from .. import errors
-from ..parsing import parser
-
-from ..lexing import lexer
-from ..introspection import introspecter
-from ..utils.minify import minify_html
-from ..css.extract import extract_css_from_html
+from ..css.extract import extract_css_from_soup
 from ..parsing import nodes
-from ..tagbuilding.builder import parse_tokens_to_tags
+from ..parsing.metadata import extract_metadata_from_soup
+from ..parsing.parser import parse_soup_into_nodes
+from ..utils.minify import minify_html
+from ..utils.soup import HtmlSoup
+from . import introspection, postprocess
 
 
 def parse_template(
@@ -42,25 +37,16 @@ def _parse_template(
     html: str,
     file: t.Union[Path, None],
 ) -> nodes.Template:
-    # Convert tokens into valid HTML to prevent HTML parsing mangling it
-    tokens = lexer.to_token_stream(html, file=file)
-    tags = parse_tokens_to_tags(tokens)
-    tagged_html, token_lookup = htmlify.convert_tags_to_valid_html(tags)
+    minifed_html = minify_html(html)
+    soup = HtmlSoup(minifed_html)
+    css = extract_css_from_soup(soup, prefix=name)
+    metadata = extract_metadata_from_soup(soup)
+    nodes = parse_soup_into_nodes(soup)
 
-    # Process HTML
-    # Note: CSS in minified later
-    tagged_html, css = extract_css_from_html(tagged_html, prefix=name)
-    tagged_html = minify_html(tagged_html)
+    info = introspection.create_template_info(nodes, metadata, css)
+    nodes = postprocess.place_default_style_node(nodes, info, css)
 
-    tags = htmlify.convert_tagged_html_to_tokens(tagged_html, token_lookup)
-    body = parser.parse_tags_to_template_ast(tags)
-
-    # Postprocessing
-    info = introspecter.create_template_info(tags, css)
-    body = postprocess.place_default_style_node(body, info, css)
-
-    # Construct the final object
-    return construct_template_obj(name, file, body, css, info)
+    return construct_template_obj(name, file, nodes, css, info)
 
 
 def construct_template_obj(
@@ -68,7 +54,7 @@ def construct_template_obj(
     file: t.Optional[Path],
     body: nodes.TemplateBlock,
     css: str,
-    info: introspecter.TemplateInfo,
+    info: introspection.TemplateInfo,
 ) -> nodes.Template:
     if info.is_layout:
         return nodes.LayoutTemplate(

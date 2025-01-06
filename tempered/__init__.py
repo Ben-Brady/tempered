@@ -1,19 +1,15 @@
 "Generate native python functions from HTML templates"
-__version__ = "0.10.0"
-from .src.errors import (
-    InvalidTemplate as InvalidTemplate,
-    ParserException as ParserException,
-    ParsingWarning as ParsingWarning,
-    BuildError as BuildError,
-    ErrorInfo as ErrorInfo
-)
+__version__ = "0.11.0"
+from .src.errors import BuildException as BuildException
+from .src.errors import InvalidTemplateException as InvalidTemplateException
+from .src.errors import ParserException as ParserException
+from .src.errors import ParsingWarning as ParsingWarning
 from .src.tempered import Tempered as Tempered
 
 __all__ = [
     "Tempered",
-    "InvalidTemplate",
+    "InvalidTemplateException",
     "ParserException",
     "ParsingWarning",
-    "BuildError",
-    "ErrorInfo",
+    "BuildException",
 ]

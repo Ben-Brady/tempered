@@ -1,12 +1,17 @@
-{%param videos %}
-{%param page: int = 0 %}
+<script type="tempered/metadata">
+parameters:
+    videos: list
+    page: int = 0
+imports:
+    Thumbnail: "components/Thumbnail.html"
+    LoadingIcon: "components/LoadingIcon.html"
+</script>
 
-{% import Thumbnail from "components/Thumbnail.html" %}
-{% import LoadingIcon from "components/LoadingIcon.html" %}
 
-{% for video in videos %}
-{% component Thumbnail(video=video) %}
-{% endfor %}
-<div hx-get="/videos/scroll/{{page + 1}}" hx-trigger="intersect once" hx-swap="outerHTML" hx-target="this">
-    {% component LoadingIcon(fade=True) %}
+<t:for target="video" in="videos">
+    <t:Thumbnail video="video" />
+</t:for>
+
+<div hx-trigger="intersect once" hx-get="/videos/scroll/{{page + 1}}" hx-swap="outerHTML" hx-target="this">
+    <t:LoadingIcon fade="True" />
 </div>

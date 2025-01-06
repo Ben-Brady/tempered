@@ -1,49 +1,59 @@
-{% param user: "Profile" %}
+<script type="tempered/metadata">
+layout: "layout.html"
+parameters:
+    user: "Profile"
+imports:
+    UsernameEdit: "components/UsernameEdit.html"
+    Thumbnail: "components/Thumbnail.html"
+</script>
 
-{% layout "layout.html" %}
-{% import UsernameEdit from "components/UsernameEdit.html" %}
-{% import Thumbnail from "components/Thumbnail.html" %}
+<t:block name="title">@{{user.username}}</t:block>
 
-{% block title %} @{{user.username}} {% endblock %}
+<script type="tempered/python">
+    isMyAccount = account and user.id == account.id
+</script>
 
-{% set isMyAccount = account and user.id == account.id %}
 <div style="width: 100%; height: 100%; position: relative">
     <div id="header">
         <div class="icon">
             <img src="/static/Profile.png" />
         </div>
         <div id="info">
-            {% if isMyAccount %}
-            {% component UsernameEdit(user=user) %}
-            {% else%}
-            <h3>
-                {{user.username}}
-            </h3>
-            {% endif %}
-            {% if isMyAccount %}
-            <div id="account-buttons">
-                <button data-type="primary" hx-post="/logout">
-                    Logout
-                </button>
-                <button data-type="primary" hx-post="/account/delete/{{account.id}}">
-                    Delete Account
-                </button>
-            </div>
-            {% endif %}
+            <t:if condition="isMyAccount">
+                <T:UsernameEdit user="user" />
+            </t:if>
+            <t:else>
+                <h3>
+                    {{user.username}}
+                </h3>
+            </t:else>
+
+            <t:if condition="isMyAccount">
+                <div id="account-buttons">
+                    <button data-type="primary" hx-post="/logout">
+                        Logout
+                    </button>
+                    <button data-type="primary" hx-post="/account/delete/{{account.id}}">
+                        Delete Account
+                    </button>
+                </div>
+            </t:if>
         </div>
     </div>
+
     <div id="content">
-        {% if len(user.videos) == 0 %}
-        <h3 style="width: 100%; text-align: center;">
-            No Videos
-        </h3>
-        {% else %}
-        <div id="videos">
-            {% for video in user.videos %}
-            {% component Thumbnail(video=video) %}
-            {% endfor %}
-        </div>
-        {% endif %}
+        <t:if condition="len(user.videos) == 0">
+            <h3 style="width: 100%; text-align: center;">
+                No Videos
+            </h3>
+        </t:if>
+        <t:else>
+            <div id="videos">
+                <t:for target="video" in="user.videos">
+                    <T:Thumbnail video="video" />
+                </t:for>
+            </div>
+            </telse>
     </div>
 </div>
 

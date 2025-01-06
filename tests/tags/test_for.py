@@ -5,7 +5,7 @@ from tests import build_template, test
 def _():
     component = build_template(
         """
-        {% for x in range(5) %}{{ x }}{% endfor %}
+        <t:for for="x" in="range(5)">{{ x }}</t:for>
     """
     )
     html = component()
@@ -13,12 +13,11 @@ def _():
         assert str(i) in html
 
 
-
 @test("For each loops are valid")
 def _():
     component = build_template(
         """
-        {% for item in items %}{{ item }}{% endfor %}
+        <t:for for="item" in="items">{{ item }}</t:for>
     """
     )
     items = ["a", "b", "c"]
@@ -31,21 +30,23 @@ def _():
 def _():
     component = build_template(
         """
-        {% for key, value in foo.items() %}
+
+        <t:for for="key, value" in="foo.items()">
             {{ key }}={{ value}}
-        {% endfor %}
+        </t:for>
+
     """
     )
-    html = component(foo={"a": 1})
+    html = component(foo={"a": 1, "b": 2})
     assert "a=1" in html
-
+    assert "b=2" in html
 
 
 @test("Empty for loops are valid")
 def _():
     component = build_template(
         """
-        {% for x in range(5) %}{% endfor %}
+        <t:for for="x" in="range(5)"></t:for>
     """
     )
     component()
@@ -55,9 +56,9 @@ def _():
 def _():
     component = build_template(
         """
-        {% for x in range(5) %}
+        <t:for for="x" in="range(5)">
             {{ x }}
-        {% endfor %}
+        </t:for>
     """
     )
     html = component()
@@ -65,30 +66,15 @@ def _():
         assert str(i) in html
 
 
-@test("Setting variables inside a for loop is valid")
-def _():
-    component = build_template(
-        """
-        {% for x in range(5) %}
-            {% set squared = x * x %}
-            {{ squared }}
-        {% endfor %}
-    """
-    )
-    html = component()
-    for i in range(5):
-        assert str(i * i) in html
-
-
 @test("Nested loops are valid")
 def _():
     component = build_template(
         """
-        {% for x in range(2) %}
-            {% for y in range(2) %}
+        <t:for for="x" in="range(2)">
+            <t:for for="y" in="range(2)">
                 ({{x}},{{y}})
-            {% endfor %}
-        {% endfor %}
+            </t:for>
+        </t:for>
     """
     )
     html = component()
@@ -98,15 +84,36 @@ def _():
             assert f"({x},{y})" in html
 
 
+@test("Setting variables inside a for loop is valid")
+def _():
+    component = build_template(
+        """
+        <t:for for="x" in="range(5)">
+            <t:for for="y" in="range(5)">
+                <script type="tempered/python">
+                    squared = x * y
+                </script>
+                {{ squared }}
+            </t:for>
+        </t:for>
+    """
+    )
+    html = component()
+    for i in range(5):
+        assert str(i * i) in html
+
+
 @test("Nested loops with identical names act correctly")
 def _():
     component = build_template(
         """
-        {% for x in range(5) %}
-            {% for x in range(5) %}
+
+        <t:for for="x" in="range(5)">
+            <t:for for="x" in="range(5)">
                 {{x}}
-            {% endfor %}
-        {% endfor %}
+            </t:for>
+        </t:for>
+
     """
     )
     html = component()
@@ -119,8 +126,12 @@ def _():
 def _():
     component = build_template(
         """
-        {% for x in range(5) %}{{x}}{% endfor %}
-        {% for x in range(5) %}{{x}}{% endfor %}
+        <t:for for="x" in="range(5)">
+            {{ x }}
+        </t:for>
+        <t:for for="x" in="range(5)">
+            {{ x }}
+        </t:for>
     """
     )
     html = component()

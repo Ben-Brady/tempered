@@ -1,9 +1,8 @@
 import warnings
-
+from dataclasses import dataclass
 import bs4
 from bs4 import MarkupResemblesLocatorWarning
 import typing_extensions as t
-from dataclasses import dataclass
 from .. import errors
 from ..utils.soup import HtmlSoup
 from . import sass, scoped
@@ -18,19 +17,15 @@ class CssOptions:
     lang: t.Optional[str]
 
 
-class ExtractResult(t.NamedTuple):
-    html: str
-    css: str
-
-
-def extract_css_from_html(body: str, prefix: t.Optional[str] = None) -> ExtractResult:
-    soup = HtmlSoup(body)
+def extract_css_from_soup(
+    soup: bs4.BeautifulSoup, prefix: t.Union[str, None] = None
+) -> str:
     css = ""
 
     style_tags = t.cast(t.List[bs4.Tag], soup.find_all("style"))
     has_styles = len(style_tags) != 0
     if not has_styles:
-        return ExtractResult(body, css="")
+        return ""
 
     scope_id = scoped.generate_scope_id(prefix)
     scoped.apply_scope_to_soup(soup, scope_id)
@@ -39,7 +34,7 @@ def extract_css_from_html(body: str, prefix: t.Optional[str] = None) -> ExtractR
             options = CssOptions(
                 is_global=tag.has_attr("global"),
                 scope_id=scope_id,
-                lang=get_bs4_attr(tag, "lang")
+                lang=get_bs4_attr(tag, "lang"),
             )
 
             css += transform_styles(tag.text, options)
@@ -51,8 +46,7 @@ def extract_css_from_html(body: str, prefix: t.Optional[str] = None) -> ExtractR
 
         tag.decompose()
 
-    html = soup.decode()
-    return ExtractResult(html, css)
+    return css
 
 
 def transform_styles(css: str, options: CssOptions) -> str:

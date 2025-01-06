@@ -1,72 +1,82 @@
-{% param fade: bool = False %}
+<script type="tempered/metadata">
+parameters:
+    fade: bool
+</script>
 
-{%if fade %}
+<t:if condition="fade">
     <div class="fadeIn">
         <div></div>
         <div></div>
         <div></div>
     </div>
-{% else %}
+</t:if>
+<t:else>
     <div class="fadeIn animated">
         <div></div>
         <div></div>
         <div></div>
     </div>
-{% endif %}
+</t:else>
 
 <style>
-@keyframes fadeIn {
-    0% {
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes lds-facebook {
+        0% {
+            top: 8px;
+            height: 64px;
+        }
+
+        50%,
+        100% {
+            top: 24px;
+            height: 32px;
+        }
+    }
+
+    .fadeIn {
         opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
 
-@keyframes lds-facebook {
-    0% {
-        top: 8px;
-        height: 64px;
+        animation: fadeIn forwards 0.3s;
+        animation-delay: 0.8s;
     }
-    50%,
-    100% {
-        top: 24px;
-        height: 32px;
+
+    .animated {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
     }
-}
-.fadeIn {
-    opacity: 0;
 
-    animation: fadeIn forwards 0.3s;
-    animation-delay: 0.8s;
-}
+    .animated>div {
+        display: inline-block;
+        position: absolute;
+        left: 8px;
+        width: 16px;
+        background: var(--BACKGROUND-3);
+        animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    }
 
-.animated {
-    display: inline-block;
-    position: relative;
-    width: 80px;
-    height: 80px;
-}
+    .animated>div:nth-child(1) {
+        left: 8px;
+        animation-delay: -0.24s;
+    }
 
-.animated > div {
-    display: inline-block;
-    position: absolute;
-    left: 8px;
-    width: 16px;
-    background: var(--BACKGROUND-3);
-    animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
-}
-.animated > div:nth-child(1) {
-    left: 8px;
-    animation-delay: -0.24s;
-}
-.animated > div:nth-child(2) {
-    left: 32px;
-    animation-delay: -0.12s;
-}
-.animated > div:nth-child(3) {
-    left: 56px;
-    animation-delay: 0;
-}
+    .animated>div:nth-child(2) {
+        left: 32px;
+        animation-delay: -0.12s;
+    }
+
+    .animated>div:nth-child(3) {
+        left: 56px;
+        animation-delay: 0;
+    }
 </style>

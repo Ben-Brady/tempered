@@ -1,8 +1,14 @@
-{% param upload_id: int|None = None %}
+<script type="tempered/metadata">
+layout: layout.html
+imports:
+ UploadPage: "components/UploadPage.html"
+parameters:
+  upload_id:
+    type: int|None
+    default: None
+</script>
 
-{% layout "layout.html" %}
-{% import UploadPage from "components/UploadPage.html" %}
 
-{% block title %}Upload{% endblock %}
+<t:block name="title">Upload</t:block>
 
-{% component UploadPage(upload_id=upload_id) %}
+<T:UploadPage upload_id="upload_id" />

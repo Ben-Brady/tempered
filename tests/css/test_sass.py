@@ -3,11 +3,13 @@ from tests import build_template
 
 
 def test_scss_styles_are_transpiled():
-    func = build_template("""
+    func = build_template(
+        """
         <style global lang="scss">
             a { b { color: red; }}
         </style>
-    """)
+    """
+    )
 
     html = func(with_styles=True)
     soup = bs4.BeautifulSoup(html, "html.parser")

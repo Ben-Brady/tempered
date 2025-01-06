@@ -1,38 +1,47 @@
-{% param upload_id: int|None = None %}
-
-{% import ProgressBar from "components/ProgressBar.html" %}
+<script type="tempered/metadata">
+parameters:
+    upload_id:
+        type: int | None
+        default: None
+imports:
+    ProgressBar: "components/ProgressBar.html"
+</script>
 
 <div id="page">
     <div id="video-section">
-        {% if not upload_id %}
-        <form id="upload-form" style="width: 20rem;" enctype="multipart/form-data" hx-post="/upload/create"
-            hx-on::load="this.reset()" hx-swap="outerHTML" hx-target="#page" hx-trigger="change from:#file-upload">
-            <input id="file-upload" hx-trigger="change" name="file" type="file" accept="video/*">
-        </form>
-        {% else %}
-        <img id="video-preview" hx-get="/upload/thumbnail/{{upload_id}}" hx-swap="outerHTML" hx-trigger="load" />
-        <div id="video-info">
-            <div hx-get="/upload/info/{{upload_id}}" hx-swap="outerHTML" hx-trigger="load">
+        <t:if condition="not upload_id">
+            <form id="upload-form" style="width: 20rem;" enctype="multipart/form-data" hx-post="/upload/create"
+                hx-on::load="this.reset()" hx-swap="outerHTML" hx-target="#page" hx-trigger="change from:#file-upload">
+                <input id="file-upload" hx-trigger="change" name="file" type="file" accept="video/*">
+            </form>
+        </t:if>
+        <t:else>
+            <img id="video-preview" hx-get="/upload/thumbnail/{{upload_id}}" hx-swap="outerHTML" hx-trigger="load" />
+            <div id="video-info">
+                <div hx-get="/upload/info/{{upload_id}}" hx-swap="outerHTML" hx-trigger="load">
+                </div>
+                <t:ProgressBar refresh_url="f'/upload/progress/{upload_id}'" />
             </div>
-            {% component ProgressBar(refresh_url=f" /upload/progress/{upload_id}") %}
-        </div>
-        {% endif %}
+        </t:else>
     </div>
 
     <form id="metadata-form" method="post" hx-post="/upload/submit/{{upload_id}}">
         <div style="width: 20rem; height: 2rem;">
-            {% if upload_id is None %}
-            <input name="title" type="text" placeholder="Title" disabled>
-            {% else %}
-            <input name="title" type="text" placeholder="Title">
-            {% endif %}
+
+            <t:if condition="upload_id is None">
+                <input name="title" type="text" placeholder="Title" disabled>
+            </t:if>
+            <t:else>
+                <input name="title" type="text" placeholder="Title">
+            </t:else>
         </div>
         <div style="width: 30rem; height: 6rem;">
-            {% if upload_id is None %}
-            <textarea name="description" placeholder="Description" data-type="primary" disabled></textarea>
-            {% else %}
-            <textarea name="description" placeholder="Description" data-type="primary"></textarea>
-            {% endif %}
+            <t:if condition="upload_id is None">
+                <textarea name="description" placeholder="Description" data-type="primary" disabled></textarea>
+            </t:if>
+            <t:else>
+                <textarea name="description" placeholder="Description" data-type="primary"></textarea>
+            </t:else>
         </div>
         <button data-type="primary">
             Upload

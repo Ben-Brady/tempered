@@ -4,7 +4,11 @@ from tests import build_template, build_templates
 def test_variables_are_converted_to_kwargs():
     func = build_template(
         """
-        {% param a: int %}
+        <script type="metadata/tempered">
+        parameters:
+            a: int
+        </script>
+
         {{ a }}
         {{ b }}
     """
@@ -15,29 +19,15 @@ def test_variables_are_converted_to_kwargs():
 
 
 def test_kwargs_passed_to_layout():
-    func = build_templates(
+    content = """
+        <script type="tempered/metadata">
+        layout: layout.html
+        </script>
         """
-        {% layout "layout" %}
-        """,
-        (
-            "layout",
-            """
-         {% slot %}
-         {{ foo }}
-         """,
-        ),
-    )
 
-    assert "TEMPERED" in func(foo="TEMPERED")
-
-
-def test_kwargs_passed_to_component():
     func = build_templates(
-        """
-        {% import Child from "child" %}
-        {% component Child() %}
-        """,
-        ("child", "{{ foo }}"),
+        content,
+        ("layout.html", "<t:slot></t:slot>{{ foo }}"),
     )
 
     assert "TEMPERED" in func(foo="TEMPERED")
@@ -55,9 +45,9 @@ def test_kwargs_lets_you_pass_functions():
 def test_kwargs_dont_affect_for_loops():
     func = build_template(
         """
-        {% for x in range(3) %}
+        <t:for for="x" in="range(3)">
             {{ x }}
-        {% endfor %}
+        </t:for>
         {{ x }}
     """
     )
@@ -69,9 +59,9 @@ def test_kwargs_dont_affect_for_loops():
 def test_kwargs_loop_variable():
     func = build_template(
         """
-        {% for x in items %}
+        <t:for for="x" in="items">
             {{ x }}
-        {% endfor %}
+        </t:for>
     """
     )
     items = ["a", "b", "c"]

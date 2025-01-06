@@ -43,22 +43,21 @@ class ComponentNode(SingleTagNode):
 
 
 @dataclass
-class AssignmentNode(SingleTagNode):
-    target: ast.expr
-    value: ast.expr
-
-
-@dataclass
 class ImportNode(SingleTagNode):
     target: str
     name: str
 
 
 @dataclass
+class CodeNode(Node):
+    body: t.List[ast.stmt]
+
+
+@dataclass
 class IfNode(Node):
     condition: ast.expr
     if_block: TemplateBlock
-    else_block: t.Optional[TemplateBlock]
+    else_block: t.Optional[TemplateBlock] = None
     elif_blocks: t.List[t.Tuple[ast.expr, TemplateBlock]] = field(default_factory=list)
 
 

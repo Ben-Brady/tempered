@@ -1,143 +1,182 @@
-import ast
+import re
+from textwrap import dedent
+import bs4
 import typing_extensions as t
-
-from ..tagbuilding import tags
+from ..errors import ParserException
+from ..utils import ast_utils
 from . import nodes
-from ..utils.scanner import Scanner
-
-TagScanner = Scanner[tags.Tag]
-T = t.TypeVar("T", bound=tags.Tag)
-ParseRules: t.TypeAlias = t.List[
-    t.Tuple[
-        t.Type[T],
-        t.Callable[
-            [TagScanner, T],
-            t.Optional[nodes.Node],
-        ],
-    ]
-]
 
 
-def parse_tags_to_template_ast(
-    tags: t.Sequence[tags.Tag],
-) -> nodes.TemplateBlock:
-    scanner = Scanner(tags)
-    body = take_tags_until(scanner)
+def parse_soup_into_nodes(soup: bs4.Tag) -> t.Sequence[nodes.Node]:
+    body = list(iterate_over_tag(soup))
+    body = squash_html_nodes(body)
     return body
 
 
-def next_tag(scanner: TagScanner) -> t.Optional[nodes.Node]:
-    tag = scanner.pop()
-    parse_rules: ParseRules = [
-        (tags.IfStartTag, take_if),
-        (tags.ForStartTag, take_for),
-        (tags.SlotStartTag, take_slot),
-        (tags.BlockStartTag, take_block),
-    ]
+def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
+    children = list(soup.children)
+    while len(children) > 0:
+        tag = children.pop(0)
 
-    for rule_tag, func in parse_rules:
-        if isinstance(tag, tags.PragmaTag):
-            return None
-        if isinstance(tag, nodes.SingleTagNode):
-            return tag
-        if isinstance(tag, rule_tag):
-            return func(scanner, tag)
+        if isinstance(tag, bs4.NavigableString):
+            yield from extract_exprs_from_text(tag.text)
+            continue
 
-    if isinstance(tag, tags.SlotEndTag):
-        raise ValueError("Slot not opened")
-    elif isinstance(tag, tags.BlockEndTag):
-        raise ValueError("Block not opened")
-    elif isinstance(tag, (tags.ElIfTag, tags.ElseTag, tags.IfEndTag)):
-        raise ValueError("If statement not openned")
-    elif isinstance(tag, tags.ForEndTag):
-        raise ValueError("For loop not opened")
-    else:
-        raise ValueError("Unknown Tag")
+        tag = t.cast(bs4.Tag, tag)
+        if tag.name == "script" and get_attr_optional(tag, "type") == "tempered/python":
+            code = dedent(tag.text)
+            yield nodes.CodeNode(body=ast_utils.parse(code))
+            continue
 
+        if not tag.name.startswith("t:"):
+            yield from get_opening_tag(tag)
+            yield from parse_soup_into_nodes(tag)
+            yield get_closing_tag(tag)
+            continue
 
-def take_tags_until(
-    scanner: TagScanner,
-    stop_tags: t.List[t.Type[tags.CompositeTag]] = [],
-) -> t.List[nodes.Node]:
-    tags = []
-    while scanner.has_tokens:
-        if scanner.is_next(*stop_tags):
-            break
+        name = tag.name.removeprefix("t:")
+        if name == "for":
+            target = ast_utils.create_expr(get_attr(tag, "for"))
+            iterable = ast_utils.create_expr(get_attr(tag, "in"))
+            body = parse_soup_into_nodes(tag)
+            yield nodes.ForNode(target=target, iterable=iterable, loop_block=body)
+        elif name == "if":
+            if_condition = ast_utils.create_expr(get_attr(tag, "condition"))
+            if_block = list(parse_soup_into_nodes(tag))
 
-        tag = next_tag(scanner)
-        if tag:
-            tags.append(tag)
+            elif_blocks = []
+            while True:
+                if len(children) <= 0:
+                    break
+                elif_block = children[0]
+                if not isinstance(elif_block, bs4.Tag):
+                    break
+                if elif_block.name != "t:elif":
+                    break
 
-    return tags
+                children.pop(0)
+                elif_condition = ast_utils.create_expr(
+                    get_attr(elif_block, "condition")
+                )
+                elif_block = list(parse_soup_into_nodes(elif_block))
+                elif_blocks.append((elif_condition, elif_block))
 
+            else_block = None
+            if len(children) > 0:
+                elseTag = children[0]
+                if isinstance(elseTag, bs4.Tag) and elseTag.name == "t:else":
+                    children.pop(0)
+                    else_block = list(parse_soup_into_nodes(elseTag))
 
-def take_if(scanner: TagScanner, tag: tags.IfStartTag) -> nodes.Node:
-    if_block: t.List[nodes.Node] = take_tags_until(
-        scanner, stop_tags=[tags.ElIfTag, tags.ElseTag, tags.IfEndTag]
-    )
+            yield nodes.IfNode(
+                condition=if_condition,
+                if_block=if_block,
+                elif_blocks=elif_blocks,
+                else_block=else_block,
+            )
+        elif name == "elif":
+            raise ParserException("t:elif must be used with t:if")
+        elif name == "else":
+            raise ParserException("t:else must be used with t:if")
+        elif name == "styles":
+            yield nodes.StyleNode()
+        elif name == "html":
+            value = get_attr(tag, "value")
+            yield nodes.RawExprNode(value=ast_utils.create_expr(value))
+        elif name == "block":
+            name = get_attr(tag, "name")
+            yield nodes.BlockNode(name=name, body=list(iterate_over_tag(tag)))
+        elif name == "slot":
+            name = get_attr_optional(tag, "name")
+            if name is None:
+                yield nodes.SlotNode(name=None, default=None)
+                continue
 
-    elif_blocks: t.List[t.Tuple[ast.expr, nodes.TemplateBlock]] = []
-    while scanner.is_next(tags.ElIfTag):
-        elif_token = scanner.expect(tags.ElIfTag)
-        block = take_tags_until(
-            scanner, stop_tags=[tags.ElIfTag, tags.ElseTag, tags.IfEndTag]
-        )
-        elif_blocks.append((elif_token.condition, block))
+            is_required = "required" in tag.attrs
+            if is_required:
+                default = None
+            else:
+                default = list(iterate_over_tag(tag))
 
-    if scanner.accept(tags.ElseTag):
-        else_block = take_tags_until(scanner, stop_tags=[tags.IfEndTag])
-    else:
-        else_block = None
+            yield nodes.SlotNode(name=name, default=default)
 
-    scanner.expect(tags.IfEndTag)
-    return nodes.IfNode(
-        condition=tag.condition,
-        if_block=if_block,
-        elif_blocks=elif_blocks,
-        else_block=else_block,
-    )
-
-
-def take_for(
-    scanner: TagScanner, tag: tags.ForStartTag
-) -> t.Union[nodes.Node, None]:
-    block = take_tags_until(scanner, stop_tags=[tags.ForEndTag])
-    scanner.expect(tags.ForEndTag)
-
-    return nodes.ForNode(
-        target=tag.target,
-        iterable=tag.iterable,
-        loop_block=block,
-    )
-
-
-def take_slot(
-    scanner: TagScanner, tag: tags.SlotStartTag
-) -> t.Union[nodes.Node, None]:
-    if tag.name is None:
-        return nodes.SlotNode(name=None, default=None)
-
-    if tag.is_required:
-        default_body = None
-    else:
-        default_body = take_tags_until(scanner=scanner, stop_tags=[tags.SlotEndTag])
-
-        scanner.expect(tags.SlotEndTag)
-
-    slot = nodes.SlotNode(
-        name=tag.name,
-        default=default_body,
-    )
-    return slot
+        else:
+            yield nodes.ComponentNode(
+                component_name=name,
+                keywords={
+                    key: ast_utils.create_expr(value)
+                    for key, value in tag.attrs.items()
+                },
+            )
 
 
-def take_block(
-    scanner: TagScanner, tag: tags.BlockStartTag
-) -> t.Union[nodes.Node, None]:
-    body = take_tags_until(scanner, stop_tags=[tags.BlockEndTag])
-    scanner.expect(tags.BlockEndTag)
+def squash_html_nodes(_nodes: t.List[nodes.Node]) -> t.List[nodes.Node]:
+    "Combined sequential HTML nodes"
+    new_nodes = []
 
-    return nodes.BlockNode(
-        name=tag.name,
-        body=body,
-    )
+    html = ""
+    for node in _nodes:
+        if isinstance(node, nodes.HtmlNode):
+            html += node.html
+        else:
+            if html:
+                html = html.strip()
+                new_nodes.append(nodes.HtmlNode(html))
+                html = ""
+
+            new_nodes.append(node)
+
+    if html:
+        html = html.strip()
+        new_nodes.append(nodes.HtmlNode(html))
+
+    return new_nodes
+
+
+def get_opening_tag(tag: bs4.Tag) -> t.Iterable[nodes.Node]:
+    yield nodes.HtmlNode(f"<{tag.name}")
+
+    for name, value in tag.attrs.items():
+        yield nodes.HtmlNode(f' {name}="')
+        if isinstance(value, list):
+            value = " ".join(value)
+
+        yield from extract_exprs_from_text(value)
+        yield nodes.HtmlNode('"')
+
+    yield nodes.HtmlNode(">")
+
+
+def get_closing_tag(tag: bs4.Tag) -> nodes.HtmlNode:
+    return nodes.HtmlNode(f"</{tag.name}>")
+
+
+def extract_exprs_from_text(text: str) -> t.Iterable[nodes.Node]:
+    EXPR_RE = re.compile(r"(?:{{)([\s\S]*?)(?:}})")
+
+    for i, x in enumerate(EXPR_RE.split(text)):
+        is_expr = i % 2 == 1  # Every odd value is an expression
+        if is_expr:
+            expr = str(x).strip()
+            yield nodes.ExprNode(ast_utils.create_expr(expr))
+        else:
+            yield nodes.HtmlNode(x)
+
+
+def get_attr(tag: bs4.Tag, name: str) -> str:
+    value = tag.attrs[name]
+    if isinstance(value, list):
+        value = " ".join(value)
+
+    return value
+
+
+def get_attr_optional(tag: bs4.Tag, name: str) -> t.Union[str, None]:
+    if name not in tag.attrs:
+        return None
+
+    value = tag.attrs[name]
+    if isinstance(value, list):
+        value = " ".join(value)
+
+    return value

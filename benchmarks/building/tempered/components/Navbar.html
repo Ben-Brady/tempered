@@ -1,3 +1,8 @@
+<script type="tempered/metadata">
+imports:
+    fade: bool
+</script>
+
 <nav>
     <div>
         <a class="icon" href="/">
@@ -10,17 +15,17 @@
             <img src="/static/Upload.svg" alt="Upload" />
         </a>
 
-        {% if account is None %}
-        <a class="icon" href="/account">
-            <img src="/static/Account.svg" alt="Account" />
-        </a>
-        {% else %}
-        <div class="icon">
-            {% component UserIcon(user=account) %}
-        </div>
-        {% endif %}
+        <t:if condition="account is None">
+            <a class="icon" href="/account">
+                <img src="/static/Account.svg" alt="Account" />
+            </a>
+        </t:if>
+        <t:else>
+            <div class="icon">
+                <t:UserIcon user="account" />
+            </div>
+        </t:else>
     </div>
-
 </nav>
 
 <style>

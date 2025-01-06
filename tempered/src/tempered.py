@@ -2,8 +2,8 @@ from __future__ import annotations
 import zlib
 from pathlib import Path
 import typing_extensions as t
-from .template.template import parse_template
 from . import module, types
+from .template.template import parse_template
 
 
 class TemperedBase:
@@ -60,8 +60,7 @@ class TemperedBase:
 
     def add_from_mapping(self, templates: t.Mapping[str, str]):
         template_objs = [
-            parse_template(name, html, file=None)
-            for name, html in templates.items()
+            parse_template(name, html, file=None) for name, html in templates.items()
         ]
         self._module.build_templates(template_objs)
         self._reconstruct_types()
@@ -72,7 +71,7 @@ class TemperedBase:
             return func(**context)
 
         string_hash = hex(zlib.crc32(html.encode()))[2:]
-        name = f"string_{string_hash}>"
+        name = f"string_<{string_hash}>"
         parsed_template = parse_template(name, html)
         self._module.build_templates([parsed_template])
         func = self._module.get_template_func(name)
@@ -176,10 +175,7 @@ class Tempered(TemperedBase):
         **Example**
         ```python
         tempered.add_string("title.html", \"""
-            {% param title: str %}
-            <h1>
-                {{ title }}
-            </h1>
+            <h1>{{ title }}</h1>
         \""")
         ```
 
@@ -197,7 +193,6 @@ class Tempered(TemperedBase):
         **Example**
         ```python
         tempered.add_template_from_string("title.html", \"""
-            {% param title: str %}
             <h1>
                 {{ title }}
             </h1>

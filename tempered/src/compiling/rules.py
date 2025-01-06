@@ -1,11 +1,11 @@
 from __future__ import annotations
 import ast
 import typing_extensions as t
-from ..utils import ast_utils
 from ..parsing.nodes import (
-    AssignmentNode, BlockNode, ComponentNode, ExprNode, ForNode, HtmlNode, IfNode,
-    ImportNode, Node, RawExprNode, SlotNode, StyleNode,
+    BlockNode, CodeNode, ComponentNode, ExprNode, ForNode, HtmlNode, IfNode, ImportNode,
+    Node, RawExprNode, SlotNode, StyleNode,
 )
+from ..utils import ast_utils
 from .calls import create_escape_call, slot_parameter, slot_variable_name
 from .constants import CSS_VARIABLE, KWARGS_VAR, NAME_LOOKUP_VAR, WITH_STYLES
 
@@ -29,11 +29,8 @@ def construct_raw_expr(ctx: BuildContext, tag: RawExprNode) -> RuleReturnType:
     yield ctx.add_expr(tag.value)
 
 
-def construct_assign(ctx: BuildContext, tag: AssignmentNode) -> RuleReturnType:
-    yield ast_utils.Assign(
-        target=tag.target,
-        value=tag.value,
-    )
+def construct_code(ctx: BuildContext, tag: CodeNode) -> RuleReturnType:
+    yield from tag.body
 
 
 def construct_import(ctx: BuildContext, tag: ImportNode) -> RuleReturnType:
@@ -51,17 +48,14 @@ def construct_if(ctx: BuildContext, tag: IfNode) -> RuleReturnType:
     ctx.ensure_output_assigned()
     EMPTY_BODY = [ast_utils.create_stmt("...", ast.Expr)]
 
-    # {% if %}
     if_body = ctx.create_block(tag.if_block) or EMPTY_BODY
 
-    # {% elif %}
     elif_blocks: t.List[t.Tuple[ast.expr, t.Sequence[ast.stmt]]] = []
     for condition, elif_block in tag.elif_blocks:
         elif_body = ctx.create_block(elif_block)
         if len(elif_body) != 0:
             elif_blocks.append((condition, elif_body))
 
-    # {% else %}
     if tag.else_block:
         else_body = ctx.create_block(tag.else_block) or EMPTY_BODY
     else:
@@ -164,7 +158,7 @@ default_rules: t.List[Rule] = [
     (ExprNode, construct_expr),
     (ComponentNode, construct_component),
     (RawExprNode, construct_raw_expr),
-    (AssignmentNode, construct_assign),
+    (CodeNode, construct_code),
     (ImportNode, construct_import),
     (IfNode, construct_if),
     (ForNode, construct_for),

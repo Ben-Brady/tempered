@@ -1,36 +1,41 @@
 import bs4
-from tempered.src.css.extract import extract_css_from_html
+from tempered.src.css.extract import extract_css_from_soup
 from tempered.src.css.postprocess import minify_css
+from tempered.src.utils.soup import HtmlSoup
 
 
 def test_preprocess_extracts_style_tags():
-    HTML = """
+    soup = HtmlSoup(
+        """
     <style global>
         body { background: black; }
     </style>
     <style>
-        div { color: red;}
+        div { color: red; }
     </style>
     """
-    html, css = extract_css_from_html(HTML)
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    )
+    extract_css_from_soup(soup)
     assert len(soup.find_all("style")) == 0
 
 
 def test_preprocess_extracts_global_css():
-    HTML = """
+    soup = HtmlSoup(
+        """
     <style global>
         body {
             background: black;
         }
     </style>
     """
-    html, css = extract_css_from_html(HTML)
+    )
+    css = extract_css_from_soup(soup)
     assert minify_css(css) == "body{background:black}"
 
 
 def test_preprocess_scopes_css():
-    HTML = """
+    soup = HtmlSoup(
+        """
     <div></div>
 
     <style>
@@ -39,8 +44,8 @@ def test_preprocess_scopes_css():
         }
     </style>
     """
-    html, css = extract_css_from_html(HTML)
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    )
+    css = extract_css_from_soup(soup)
     div = soup.find("div")
 
     assert div and isinstance(div, bs4.element.Tag), "div should exist"
@@ -49,7 +54,8 @@ def test_preprocess_scopes_css():
 
 
 def test_preprocess_doesnt_override_clases():
-    HTML = """
+    soup = HtmlSoup(
+        """
     <div class="test">
     </div>
 
@@ -57,8 +63,9 @@ def test_preprocess_doesnt_override_clases():
         div { background: black; }
     </style>
     """
-    html, css = extract_css_from_html(HTML)
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    )
+    extract_css_from_soup(soup)
+
     div = soup.find("div")
     assert div and isinstance(div, bs4.element.Tag), "div should exist"
     assert "class" in div.attrs, "div should have a scope class"

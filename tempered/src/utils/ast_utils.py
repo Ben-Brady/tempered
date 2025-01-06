@@ -1,5 +1,4 @@
 import ast
-import sys
 import textwrap
 import typing_extensions as t
 from typing_extensions import Iterable, Sequence

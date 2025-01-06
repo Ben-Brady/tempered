@@ -1,7 +1,7 @@
 import ast
 import typing_extensions as t
-from ..utils import ast_utils
 from ..parsing import LayoutTemplate, Template, TemplateParameter
+from ..utils import ast_utils
 from . import constants
 from .accumulators import Variable
 from .builder import BuildContext
@@ -103,6 +103,10 @@ def construct_body(ctx: BuildContext) -> t.Sequence[ast.stmt]:
     statements: t.List[ast.stmt] = []
     if ctx.is_layout or ctx.uses_layout:
         statements.extend(create_style_contant(ctx))
+
+    # TODO: This shoudn't use tag system, legacy from {% import %}
+    for tag in ctx.template.imports:
+        ctx.construct_tag(tag)
 
     for tag in ctx.template.body:
         ctx.construct_tag(tag)

@@ -1,12 +1,17 @@
-{% param comment %}
-{% param editting: bool = False %}
-
-{% import UserIcon from "components/UserIcon.html" %}
+<script type="tempered/metadata">
+parameters:
+    comment:
+    editting:
+        type: bool
+        default: False
+imports:
+    UserIcon: "components/UserIcon.html"
+</script>
 
 <div class="comment" hx-target="closest .comment" hx-swap="outerHTML">
     <div class="left">
         <div class="icon">
-            {% component UserIcon(user=comment.author) %}
+            <t:UserIcon user="comment.author" />
         </div>
     </div>
     <form class="body">
@@ -18,19 +23,21 @@
                 {{ format_time_since(comment.created_at) }}
             </small>
 
-            {% if comment.editted_at is not None %}
-            <small>
-                (Edited {{format_time_since(comment.editted_at)}})
-            </small>
-            {% endif %}
-            {% if editting %}
-            <img class="button" src="/static/Cancel.svg" alt="Delete" hx-post="/comment/edit/cancel/{{comment.id}}">
-            <img class="button" src="/static/Edit.svg" alt="Edit" hx-post="/comment/edit/submit/{{comment.id}}">
-            {% elif account and comment.author.id == account.id %}
-            <img class="button" src="/static/Edit.svg" alt="Edit" hx-post="/comment/edit/start/{{comment.id}}">
-            <img class="button" src="/static/Trash.svg" alt="Delete" hx-post="/comment/delete/{{comment.id}}">
-            {% endif %}
+            <t:if condition="comment.editted_at is not None">
+                <small>
+                    (Edited {{format_time_since(comment.editted_at)}})
+                </small>
+            </t:if>
 
+            <t:if condition="editting">
+                <img class="button" src="/static/Cancel.svg" alt="Delete" hx-post="/comment/edit/cancel/{{comment.id}}">
+                <img class="button" src="/static/Edit.svg" alt="Edit" hx-post="/comment/edit/submit/{{comment.id}}">
+            </t:if>
+            <t:elif condition="account and comment.author.id == account.id">
+                </t:if>
+                <img class="button" src="/static/Edit.svg" alt="Edit" hx-post="/comment/edit/start/{{comment.id}}">
+                <img class="button" src="/static/Trash.svg" alt="Delete" hx-post="/comment/delete/{{comment.id}}">
+            </t:elif>
         </div>
         <div class="seperator"></div>
         {% if editting %}
