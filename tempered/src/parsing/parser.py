@@ -98,12 +98,17 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
                 body=list(iterate_over_tag(tag))
             )
         elif name == "slot":
+            name = get_attr_optional(tag, "name")
+            if name is None:
+                yield nodes.SlotNode(name=None, default=None)
+                return
+
             is_required = "required" in tag.attrs
             if is_required:
-                yield nodes.SlotNode(name=None, default=None)
+                default = None
+            else:
+                default = list(iterate_over_tag(tag))
 
-            name = get_attr_optional(tag, "name")
-            default = list(iterate_over_tag(tag))
             yield nodes.SlotNode(name=name, default=default)
 
         else:
