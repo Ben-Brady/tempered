@@ -20,7 +20,7 @@ imports:
         </div>
         <div id="info">
             <t:if condition="isMyAccount">
-                <c:UsernameEdit user="user" />
+                <T:UsernameEdit user="user" />
             </t:if>
             <t:else>
                 <h3>
@@ -50,7 +50,7 @@ imports:
         <t:else>
             <div id="videos">
                 <t:for target="video" in="user.videos">
-                    <c:Thumbnail video="video" />
+                    <T:Thumbnail video="video" />
                 </t:for>
             </div>
             </telse>
