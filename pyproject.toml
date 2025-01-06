@@ -12,11 +12,9 @@ dependencies = [
     "tinycss2~=1.2.1",
     "rcssmin!=1.1.2",
     "strictyaml==1.7.3",
-    "typing_extensions",
-    "markupsafe; python_version <= '3.9'",
-    "astor; python_version <= '3.8'",
+    "typing_extensions"
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 
 [project.optional-dependencies]
 all = ["libsass", "lxml"]
