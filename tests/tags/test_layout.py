@@ -26,7 +26,7 @@ def test_layout_migrates_css():
 
     func = build_templates(
         f"""
-        <script type"tempered/metadata">
+        <script type="tempered/metadata">
         layout: layout.html
         </script>
 

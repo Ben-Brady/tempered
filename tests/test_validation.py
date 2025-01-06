@@ -34,15 +34,15 @@ def test_checks_detect_invalid_blocks():
     with pytest.raises(tempered.InvalidTemplateException):
         build_templates(
             """
-            <script type"tempered/metadata">
-            layout: layout
+            <script type="tempered/metadata">
+            layout: layout.html
             </script>
 
             <t:block name="nonexist">
                 This is invalid
             </block>
             """,
-            ("layout", "<t:slot name='exists'></t:slot>"),
+            ("layout.html", "<t:slot name='exists'></t:slot>"),
         )
 
 
@@ -50,7 +50,7 @@ def test_checks_detect_missing_blocks():
     with pytest.raises(tempered.InvalidTemplateException):
         build_templates(
             """
-            <script type"tempered/metadata">
+            <script type="tempered/metadata">
             layout: layout
             </script>
 
