@@ -47,7 +47,7 @@ def _():
 def _():
     component = build_template(
         """
-        <t:for for="x" in="range(5)"/>
+        <t:for for="x" in="range(5)"></t:for>
     """
     )
     component()

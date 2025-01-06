@@ -11,7 +11,7 @@ def test_importing_components():
             Foo: foo
         </script>
 
-        <t:Foo />
+        <t:Foo></t:Foo>
     """,
         ("foo", """Hello World"""),
     )
@@ -27,7 +27,7 @@ def test_importing_components_with_non_ident_names():
             Foo: components/foo.html
         </script>
 
-        <t:Foo />
+        <t:Foo></t:Foo>
     """,
         ("components/foo.html", """Hello World"""),
     )
@@ -45,7 +45,7 @@ def test_raise_error_on_invalid_import():
                 Foo: components/foo.html
             </script>
 
-            <t:Foo />
+            <t:Foo></t:Foo>
         """,
             ("bar", "Hello World"),
         )

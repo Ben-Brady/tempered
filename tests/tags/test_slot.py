@@ -12,7 +12,7 @@ def test_default_slot():
         """,
         (
             "layout",
-            "<title>A<t:slot />C</title>",
+            "<title>A<t:slot></t:slot>C</title>",
         ),
     )
     html = component()
@@ -35,7 +35,7 @@ def test_single_named_slot():
         (
             "layout",
             """
-        <title><t:slot name='title'/></title>
+        <title><t:slot name='title'></t:slot></title>
     """,
         ),
     )
@@ -57,7 +57,7 @@ def test_single_named_required_slot():
         (
             "layout",
             """
-        <title><t:slot name='title' required /></title>
+        <title><t:slot name='title' required></t:slot></title>
     """,
         ),
     )

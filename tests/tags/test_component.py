@@ -39,7 +39,7 @@ def _():
         A: a
     </script>
 
-    <t:A/>
+    <t:A></t:A>
     """
     A_TEMPLATE = """
     <script type="tempered/metadata">
@@ -47,7 +47,7 @@ def _():
         B: b
     </script>
 
-    <t:B/>
+    <t:B></t:B>
     """
     B_TEMPLATE = """
     <script type="tempered/metadata">
@@ -55,7 +55,7 @@ def _():
         C: c
     </script>
 
-    <t:C/>
+    <t:C></t:C>
     """
     C_TEMPLATE = """
     <script type="tempered/metadata">
@@ -63,7 +63,7 @@ def _():
         D: d
     </script>
 
-    <t:D/>
+    <t:D></t:D>
     """
     D_TEMPLATE = f"<style>a {{ color: {CSS_KEY}; }}</style>"
 
@@ -87,7 +87,7 @@ def _():
             Computed: computed
         </script>
 
-        <t:Computed foo="'bar'" />
+        <t:Computed foo="'bar'"></t:Computed>
         """,
         ("computed", "{{foo}}{{foo}}"),
     )
@@ -115,7 +115,7 @@ def _():
             Computed: computed.html
         </script>
 
-        <t:Computed />
+        <t:Computed></t:Computed>
     ''', bar="bar")
     assert "barbar" in html, html
 
@@ -129,7 +129,7 @@ def _():
             Computed: computed.html
         </script>
 
-        <t:Computed bar="'bar'"/>
+        <t:Computed bar="'bar'"></t:Computed>
         """,
         (
             "computed.html",
@@ -152,4 +152,4 @@ def _():
 @test("Raised invalid template on unimported component")
 def _():
     with pytest.raises(InvalidTemplateException):
-        build_templates("""<t:Computed bar="'bar'"/>""")
+        build_templates("""<t:Computed bar="'bar'"></t:Computed>""")

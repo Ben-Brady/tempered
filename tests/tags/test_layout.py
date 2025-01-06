@@ -11,7 +11,7 @@ def test_layout_extend_with_default_slot():
 
         Test
         """,
-        ("layout.html", "<div><t:slot/></div>"),
+        ("layout.html", "<div><t:slot></t:slot></div>"),
     )
 
     html = func()
@@ -35,7 +35,7 @@ def test_layout_migrates_css():
         a {{ content: '{CSS_KEY}'; }}
         </style>
         """,
-        ("layout.html", "<t:styles/> <t:slot/>"),
+        ("layout.html", "<t:styles></t:styles> <t:slot></t:slot>"),
     )
     html = func()
     soup = bs4.BeautifulSoup(html, "html.parser")
@@ -124,8 +124,8 @@ def test_layout_styles_are_combined():
         </style>
     """
     layout = f"""
-        <t:styles />
-        <t:slot />
+        <t:styles></t:styles>
+        <t:slot></t:slot>
         <style>
             a {{ content: '{CSS_LAYOUT}'; }}
         </style>
