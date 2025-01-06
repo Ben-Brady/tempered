@@ -135,5 +135,4 @@ def _():
     """)
     html = component()
 
-    # TODO: This assert is flakey
-    assert html.count("0  1  2  3  4") == 2, html
+    assert html.count("01234") == 2, html
