@@ -37,6 +37,8 @@ def check_for_missing_blocks(template: Template, lookup: t.Dict[str, Template]):
 
     layout = t.cast(LayoutTemplate, lookup[template.layout])
     for slot in layout.slots:
+        if slot.name == None: continue
+
         slot_used = slot.name in template.blocks
         if slot.is_required and not slot_used:
             raise InvalidTemplateException.create(
