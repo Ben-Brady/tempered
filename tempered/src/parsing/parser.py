@@ -101,7 +101,7 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
             name = get_attr_optional(tag, "name")
             if name is None:
                 yield nodes.SlotNode(name=None, default=None)
-                return
+                continue
 
             is_required = "required" in tag.attrs
             if is_required:

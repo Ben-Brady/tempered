@@ -1,6 +1,6 @@
 import bs4
+import pytest
 from tests import build_templates
-
 
 def test_default_slot():
     component = build_templates(
@@ -18,7 +18,10 @@ def test_default_slot():
     html = component()
     soup = bs4.BeautifulSoup(html, features="html.parser")
     tag = soup.find("title")
-    assert tag and "ABC" in tag.text
+    assert tag
+    assert "A" in tag.text
+    assert "B" in tag.text
+    assert "C" in tag.text
 
 
 def test_single_named_slot():
