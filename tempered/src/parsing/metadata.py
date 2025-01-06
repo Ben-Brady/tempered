@@ -70,17 +70,3 @@ def parse_metadata_yaml(text: str) -> Metadata:
         style_includes=data.get("style_includes", []),
         layout=data.get("layout", None),
     )
-
-
-# <script type="tempered/metadata">
-# layout: layout.html
-# parameters:
-#     foo: str
-#     bar: str
-# imports:
-#     Foo: foo.html
-#     Bar: bar.html
-# style_includes:
-#     - foo.html
-#     - bar.html
-# </script>
