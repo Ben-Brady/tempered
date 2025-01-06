@@ -99,17 +99,13 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
             )
         elif name == "slot":
             is_required = "required" in tag.attrs
-            name = get_attr_optional(tag, "name")
-
             if is_required:
-                default = None
-            else:
-                default = list(iterate_over_tag(tag))
+                yield nodes.SlotNode(name=None, default=None)
 
-            yield nodes.SlotNode(
-                name=name,
-                default=default
-            )
+            name = get_attr_optional(tag, "name")
+            default = list(iterate_over_tag(tag))
+            yield nodes.SlotNode(name=name, default=default)
+
         else:
             yield nodes.ComponentNode(
                 component_name=name,
@@ -130,12 +126,14 @@ def squash_html_nodes(_nodes: t.List[nodes.Node]) -> t.List[nodes.Node]:
             html += node.html
         else:
             if html:
+                html = html.strip()
                 new_nodes.append(nodes.HtmlNode(html))
                 html = ""
 
             new_nodes.append(node)
 
     if html:
+        html = html.strip()
         new_nodes.append(nodes.HtmlNode(html))
 
     return new_nodes
