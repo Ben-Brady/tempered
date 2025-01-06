@@ -10,7 +10,7 @@ imports:
 
 <t:for target="video" in="videos">
     <t:Thumbnail video="video" />
-</T:for>
+</t:for>
 
 <div hx-trigger="intersect once" hx-get="/videos/scroll/{{page + 1}}" hx-swap="outerHTML" hx-target="this">
     <t:LoadingIcon fade="True" />

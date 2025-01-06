@@ -7,7 +7,7 @@ imports:
     Thumbnail: "components/Thumbnail.html"
 </script>
 
-<t:block name="title">@{{user.username}}</T:block>
+<t:block name="title">@{{user.username}}</t:block>
 
 <script type="tempered/python">
     isMyAccount = account and user.id == account.id
@@ -26,7 +26,7 @@ imports:
                 <h3>
                     {{user.username}}
                 </h3>
-            </T:else>
+            </t:else>
 
             <t:if condition="isMyAccount">
                 <div id="account-buttons">
@@ -51,7 +51,7 @@ imports:
             <div id="videos">
                 <t:for target="video" in="user.videos">
                     <c:Thumbnail video="video" />
-                </T:for>
+                </t:for>
             </div>
             </telse>
     </div>

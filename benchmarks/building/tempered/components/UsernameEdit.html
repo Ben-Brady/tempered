@@ -15,16 +15,16 @@ parameters:
             <img src="/static/Edit.svg" alt="Edit" hx-post="/username/edit" hx-target="#username-edit"
                 hx-swap="outerHTML" />
         </div>
-    </tc    :if>
-    <t:else>
-        <form hx-swap="outerHTML" hx-target="#username-edit">
-            <input type="hidden" name="user_id" value="{{user.id}}" />
-            <input type="text" name="username" placeholder="Username" value="{{user.username}}" />
-            <img src="/static/Save.svg" alt="Save" id="save-button" hx-post="/username/save" />
-            <img src="/static/Cancel.svg" alt="Cancel" hx-post="/username/cancel" />
-        </form>
-    </T:else>
-    <div id="username-error"></div>
+        </tc :if>
+        <t:else>
+            <form hx-swap="outerHTML" hx-target="#username-edit">
+                <input type="hidden" name="user_id" value="{{user.id}}" />
+                <input type="text" name="username" placeholder="Username" value="{{user.username}}" />
+                <img src="/static/Save.svg" alt="Save" id="save-button" hx-post="/username/save" />
+                <img src="/static/Cancel.svg" alt="Cancel" hx-post="/username/cancel" />
+            </form>
+        </t:else>
+        <div id="username-error"></div>
 </div>
 
 <style>
