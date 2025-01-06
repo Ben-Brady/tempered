@@ -15,7 +15,7 @@ warnings.simplefilter("ignore", MarkupResemblesLocatorWarning)
 class CssOptions:
     is_global: bool
     scope_id: str
-    lang: t.Union[str, None]
+    lang: t.Optional[str]
 
 
 def extract_css_from_soup(soup: bs4.BeautifulSoup, prefix: t.Union[str, None] = None) -> str:
@@ -58,7 +58,7 @@ def transform_styles(css: str, options: CssOptions) -> str:
     return css
 
 
-def get_bs4_attr(tag: bs4.Tag, attr: str) -> t.Union[str, None]:
+def get_bs4_attr(tag: bs4.Tag, attr: str) -> t.Optional[str]:
     value = tag.get(attr, None)
     if isinstance(value, list):
         value = value[0]
