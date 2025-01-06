@@ -53,16 +53,17 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
             condition = ast_utils.create_expr(get_attr(tag, "condition"))
             if_block = list(parse_soup_into_nodes(tag))
 
+
             elif_blocks = []
             while True:
                 if len(children) <= 0: break
-                elifBlock = children[0]
-                if not isinstance(elifBlock, bs4.Tag): break
-                if elifBlock.name != "t:elif": break
+                elif_block = children[0]
+                if not isinstance(elif_block, bs4.Tag): break
+                if elif_block.name != "t:elif": break
 
                 children.pop(0)
-                condition = ast_utils.create_expr(get_attr(elifBlock, "condition"))
-                elif_block = list(parse_soup_into_nodes(elifBlock))
+                condition = ast_utils.create_expr(get_attr(elif_block, "condition"))
+                elif_block = list(parse_soup_into_nodes(elif_block))
                 elif_blocks.append((condition, elif_block))
 
 
@@ -76,6 +77,7 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
             yield nodes.IfNode(
                 condition=condition,
                 if_block=if_block,
+                elif_blocks=elif_blocks,
                 else_block=else_block
             )
         elif name == "elif":
