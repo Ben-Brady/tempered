@@ -24,7 +24,6 @@ def _recursively_calculate_dependencies(
         required_names.append(template.layout)
 
     for name in list(required_names):
-        print(lookup)
         child = lookup[name]
         child_children = _recursively_calculate_dependencies(child, lookup, cache)
         components_used.update(child_children)
