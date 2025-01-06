@@ -6,11 +6,6 @@ from ..errors import ParserException
 from ..utils import ast_utils
 from . import nodes
 
-IF_TAG = "t:if"
-ELSE_TAG = "t:else"
-FOR_TAG = "t:for"
-STYLES_TAG = "t:styles"
-
 
 def parse_soup_into_nodes(soup: bs4.Tag) -> t.Sequence[nodes.Node]:
     body = list(iterate_over_tag(soup))
