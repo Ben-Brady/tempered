@@ -1,4 +1,0 @@
-django
-jinja2
-tempered[sass]
-matplotlib
