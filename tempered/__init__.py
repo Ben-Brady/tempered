@@ -1,5 +1,5 @@
 "Generate native python functions from HTML templates"
-__version__ = "0.11.0"
+__version__ = "0.11.1"
 from .src.errors import BuildException as BuildException
 from .src.errors import InvalidTemplateException as InvalidTemplateException
 from .src.errors import ParserException as ParserException
