@@ -48,7 +48,13 @@ def iterate_over_tag(soup: bs4.Tag) -> t.Iterable[nodes.Node]:
             while True:
                 if len(children) <= 0:
                     break
+
                 elif_block = children[0]
+                if isinstance(elif_block, bs4.NavigableString) and elif_block.isspace():
+                    if len(children) > 1:
+                        children.pop(0)
+                        elif_block = children[0]
+
                 if not isinstance(elif_block, bs4.Tag):
                     break
                 if elif_block.name != "t:elif":
