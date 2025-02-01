@@ -1,16 +1,18 @@
 ::: tempered.Tempered
     options:
         members:
+            - template_files
             - add_from_file
             - add_from_folder
             - add_from_string
-            - add_from_mapping
-            - render_template
+            - add_from_dict
+            - render
             - render_string
             - add_global
-            - template_files
+
+## Exceptions
 
 ::: tempered.InvalidTemplateException
 ::: tempered.ParserException
 ::: tempered.BuildException
-::: tempered.ParsingWarning
+::: tempered.BuildWarning

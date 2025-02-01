@@ -58,7 +58,7 @@ class TemperedBase:
         self._module.build_templates([template])
         self._reconstruct_types()
 
-    def add_from_mapping(self, templates: t.Mapping[str, str]):
+    def add_from_dict(self, templates: t.Mapping[str, str]):
         template_objs = [
             parse_template(name, html, file=None) for name, html in templates.items()
         ]
@@ -101,7 +101,7 @@ class Tempered(TemperedBase):
     """
     A readonly list of the any files used in templates.
 
-    This is useful for watchdog and code refreshing tools.
+    This can be used to let frameworks (like flask) reload when the templates files change
 
     **Example in Flask**
 
@@ -111,7 +111,8 @@ class Tempered(TemperedBase):
     if __name__ == "__main__":
         app.run(
             extra_files=tempered.template_files,
-            # Flask now reloads when a template changes
+            # Flask now knows that when a template file updates
+            # It should refresh the page
         )
     ```
     """
@@ -156,7 +157,7 @@ class Tempered(TemperedBase):
         Removes the folder prefix from all template names
 
         Args:
-            folder: Imports all files form this folder recursively, the name of the templatse are the filepath without the folder suffix
+            folder: Imports all files form this folder recursively, the name of the each template is the filepath without the folder suffix
 
         **Example**
         ```python
@@ -183,10 +184,13 @@ class Tempered(TemperedBase):
         """
         TemperedBase.add_from_string(self, name, html)
 
-    def add_from_mapping(self, templates: t.Mapping[str, str]):
-        """Add mult
+    def add_from_dict(self, templates: t.Mapping[str, str]):
+        """
+        Create multiple templates from a dictionary or mapping.
 
-        Useful for adding templates that depend on each other
+        Useful for adding templates that depend on each other.
+
+        This is the recommended way to create multiple templates, as it allows the templates to only be built once.
 
         Args:
             templates: A dictionary of template names and their content
@@ -199,7 +203,7 @@ class Tempered(TemperedBase):
             </h1>
         \""")
         """
-        TemperedBase.add_from_mapping(self, templates)
+        TemperedBase.add_from_dict(self, templates)
 
     def render(self, name: str, **context: t.Any) -> str:
         """Renders a template using the given parameters

@@ -8,13 +8,24 @@ class BuildException(Exception):
     pass
 
 
-class ParsingWarning(Warning):
+class BuildWarning(Warning):
+    """
+    This is raised when a template has a non-failing error in it.
+
+    This should be fixed, as functionality from the template will not work, but it will still render something.
+    """
     pass
 
 
 class InvalidTemplateException(BuildException):
+    """
+    A template is in valid due to a logic error.
+
+    This most commonly caused by a failed imports or reference
+    """
+
     @classmethod
-    def create(
+    def _create(
         cls,
         msg: str,
         name: str,
@@ -27,10 +38,13 @@ class InvalidTemplateException(BuildException):
 
 
 class ParserException(BuildException):
-    error_info: t.Optional[ErrorInfo] = None
+    """
+    A template failed be parsed due a syntax error
+    """
+    _error_info: t.Optional[ErrorInfo] = None
 
     @classmethod
-    def create(
+    def _create(
         cls,
         msg: str,
         file: t.Union[Path, None],
@@ -41,7 +55,7 @@ class ParserException(BuildException):
         return cls(msg)
 
     @classmethod
-    def create_from_parser(
+    def _create_from_parser(
         cls,
         msg: str,
         source: str,
@@ -67,7 +81,7 @@ class ParserException(BuildException):
         )
 
         err = cls(msg)
-        err.error_info = err_info
+        err._error_info = err_info
         return err
 
 

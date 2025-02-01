@@ -10,14 +10,16 @@ repo_url: https://github.com/Ben-Brady/tempered
 nav:
     - Home: index.md
     - Quickstart:
-        - intro.md
-        - flask.md
+        - quickstart/intro.md
+        - quickstart/flask.md
     - Documentation:
         - Tempered: documentation/tempered.md
         - Globals: documentation/globals.md
         - Components: documentation/components.md
         - Layout: documentation/layout.md
         - Parameters: documentation/parameters.md
+        - Includes: documentation/includes.md
+        - Styles: documentation/styles.md
         - Configuration: documentation/configuration.md
         - Tags:
             - "{{ expr }}": tags/expr.md

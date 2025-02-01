@@ -13,7 +13,7 @@ def transform_sass(css: str, lang: t.Literal["sass", "scss"]) -> str:
     if sass is None:
         warnings.warn(
             message='sass support not installed, run "pip install tempered[sass]"',
-            category=errors.ParsingWarning,
+            category=errors.BuildWarning,
         )
         return ""
 

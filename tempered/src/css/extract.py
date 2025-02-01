@@ -41,7 +41,7 @@ def extract_css_from_soup(
         except Exception:
             warnings.warn(
                 message="Failed to parse CSS",
-                category=errors.ParsingWarning,
+                category=errors.BuildWarning,
             )
 
         tag.decompose()
