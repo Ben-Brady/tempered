@@ -1,4 +1,4 @@
-site_url: https://ben-brady.github.io/tempered/
+site_url: https://tempered.nnilky.site
 docs_dir: docs
 
 site_name: Tempered
@@ -8,73 +8,88 @@ repo_name: Tempered
 repo_url: https://github.com/Ben-Brady/tempered
 
 nav:
-- Introduction:
-  - Home: index.md
-  - Quickstart: introduction/quickstart.md
-- Documentation:
-  - Templating: documentation/templating.md
-  - Reference: documentation/reference.md
-  - Configuration: documentation/configuration.md
+    - Home: index.md
+    - Quickstart:
+        - intro.md
+        - flask.md
+    - Documentation:
+        - Tempered: documentation/tempered.md
+        - Globals: documentation/globals.md
+        - Components: documentation/components.md
+        - Layout: documentation/layout.md
+        - Parameters: documentation/parameters.md
+        - Configuration: documentation/configuration.md
+        - Tags:
+            - "{{ expr }}": tags/expr.md
+            - "t:if": tags/if.md
+            - "t:for": tags/for.md
+            - "t:styles": tags/styles.md
+            - "t:html": tags/html.md
+            - "t:block": tags/block.md
+            - "t:slot": tags/slot.md
+            - "t:Component": tags/component.md
+            - script/metadata: tags/metadata.md
+            - script/python: tags/python.md
+    - Reference: reference.md
 
 theme:
-  name: material
-  favicon: assets/logo-monochrome.svg
-  logo: assets/logo.svg
-  features:
-    - content.code.copy # Add the copy to clipboard button to code blocks
-    - search # Add the search bar
-    - search.suggest # Add suggestions to search
-    - navigation.top
-    - navigation.tabs # Page tabs at the top
-    - navigation.instant # Preload pages
-    - navigation.tracking # Add anchor tag to url
-  extra:
-    social:
-      - icon: fontawesome/brands/github
-        link: https://github.com/Ben-Brady/tempered
-  palette:
-  - media: '(prefers-color-scheme: light)'
-    scheme: default
-    primary: blue grey
-    accent: amber
-    toggle:
-      icon: material/lightbulb
-      name: Switch to dark mode
-  - media: '(prefers-color-scheme: dark)'
-    scheme: slate
-    primary: blue grey
-    accent: amber
-    toggle:
-      icon: material/lightbulb-outline
-      name: Switch to light mode
-
+    name: material
+    favicon: assets/logo-monochrome.svg
+    logo: assets/logo.svg
+    features:
+        - content.code.copy # Add the copy to clipboard button to code blocks
+        - search # Add the search bar
+        - search.suggest # Add suggestions to search
+        - navigation.top
+        - navigation.tabs # Page tabs at the top
+        - navigation.instant # Preload pages
+        - navigation.tracking # Add anchor tag to url
+    extra:
+        social:
+            - icon: fontawesome/brands/github
+              link: https://github.com/Ben-Brady/tempered
+    palette:
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          primary: blue grey
+          accent: amber
+          toggle:
+              icon: material/lightbulb
+              name: Switch to dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          primary: blue grey
+          accent: amber
+          toggle:
+              icon: material/lightbulb-outline
+              name: Switch to light mode
 
 plugins:
-  search: # Add the search bar
-  offline:
-  mkdocstrings:
-    handlers:
-      python:
-        options:
-          show_root_heading: true
-          show_if_no_docstring: true
-          inherited_members: true
-          members_order: source
-          separate_signature: true
-          unwrap_annotated: true
-          filters:
-            - '!^_'
-          merge_init_into_class: true
-          docstring_section_style: spacy
-          signature_crossrefs: true
-          show_symbol_type_heading: true
-          show_symbol_type_toc: true
+    search: # Add the search bar
+    offline:
+    mkdocstrings:
+        handlers:
+            python:
+                options:
+                    show_root_heading: true
+                    show_if_no_docstring: true
+                    inherited_members: true
+                    members_order: source
+                    separate_signature: true
+                    unwrap_annotated: true
+                    filters:
+                        - "!^_"
+                    merge_init_into_class: true
+                    docstring_section_style: spacy
+                    signature_crossrefs: true
+                    show_symbol_type_heading: true
+                    show_symbol_type_toc: true
 
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.superfences
+    - pymdownx.highlight:
+          anchor_linenums: true
+          line_spans: __span
+          pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences

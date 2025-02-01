@@ -1,5 +1,3 @@
-# `Tempered` class
-
 ::: tempered.Tempered
     options:
         members:
@@ -11,3 +9,8 @@
             - render_string
             - add_global
             - template_files
+
+::: tempered.InvalidTemplateException
+::: tempered.ParserException
+::: tempered.BuildException
+::: tempered.ParsingWarning

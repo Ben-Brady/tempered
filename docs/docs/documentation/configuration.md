@@ -9,9 +9,3 @@ However, this may not play well with some IDEs. Additionally, it increases build
 ```python
 Tempered(generate_types=False)
 ```
-
-## Performance
-
-If you want to increase build performance: install `lxml`.
-
-This allows the HTML to parsed much faster and increases build times by 10-30%. However it is not available on all platforms, so you. If `lxml` installed, Tempered will use it by default.

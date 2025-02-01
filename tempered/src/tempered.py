@@ -126,7 +126,8 @@ class Tempered(TemperedBase):
         """
         Args:
             template_folder: The folder to import templates from, searches recursively
-            generate_types: Should type declarations be created for templates? This improves developer experience, however requires IO and can be disabled in production for a small build-time performance boost.
+            generate_types: Should type declarations be created for templates?
+                This improves developer experience, however requires IO and can be disabled in production for a small build-time performance boost.
         """
         TemperedBase.__init__(
             self,
