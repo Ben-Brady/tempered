@@ -50,8 +50,9 @@ Tempered is templating library designed around HTML and type safety.
 
 ## Lightning Fast
 
-- Templates are optimised and compiled into Python leading to microsecond long render times.
-- 5x faster than Jinja, 50x faster the django
+- Templates are optimised and compiled into Python leading to microsecond render times
+- Renders templates 5x faster than Jinja, 50x faster than django
+- No increase in compile time
 
 <a href="https://github.com/Ben-Brady/tempered/tree/main/benchmarks">
 <picture align="center">
